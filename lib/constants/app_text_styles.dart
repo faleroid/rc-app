@@ -17,6 +17,12 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
   );
 
+  static const TextStyle title = TextStyle(
+    color: AppColors.textPrimary,
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+  );
+
   // === AppBar ===
   static const TextStyle appBarTitle = TextStyle(
     color: AppColors.textPrimary,
@@ -41,11 +47,7 @@ class AppTextStyles {
     fontWeight: FontWeight.bold,
     fontSize: 13,
     shadows: [
-      Shadow(
-        blurRadius: 4.0,
-        color: Colors.black54,
-        offset: Offset(1.0, 1.0),
-      ),
+      Shadow(blurRadius: 4.0, color: Colors.black54, offset: Offset(1.0, 1.0)),
     ],
   );
 
@@ -56,16 +58,10 @@ class AppTextStyles {
   );
 
   // === Button ===
-  static const TextStyle buttonBold = TextStyle(
-    fontWeight: FontWeight.bold,
-  );
+  static const TextStyle buttonBold = TextStyle(fontWeight: FontWeight.bold);
 
   // === Tab ===
-  static const TextStyle tabActive = TextStyle(
-    fontWeight: FontWeight.bold,
-  );
+  static const TextStyle tabActive = TextStyle(fontWeight: FontWeight.bold);
 
-  static const TextStyle tabInactive = TextStyle(
-    fontWeight: FontWeight.normal,
-  );
+  static const TextStyle tabInactive = TextStyle(fontWeight: FontWeight.normal);
 }

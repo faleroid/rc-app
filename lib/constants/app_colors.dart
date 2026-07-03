@@ -5,7 +5,7 @@ class AppColors {
 
   // Colors
   static const Color primary = Colors.red;
-  static const Color background = Colors.black12;
+  static const Color background = Color(0xFF1A1A1A);
   static const Color cardDark = Color.fromARGB(255, 30, 30, 30);
 
   // Text
@@ -13,7 +13,7 @@ class AppColors {
   static const Color textSecondary = Colors.grey;
 
   // Border
-  static const Color borderColor = Colors.grey;
+  static const Color borderColor = Color.fromARGB(255, 70, 70, 70);
   static const double borderWidth = 0.5;
 
   // Tab Bar

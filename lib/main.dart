@@ -4,6 +4,9 @@ import 'constants/app_text_styles.dart';
 import 'theme/app_theme.dart';
 import 'data/dummy_data.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'service/token_service.dart';
+import 'repositories/auth_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,13 +20,57 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const MainScreen(),
+      home: const SplashScreen(),
+    );
+  }
+}
+
+/// SplashScreen: cek token untuk auto-login
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() async {
+    final tokenService = TokenService();
+    final token = await tokenService.getToken();
+
+    if (!mounted) return;
+
+    if (token != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const MainScreen(isLoggedIn: true),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final bool isLoggedIn;
+
+  const MainScreen({super.key, this.isLoggedIn = false});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -117,30 +164,66 @@ class _MainScreenState extends State<MainScreen> {
               horizontal: 16.0,
               vertical: 8.0,
             ),
-            child: TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 0,
-                ),
-              ),
-              onPressed: () {
-                print('Login tapped');
-              },
-              child: const Text('Login', style: AppTextStyles.buttonBold),
-            ),
+            child: widget.isLoggedIn
+                ? TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey[900],
+                      foregroundColor: AppColors.textPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 0,
+                      ),
+                    ),
+                    onPressed: () async {
+                      final authRepository = AuthRepository();
+                      await authRepository.logout();
+
+                      if (!mounted) return;
+
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const MainScreen(isLoggedIn: false),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: const Text(
+                      'Logout',
+                      style: AppTextStyles.buttonBold,
+                    ),
+                  )
+                : TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 0,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Login', style: AppTextStyles.buttonBold),
+                  ),
           ),
         ],
       ),
       body: _buildBody(),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF1A1A1A),
+          color: AppColors.background,
           border: Border(
             top: BorderSide(
               color: AppColors.borderColor,
