@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         if (!context.mounted) return;
 
-                        context.go('/main', extra: false);
+                        context.go('/main', extra: {'isLoggedIn': false});
                       },
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,

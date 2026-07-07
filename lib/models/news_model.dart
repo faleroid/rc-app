@@ -14,6 +14,7 @@ class NewsArticleModel {
   final String title;
   final String slug;
   final String excerpt;
+  final String? content;
   final String thumbnail;
   final DateTime createdAt;
   final CreatorModel? creator;
@@ -23,6 +24,7 @@ class NewsArticleModel {
     required this.title,
     required this.slug,
     required this.excerpt,
+    this.content,
     required this.thumbnail,
     required this.createdAt,
     this.creator,
@@ -34,6 +36,7 @@ class NewsArticleModel {
       title: json['title'] ?? '',
       slug: json['slug'] ?? '',
       excerpt: json['excerpt'] ?? '',
+      content: json['content'],
       thumbnail: json['thumbnail'] ?? '',
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -67,6 +70,23 @@ class NewsPaginatedResponse {
       articles: listData.map((e) => NewsArticleModel.fromJson(e)).toList(),
       currentPage: dataObject['current_page'] ?? 1,
       nextPageUrl: dataObject['next_page_url'],
+    );
+  }
+}
+
+class NewsDetailResponse {
+  final bool success;
+  final NewsArticleModel data;
+
+  NewsDetailResponse({
+    required this.success,
+    required this.data,
+  });
+
+  factory NewsDetailResponse.fromJson(Map<String, dynamic> json) {
+    return NewsDetailResponse(
+      success: json['success'] ?? false,
+      data: NewsArticleModel.fromJson(json['data'] ?? {}),
     );
   }
 }

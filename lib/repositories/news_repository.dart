@@ -29,4 +29,20 @@ class NewsRepository {
       );
     }
   }
+
+  Future<NewsDetailResponse> fetchNewsDetail(String slug) async {
+    try {
+      final response = await _apiService.dio.get('/news/$slug');
+
+      if (response.statusCode == 200) {
+        return NewsDetailResponse.fromJson(response.data);
+      } else {
+        throw Exception('Gagal memuat detail berita');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Terjadi kesalahan jaringan',
+      );
+    }
+  }
 }

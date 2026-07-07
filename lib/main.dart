@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (token != null) {
-      context.go('/main', extra: true);
+      context.go('/main', extra: {'isLoggedIn': true});
     } else {
       context.go('/login');
     }
@@ -65,8 +65,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
 class MainScreen extends StatefulWidget {
   final bool isLoggedIn;
+  final int initialIndex;
 
-  const MainScreen({super.key, this.isLoggedIn = false});
+  const MainScreen({super.key, this.isLoggedIn = false, this.initialIndex = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -79,6 +80,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.initialIndex;
     if (widget.isLoggedIn) {
       _fetchProfile();
     }

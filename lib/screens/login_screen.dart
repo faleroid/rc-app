@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Selamat datang, $userName!')));
 
-      context.go('/main', extra: true);
+      context.go('/main', extra: {'isLoggedIn': true});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response.message), backgroundColor: Colors.red),

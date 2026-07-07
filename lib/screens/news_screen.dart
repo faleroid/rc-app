@@ -1,6 +1,7 @@
 // lib/screens/news_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../models/news_model.dart';
 import '../repositories/news_repository.dart';
@@ -208,7 +209,13 @@ class _NewsScreenState extends State<NewsScreen> {
           BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
         ],
       ),
-      child: Stack(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            context.push('/news/${item.slug}');
+          },
+          child: Stack(
         fit: StackFit.expand,
         children: [
           // Gambar Background
@@ -291,6 +298,8 @@ class _NewsScreenState extends State<NewsScreen> {
             ),
           ),
         ],
+        ),
+      ),
       ),
     );
   }
@@ -306,8 +315,14 @@ class _NewsScreenState extends State<NewsScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white10),
       ),
-      child: IntrinsicHeight(
-        child: Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            context.push('/news/${item.slug}');
+          },
+          child: IntrinsicHeight(
+            child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Image.network(
@@ -369,6 +384,8 @@ class _NewsScreenState extends State<NewsScreen> {
               ),
             ),
           ],
+            ),
+          ),
         ),
       ),
     );

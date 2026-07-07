@@ -5,6 +5,8 @@ import '../screens/profile_screen.dart';
 import '../screens/change_password_screen.dart';
 import '../screens/verify_password_screen.dart';
 import '../screens/update_username_screen.dart';
+import '../screens/news_screen.dart';
+import '../screens/detail_news_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -14,8 +16,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/main',
       builder: (context, state) {
-        final isLoggedIn = state.extra as bool? ?? false;
-        return MainScreen(isLoggedIn: isLoggedIn);
+        final extraData = state.extra as Map<String, dynamic>? ?? {};
+        final isLoggedIn = extraData['isLoggedIn'] as bool? ?? false;
+        final initialIndex = extraData['index'] as int? ?? 0;
+        return MainScreen(isLoggedIn: isLoggedIn, initialIndex: initialIndex);
       },
     ),
     GoRoute(
@@ -42,6 +46,21 @@ final GoRouter appRouter = GoRouter(
         final currentName = state.extra as String? ?? '';
         return UpdateUsernameScreen(currentName: currentName);
       },
+    ),
+    GoRoute(
+      path: '/news',
+      builder: (context, state) => const NewsScreen(),
+      routes: [
+        // Rute anak (anak dari /news, jadinya /news/judul-berita-abc)
+        GoRoute(
+          path: ':slug',
+          builder: (context, state) {
+            // Mengambil parameter slug dari URL/Alamat rute
+            final slug = state.pathParameters['slug'] ?? '';
+            return DetailNewsScreen(slug: slug);
+          },
+        ),
+      ],
     ),
   ],
 );
