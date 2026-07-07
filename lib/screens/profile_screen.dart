@@ -110,12 +110,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         context.go('/main', extra: false);
                       },
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Logout',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -157,13 +164,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Row(
           children: [
-            Text(
-              user.name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+            Flexible(
+              child: Text(
+                user.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () async {
+                final result = await context.push<String>(
+                  '/update-username',
+                  extra: user.name,
+                );
+                if (result != null && mounted) {
+                  setState(() {
+                    _profileFuture = _repository.getProfile();
+                  });
+                }
+              },
+              child: const Icon(Icons.edit, color: Colors.white70, size: 20),
             ),
             const SizedBox(width: 12),
             if (user.role.toLowerCase() == 'vip')
@@ -191,13 +216,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              user.phoneNumber ?? '-',
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
+            Row(
+              children: [
+                const Icon(
+                  Icons.phone_android,
+                  color: Colors.white70,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  user.phoneNumber ?? '-',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
             ),
-            Text(
-              user.domicile ?? '-',
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
+            Row(
+              children: [
+                const Icon(
+                  Icons.location_on_outlined,
+                  color: Colors.white70,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  user.domicile ?? '-',
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
             ),
           ],
         ),
@@ -312,22 +357,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Column(
         children: [
-          _buildListTile('Password', onTap: () {
-            context.push('/profile/verify-password');
-          }),
+          _buildListTile(
+            'Password',
+            leadingIcon: Icons.lock_outline,
+            onTap: () {
+              context.push('/profile/verify-password');
+            },
+          ),
           _buildDivider(),
-          _buildListTile('Help Center'),
+          _buildListTile('Help Center', leadingIcon: Icons.help_outline),
           _buildDivider(),
-          _buildListTile('Terms of Use'),
+          _buildListTile(
+            'Terms of Use',
+            leadingIcon: Icons.description_outlined,
+          ),
           _buildDivider(),
-          _buildListTile('Privacy Policy'),
+          _buildListTile(
+            'Privacy Policy',
+            leadingIcon: Icons.security_outlined,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildListTile(String title, {VoidCallback? onTap}) {
+  Widget _buildListTile(
+    String title, {
+    required IconData leadingIcon,
+    VoidCallback? onTap,
+  }) {
     return ListTile(
+      leading: Icon(leadingIcon, color: Colors.white70),
       title: Text(
         title,
         style: const TextStyle(

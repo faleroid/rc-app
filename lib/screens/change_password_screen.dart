@@ -55,8 +55,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Kembali ke halaman Profile awal (menutup 2 halaman sekaligus)
-        context.go('/profile');
+        // Kembali ke halaman Profile
+        context.pop();
       }
     } catch (e) {
       if (mounted) {

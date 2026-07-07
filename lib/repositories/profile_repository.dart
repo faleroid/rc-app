@@ -19,6 +19,18 @@ class ProfileRepository {
     }
   }
 
+  Future<bool> updateUsername(String newName) async {
+    try {
+      final response = await _apiService.dio.patch(
+        '/profile/username',
+        data: {'name': newName},
+      );
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Gagal mengubah nama');
+    }
+  }
+
   Future<bool> verifyPassword(String currentPassword) async {
     try {
       final response = await _apiService.dio.post(

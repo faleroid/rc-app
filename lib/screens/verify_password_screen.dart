@@ -26,7 +26,7 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
         _passwordController.text,
       );
       if (isSuccess && mounted) {
-        context.push(
+        context.pushReplacement(
           '/profile/change-password',
           extra: _passwordController.text,
         );
