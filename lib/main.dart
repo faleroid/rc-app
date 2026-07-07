@@ -7,7 +7,6 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
 import 'services/token_service.dart';
-import 'repositories/auth_repository.dart';
 import 'repositories/profile_repository.dart';
 
 void main() {
