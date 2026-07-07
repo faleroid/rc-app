@@ -6,6 +6,7 @@ import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_font_sizes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -37,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: const Text(
           'RicoCapital App',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
       body: FutureBuilder<ProfileResponse>(
@@ -70,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Bergabung dengan Komunitas',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: AppFontSizes.xl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -81,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Lainnya',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: AppFontSizes.xl,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -118,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             'Logout',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: AppFontSizes.lg,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -132,12 +133,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text(
                           '@ Rico Capital App',
-                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                           style: TextStyle(color: Colors.white54, fontSize: AppFontSizes.xs),
                         ),
                         SizedBox(height: 4),
                         Text(
                           'Version : 1',
-                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                           style: TextStyle(color: Colors.white54, fontSize: AppFontSizes.xs),
                         ),
                       ],
                     ),
@@ -169,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 user.name,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: AppFontSizes.display,
                   fontWeight: FontWeight.bold,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -205,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'VIP',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: AppFontSizes.xs,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -226,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 6),
                 Text(
                   user.phoneNumber ?? '-',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
                 ),
               ],
             ),
@@ -240,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 6),
                 Text(
                   user.domicile ?? '-',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
                 ),
               ],
             ),
@@ -275,14 +276,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'Member VIP',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: AppFontSizes.xxl,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             expiredText,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -392,7 +393,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title,
         style: const TextStyle(
           color: Colors.white,
-          fontSize: 15,
+          fontSize: AppFontSizes.md,
           fontWeight: FontWeight.w500,
         ),
       ),

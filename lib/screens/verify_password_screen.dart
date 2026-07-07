@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../repositories/profile_repository.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_font_sizes.dart';
 
 class VerifyPasswordScreen extends StatefulWidget {
   const VerifyPasswordScreen({super.key});
@@ -34,7 +35,10 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          ),
         );
       }
     } finally {
@@ -61,7 +65,7 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
         ),
         title: const Text(
           'Verifikasi Keamanan',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
       body: SafeArea(
@@ -73,7 +77,7 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
             children: [
               const Text(
                 'Masukkan password saat ini untuk melanjutkan.',
-                style: TextStyle(color: Colors.white70, fontSize: 15),
+                style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.md),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -85,7 +89,7 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
                   hintText: 'Password Saat Ini',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -125,7 +129,7 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
                           'Lanjut',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: AppFontSizes.lg,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -138,4 +142,3 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
     );
   }
 }
-

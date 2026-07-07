@@ -2,6 +2,14 @@ import 'package:dio/dio.dart';
 import '../models/profile_model.dart';
 import '../services/api_service.dart';
 
+class AppException implements Exception {
+  final String message;
+  AppException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class ProfileRepository {
   final ApiService _apiService = ApiService();
 
@@ -12,10 +20,12 @@ class ProfileRepository {
       if (response.statusCode == 200) {
         return ProfileResponse.fromJson(response.data);
       } else {
-        throw Exception('Failed to load profile');
+        throw AppException('Failed to load profile');
       }
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Failed to load profile');
+      throw AppException(
+        e.response?.data['message'] ?? 'Failed to load profile',
+      );
     }
   }
 
@@ -27,7 +37,7 @@ class ProfileRepository {
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Gagal mengubah nama');
+      throw AppException(e.response?.data['message'] ?? 'Gagal mengubah nama');
     }
   }
 
@@ -39,7 +49,7 @@ class ProfileRepository {
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
-      throw Exception(
+      throw AppException(
         e.response?.data['message'] ?? 'Password salah atau terjadi kesalahan',
       );
     }
@@ -61,7 +71,9 @@ class ProfileRepository {
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Gagal mengubah password');
+      throw AppException(
+        e.response?.data['message'] ?? 'Gagal mengubah password',
+      );
     }
   }
 }

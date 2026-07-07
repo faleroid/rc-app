@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../repositories/profile_repository.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_font_sizes.dart';
 
 class UpdateUsernameScreen extends StatefulWidget {
   final String currentName;
@@ -78,7 +79,7 @@ class _UpdateUsernameScreenState extends State<UpdateUsernameScreen> {
         ),
         title: const Text(
           'Ubah Nama Lengkap',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
       body: SafeArea(
@@ -90,7 +91,7 @@ class _UpdateUsernameScreenState extends State<UpdateUsernameScreen> {
             children: [
               const Text(
                 'Gunakan nama asli Anda untuk memudahkan verifikasi.',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -101,7 +102,7 @@ class _UpdateUsernameScreenState extends State<UpdateUsernameScreen> {
                   hintText: 'Nama Lengkap',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   prefixIcon: const Icon(Icons.person, color: Colors.white70),
                   contentPadding: const EdgeInsets.symmetric(
@@ -143,7 +144,7 @@ class _UpdateUsernameScreenState extends State<UpdateUsernameScreen> {
                           'Simpan Perubahan',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: AppFontSizes.lg,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -4,6 +4,7 @@ import '../services/token_service.dart';
 import '../repositories/auth_repository.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_text_styles.dart';
+import '../constants/app_font_sizes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -86,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text(
                 'Masukkan akun',
-                style: AppTextStyles.title.copyWith(fontSize: 22),
+                style: AppTextStyles.title.copyWith(fontSize: AppFontSizes.xxxl),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Email',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -122,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Password',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.grey,
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.grey,
-                      fontSize: 14,
+                      fontSize: AppFontSizes.sm,
                     ),
                   ),
                 ),
@@ -179,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'Masuk',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: AppFontSizes.lg,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -191,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Text(
                     'Belum Punya Akun? ',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(color: Colors.grey, fontSize: AppFontSizes.sm),
                   ),
                   GestureDetector(
                     onTap: () {},
@@ -199,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Daftar Disini',
                       style: TextStyle(
                         color: AppColors.primary,
-                        fontSize: 14,
+                        fontSize: AppFontSizes.sm,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

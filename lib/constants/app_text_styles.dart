@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'app_font_sizes.dart';
 
 class AppTextStyles {
   AppTextStyles._(); // Mencegah instansiasi
@@ -7,45 +8,45 @@ class AppTextStyles {
   // === Heading ===
   static const TextStyle heading = TextStyle(
     color: AppColors.textPrimary,
-    fontSize: 24,
+    fontSize: AppFontSizes.xxl,
     fontWeight: FontWeight.bold,
   );
 
   static const TextStyle headingAccent = TextStyle(
     color: AppColors.primary,
-    fontSize: 24,
+    fontSize: AppFontSizes.xxl,
     fontWeight: FontWeight.bold,
   );
 
   static const TextStyle title = TextStyle(
     color: AppColors.textPrimary,
-    fontSize: 24,
+    fontSize: AppFontSizes.xxl,
     fontWeight: FontWeight.w600,
   );
 
   // === AppBar ===
   static const TextStyle appBarTitle = TextStyle(
     color: AppColors.textPrimary,
-    fontSize: 18,
+    fontSize: AppFontSizes.xl,
   );
 
   // === Body ===
   static const TextStyle bodyWhite = TextStyle(
     color: AppColors.textPrimary,
-    fontSize: 14,
+    fontSize: AppFontSizes.sm,
     height: 1.4,
   );
 
   static const TextStyle bodyPlaceholder = TextStyle(
     color: AppColors.textPrimary,
-    fontSize: 18,
+    fontSize: AppFontSizes.xl,
   );
 
   // === Card ===
   static const TextStyle cardTitle = TextStyle(
     color: AppColors.textPrimary,
     fontWeight: FontWeight.bold,
-    fontSize: 13,
+    fontSize: AppFontSizes.cardTitle,
     shadows: [
       Shadow(blurRadius: 4.0, color: Colors.black54, offset: Offset(1.0, 1.0)),
     ],
@@ -54,7 +55,7 @@ class AppTextStyles {
   static const TextStyle cardIndex = TextStyle(
     color: AppColors.textPrimary,
     fontWeight: FontWeight.bold,
-    fontSize: 12,
+    fontSize: AppFontSizes.xs,
   );
 
   // === Button ===

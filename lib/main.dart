@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_text_styles.dart';
+import 'constants/app_font_sizes.dart';
 import 'theme/app_theme.dart';
 import 'data/dummy_data.dart';
 import 'screens/home_screen.dart';
@@ -203,7 +204,7 @@ class _MainScreenState extends State<MainScreen> {
                           _userName,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: AppFontSizes.sm,
                             fontWeight: FontWeight.normal,
                           ),
                         ),

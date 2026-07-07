@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../repositories/profile_repository.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_font_sizes.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   // Variabel untuk menampung password dari halaman sebelumnya
@@ -89,7 +90,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
         title: const Text(
           'Buat Password Baru',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
       body: SafeArea(
@@ -107,7 +108,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   hintText: 'Password Baru',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -132,7 +133,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   hintText: 'Konfirmasi Password Baru',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 15,
+                    fontSize: AppFontSizes.md,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -172,7 +173,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           'Simpan Password',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: AppFontSizes.lg,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
