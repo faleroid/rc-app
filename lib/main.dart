@@ -6,6 +6,7 @@ import 'constants/app_font_sizes.dart';
 import 'theme/app_theme.dart';
 import 'data/dummy_data.dart';
 import 'screens/home_screen.dart';
+import 'screens/news_screen.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
@@ -159,9 +160,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
       case 1:
-        return const Center(
-          child: Text('Berita Screen', style: AppTextStyles.bodyPlaceholder),
-        );
+        return const NewsScreen();
       case 2:
         return const Center(
           child: Text('Modul Screen', style: AppTextStyles.bodyPlaceholder),
