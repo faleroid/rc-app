@@ -1,37 +1,87 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
-
+import '../constants/font.dart';
+import '../constants/margin.dart';
+/// ============================================================
+/// APP THEME — RicoCapital
+/// Mendefinisikan tema global MaterialApp dari AppConstants.
+/// ============================================================
 class AppTheme {
-  AppTheme._(); // Mencegah instansiasi
+  AppTheme._();
 
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.background,
+      fontFamily: AppFonts.primary,
+      scaffoldBackgroundColor: AppColors.bgGradientBottom,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        secondary: AppColors.accentPurple,
+        surface: AppColors.cardDark,
+        error: AppColors.primaryLight,
+      ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        titleTextStyle: AppTextStyles.appBarTitle,
-        shape: Border(
-          bottom: BorderSide(color: AppColors.borderColor, width: AppColors.borderWidth),
+        titleTextStyle: TextStyle(
+          fontFamily: AppFonts.primary,
+          color: AppColors.textWhite,
+          fontSize: AppFontSizes.md,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      tabBarTheme: TabBarThemeData(
-        dividerColor: AppColors.transparent,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: AppColors.tabActiveBackground,
-          borderRadius: BorderRadius.circular(20),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+          ),
+          textStyle: const TextStyle(
+            fontFamily: AppFonts.primary,
+            fontWeight: FontWeight.bold,
+            fontSize: AppFontSizes.md,
+          ),
         ),
-        labelColor: AppColors.tabLabelActive,
-        unselectedLabelColor: AppColors.tabLabelInactive,
-        labelStyle: AppTextStyles.tabActive,
-        unselectedLabelStyle: AppTextStyles.tabInactive,
       ),
-      bottomAppBarTheme: const BottomAppBarThemeData(
-        elevation: 0,
-        color: AppColors.background,
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: AppFonts.display,
+          color: AppColors.textWhite,
+          fontSize: AppFontSizes.xl3,
+          fontWeight: FontWeight.bold,
+        ),
+        titleLarge: TextStyle(
+          fontFamily: AppFonts.primary,
+          color: AppColors.textWhite,
+          fontSize: AppFontSizes.xl,
+          fontWeight: FontWeight.bold,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: AppFonts.primary,
+          color: AppColors.textWhite70,
+          fontSize: AppFontSizes.base,
+        ),
+        labelSmall: TextStyle(
+          fontFamily: AppFonts.primary,
+          color: AppColors.textWhite54,
+          fontSize: AppFontSizes.sm,
+        ),
+      ),
+      dividerColor: AppColors.divider,
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.bottomNavBg,
+        selectedItemColor: AppColors.bottomNavActive,
+        unselectedItemColor: AppColors.bottomNavInactive,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: TextStyle(
+          fontFamily: AppFonts.primary,
+          fontSize: AppFontSizes.xs,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: AppFonts.primary,
+          fontSize: AppFontSizes.xs,
+        ),
       ),
     );
   }
