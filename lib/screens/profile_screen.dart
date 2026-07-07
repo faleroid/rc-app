@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../models/auth_model.dart';
 import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
 import '../repositories/auth_repository.dart';
 import '../constants/app_colors.dart';
-import '../main.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: const Text(
           'RicoCapital App',
@@ -108,13 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         if (!context.mounted) return;
 
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const MainScreen(isLoggedIn: false),
-                          ),
-                          (route) => false,
-                        );
+                        context.go('/main', extra: false);
                       },
                       child: const Text(
                         'Logout',
@@ -318,7 +312,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Column(
         children: [
-          _buildListTile('Password'),
+          _buildListTile('Password', onTap: () {
+            context.push('/profile/verify-password');
+          }),
           _buildDivider(),
           _buildListTile('Help Center'),
           _buildDivider(),
@@ -330,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildListTile(String title) {
+  Widget _buildListTile(String title, {VoidCallback? onTap}) {
     return ListTile(
       title: Text(
         title,
@@ -340,7 +336,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           fontWeight: FontWeight.w500,
         ),
       ),
-      onTap: () {},
+      trailing: const Icon(Icons.chevron_right, color: Colors.white54),
+      onTap: onTap,
     );
   }
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_text_styles.dart';
 import 'theme/app_theme.dart';
 import 'data/dummy_data.dart';
 import 'screens/home_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/profile_screen.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
+import 'router/app_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,10 +18,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      routerConfig: appRouter,
     );
   }
 }
@@ -47,15 +47,9 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (token != null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(isLoggedIn: true),
-        ),
-      );
+      context.go('/main', extra: true);
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+      context.go('/login');
     }
   }
 
@@ -190,11 +184,7 @@ class _MainScreenState extends State<MainScreen> {
             child: widget.isLoggedIn
                 ? GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
-                        ),
-                      );
+                      context.push('/profile');
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -233,11 +223,7 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
+                      context.go('/login');
                     },
                     child: const Text('Login', style: AppTextStyles.buttonBold),
                   ),

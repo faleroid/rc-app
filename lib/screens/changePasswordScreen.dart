@@ -1,70 +1,78 @@
+// lib/screens/change_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../services/token_service.dart';
-import '../repositories/auth_repository.dart';
+import '../repositories/profile_repository.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  // Variabel untuk menampung password dari halaman sebelumnya
+  final String currentPassword;
+
+  const ChangePasswordScreen({super.key, required this.currentPassword});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _authRepository = AuthRepository();
-  final _tokenService = TokenService();
-
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _repository = ProfileRepository();
   bool _isLoading = false;
 
-  void _handleLogin() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+  void _savePassword() async {
+    final newPass = _newPasswordController.text;
+    final confirmPass = _confirmPasswordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
+    // Validasi dasar di sisi Flutter
+    if (newPass.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email dan password tidak boleh kosong')),
+        const SnackBar(content: Text('Password minimal 8 karakter')),
+      );
+      return;
+    }
+    if (newPass != confirmPass) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Konfirmasi password tidak cocok')),
       );
       return;
     }
 
     setState(() => _isLoading = true);
 
-    final response = await _authRepository.login(email, password);
-
-    if (!mounted) return;
-
-    setState(() => _isLoading = false);
-
-    if (response.success) {
-      final token = response.token;
-      final userName = response.data?.name;
-
-      if (token != null) {
-        await _tokenService.saveToken(token);
-      }
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Selamat datang, $userName!')));
-
-      context.go('/main', extra: true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message), backgroundColor: Colors.red),
+    try {
+      // Mengirim ketiga data (lama, baru, konfirmasi) ke API
+      final isSuccess = await _repository.updatePassword(
+        widget.currentPassword, // Mengambil password lama dari halaman sebelumnya
+        newPass,
+        confirmPass,
       );
+
+      if (isSuccess && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password berhasil diubah!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Kembali ke halaman Profile awal (menutup 2 halaman sekaligus)
+        context.go('/profile');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -75,7 +83,14 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'Buat Password Baru',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -84,17 +99,12 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Masukkan akun',
-                style: AppTextStyles.title.copyWith(fontSize: 22),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
               TextField(
-                controller: _emailController,
+                controller: _newPasswordController,
                 style: const TextStyle(color: Colors.white),
+                obscureText: true,
                 decoration: InputDecoration(
-                  hintText: 'Email',
+                  hintText: 'Password Baru',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
                     fontSize: 15,
@@ -112,14 +122,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextField(
-                controller: _passwordController,
+                controller: _confirmPasswordController,
                 style: const TextStyle(color: Colors.white),
+                obscureText: true,
                 decoration: InputDecoration(
-                  hintText: 'Password',
+                  hintText: 'Konfirmasi Password Baru',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
                     fontSize: 15,
@@ -135,23 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.white),
                     borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: const Text(
-                    'Lupa password?',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.grey,
-                      fontSize: 14,
-                    ),
                   ),
                 ),
               ),
@@ -165,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: _isLoading ? null : _handleLogin,
+                  onPressed: _isLoading ? null : _savePassword,
                   child: _isLoading
                       ? const SizedBox(
                           height: 24,
@@ -176,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         )
                       : const Text(
-                          'Masuk',
+                          'Simpan Password',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -185,27 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Belum Punya Akun? ',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: const Text(
-                      'Daftar Disini',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -213,3 +185,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

@@ -18,4 +18,38 @@ class ProfileRepository {
       throw Exception(e.response?.data['message'] ?? 'Failed to load profile');
     }
   }
+
+  Future<bool> verifyPassword(String currentPassword) async {
+    try {
+      final response = await _apiService.dio.post(
+        '/profile/verify-password',
+        data: {'current_password': currentPassword},
+      );
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Password salah atau terjadi kesalahan',
+      );
+    }
+  }
+
+  Future<bool> updatePassword(
+    String currentPassword,
+    String newPassword,
+    String newPasswordConfirmation,
+  ) async {
+    try {
+      final response = await _apiService.dio.patch(
+        '/profile/password',
+        data: {
+          'current_password': currentPassword,
+          'password': newPassword,
+          'password_confirmation': newPasswordConfirmation,
+        },
+      );
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Gagal mengubah password');
+    }
+  }
 }
