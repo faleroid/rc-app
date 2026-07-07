@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import '../service/api_service.dart';
+import '../services/api_service.dart';
 import '../models/auth_model.dart';
-import '../service/token_service.dart';
+import '../services/token_service.dart';
 
 class AuthRepository {
   final ApiService _apiService = ApiService();

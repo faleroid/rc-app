@@ -4,7 +4,7 @@ class AppColors {
   AppColors._(); // Mencegah instansiasi
 
   // Colors
-  static const Color primary = Colors.red;
+  static const Color primary = Color.fromARGB(255, 195, 52, 42);
   static const Color background = Color(0xFF1A1A1A);
   static const Color cardDark = Color.fromARGB(255, 30, 30, 30);
 
@@ -18,7 +18,7 @@ class AppColors {
 
   // Tab Bar
   static Color tabInactiveBackground = Colors.white.withOpacity(0.08);
-  static const Color tabActiveBackground = Colors.red;
+  static const Color tabActiveBackground = primary;
   static const Color tabLabelActive = Colors.white;
   static const Color tabLabelInactive = Colors.grey;
 

@@ -5,8 +5,10 @@ import 'theme/app_theme.dart';
 import 'data/dummy_data.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
-import 'service/token_service.dart';
+import 'screens/profile_screen.dart';
+import 'services/token_service.dart';
 import 'repositories/auth_repository.dart';
+import 'repositories/profile_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +27,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// SplashScreen: cek token untuk auto-login
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -78,6 +79,29 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  String _userName = 'Profile';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isLoggedIn) {
+      _fetchProfile();
+    }
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final repo = ProfileRepository();
+      final res = await repo.getProfile();
+      if (res.data != null) {
+        setState(() {
+          _userName = res.data!.name.split(' ').first;
+        });
+      }
+    } catch (e) {
+      // Pass
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -165,35 +189,36 @@ class _MainScreenState extends State<MainScreen> {
               vertical: 8.0,
             ),
             child: widget.isLoggedIn
-                ? TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.grey[900],
-                      foregroundColor: AppColors.textPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 0,
-                      ),
-                    ),
-                    onPressed: () async {
-                      final authRepository = AuthRepository();
-                      await authRepository.logout();
-
-                      if (!mounted) return;
-
-                      Navigator.of(context).pushAndRemoveUntil(
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const MainScreen(isLoggedIn: false),
+                          builder: (context) => const ProfileScreen(),
                         ),
-                        (route) => false,
                       );
                     },
-                    child: const Text(
-                      'Logout',
-                      style: AppTextStyles.buttonBold,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 14,
+                          child: Icon(
+                            Icons.person,
+                            color: Color(0xFF3B0764),
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _userName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : TextButton(

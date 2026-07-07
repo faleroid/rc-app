@@ -6,15 +6,17 @@ class UserModel {
   final String? domicile;
   final String role;
   final String status;
+  final DateTime? membershipExpiresAt;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
-    required this.role,
-    required this.status,
     this.phoneNumber,
     this.domicile,
+    required this.role,
+    required this.status,
+    this.membershipExpiresAt,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,9 @@ class UserModel {
       domicile: json['domicile'],
       role: json['role'] ?? 'user',
       status: json['status'] ?? 'inactive',
+      membershipExpiresAt: json['membership_expires_at'] != null
+          ? DateTime.parse(json['membership_expires_at'])
+          : null,
     );
   }
 }

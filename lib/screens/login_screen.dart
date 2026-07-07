@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../service/token_service.dart';
+import '../services/token_service.dart';
 import '../repositories/auth_repository.dart';
 import '../main.dart';
 import '../constants/app_colors.dart';
