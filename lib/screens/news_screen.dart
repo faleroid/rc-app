@@ -7,6 +7,7 @@ import '../models/news_model.dart';
 import '../repositories/news_repository.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
+import '../widgets/bitcoin_chart_widget.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -87,18 +88,25 @@ class _NewsScreenState extends State<NewsScreen> {
 
           return CustomScrollView(
             slivers: [
+              // 2.5. Bitcoin Chart
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 24),
+                      child: BitcoinChartWidget(),
+                    ),
+                  ],
+                ),
+              ),
+
               // 1. Bagian Judul "Breaking News"
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.local_fire_department,
-                        color: Colors.orangeAccent,
-                        size: 24,
-                      ),
-                      SizedBox(width: 8),
                       Text(
                         'Trending Hari Ini',
                         style: TextStyle(
@@ -106,6 +114,12 @@ class _NewsScreenState extends State<NewsScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.local_fire_department,
+                        color: Colors.orangeAccent,
+                        size: 24,
                       ),
                     ],
                   ),
@@ -161,19 +175,13 @@ class _NewsScreenState extends State<NewsScreen> {
               const SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(16, 32, 16, 12),
-                  child: Row(
-                    children: [
-                      Icon(Icons.article, color: AppColors.primary, size: 24),
-                      SizedBox(width: 8),
-                      Text(
-                        'Berita Terkini',
-                        style: TextStyle(
-                          fontSize: AppFontSizes.xl,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Berita Terkini',
+                    style: TextStyle(
+                      fontSize: AppFontSizes.xl,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -216,90 +224,90 @@ class _NewsScreenState extends State<NewsScreen> {
             context.push('/news/${item.slug}');
           },
           child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Gambar Background
-          Image.network(
-            'https://picsum.photos/seed/${item.id}/400/300',
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-                Container(color: Colors.grey),
-          ),
-          // Gradient Overlay agar teks mudah dibaca
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.black87, Colors.transparent],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                stops: [0.0, 0.7],
+            fit: StackFit.expand,
+            children: [
+              // Gambar Background
+              Image.network(
+                'https://picsum.photos/seed/${item.id}/400/300',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: Colors.grey),
               ),
-            ),
-          ),
-          // Konten Teks di Atas Gambar
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'TRENDING',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
-                    ),
+              // Gradient Overlay agar teks mudah dibaca
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.black87, Colors.transparent],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    stops: [0.0, 0.7],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.xl,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Row(
+              ),
+              // Konten Teks di Atas Gambar
+              Positioned(
+                bottom: 16,
+                left: 16,
+                right: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.access_time,
-                      size: 14,
-                      color: Colors.white70,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      formattedDate,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: AppFontSizes.xs,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'TRENDING',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: AppFontSizes.xl,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          size: 14,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          formattedDate,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: AppFontSizes.xs,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
         ),
-      ),
       ),
     );
   }
@@ -323,67 +331,67 @@ class _NewsScreenState extends State<NewsScreen> {
           },
           child: IntrinsicHeight(
             child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Image.network(
-              'https://picsum.photos/seed/${item.id}/200/200',
-              width: 110,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  Container(width: 110, color: Colors.grey),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      item.title,
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.md,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      item.excerpt,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: AppFontSizes.xs,
-                        height: 1.4,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Image.network(
+                  'https://picsum.photos/seed/${item.id}/200/200',
+                  width: 110,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Container(width: 110, color: Colors.grey),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          size: 12,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 6),
                         Text(
-                          formattedDate,
+                          item.title,
                           style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 10,
+                            fontSize: AppFontSizes.md,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.3,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.excerpt,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: AppFontSizes.xs,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_today,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              formattedDate,
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
             ),
           ),
         ),
