@@ -8,6 +8,8 @@ import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/news_screen.dart';
 import 'screens/academy_page.dart';
+import 'screens/about_page.dart';
+import 'screens/package.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
@@ -168,7 +170,6 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     }
   }
-
   // ── BUILD ─────────────────────────────────────────────────────
 
   /// Tampilan saat SplashScreen aktif: hanya loading spinner di tengah.
@@ -222,14 +223,16 @@ class MainScreen extends StatefulWidget {
   /// false → tampilkan tombol "Login" di AppBar
   final bool isLoggedIn;
   final int initialIndex;
+  final int initialTabIndex;
 
-  const MainScreen({super.key, this.isLoggedIn = false, this.initialIndex = 0});
+  const MainScreen({super.key, this.isLoggedIn = false, this.initialIndex = 0, this.initialTabIndex = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin {
   // ── STATE VARIABLES ──────────────────────────────────────────
 
   /// Index item yang aktif di BottomNavigationBar.
@@ -239,13 +242,30 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   String _userName = 'Profile';
 
+  /// TabController eksplisit — memungkinkan navigasi programatik
+  /// ke tab mana pun, berulang kali tanpa masalah.
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+
+    _tabController = TabController(
+      length: 4,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+
     if (widget.isLoggedIn) {
       _fetchProfile();
     }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchProfile() async {
@@ -262,165 +282,90 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  /// Index tab aktif di TabBar bagian atas (hanya muncul di Beranda).
-  /// 0 = Home | 1 = Academy | 2 = Profile | 3 = Packages
-  int _tabIndex = 0;
-
-  /// Sinkron dengan _selectedIndex, digunakan khusus untuk
-  /// AppBottomNavBar widget yang membutuhkan parameter terpisah.
-  int _bottomNavIndex = 0;
-
-  /// Flag khusus untuk memicu auto-scroll ke section Pricing
-  /// di dalam HomePage. Direset ke false setelah scroll selesai
-  /// agar tidak scroll ulang saat tab dibuka kembali.
-  bool _scrollToPricingOnHome = false;
-
   // ── HELPER METHODS ────────────────────────────────────────────
 
   /// Dipanggil saat user menekan item di BottomNavigationBar.
-  /// Memperbarui _selectedIndex → Flutter rebuild → tampilan berubah.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  /// Navigasi paksa ke tab Home (index 0) sekaligus mengaktifkan
-  /// flag _scrollToPricingOnHome agar HomePage auto-scroll ke bagian Pricing.
-  ///
-  /// Dipanggil dari dalam halaman Academy via callback onNavigateToPricing,
-  /// misalnya saat user menekan tombol "Lihat Paket" di halaman Academy.
-  void _navigateToHomeAndScroll() {
-    setState(() {
-      _tabIndex = 0;                 // Pindah ke tab Home
-      _scrollToPricingOnHome = true; // Aktifkan flag → HomePage akan auto-scroll
-    });
+  /// Navigasi ke tab Academy (index 1).
+  /// Menggunakan animateTo() yang selalu bisa dipanggil berulang.
+  void _navigateToacademy() {
+    _tabController.animateTo(1);
   }
 
-  /// Menentukan warna gradient background berdasarkan tab yang aktif.
-  ///
-  /// Setiap tab memiliki nuansa warna berbeda untuk memberi pengalaman
-  /// visual yang khas per halaman:
-  ///   - Tab Profile (index 2) → Gradient ungu (warna brand profil)
-  ///   - Tab lainnya           → Gradient hitam/gelap (warna utama web)
-  ///
-  /// Return: List<Color> berisi 3 warna untuk LinearGradient (atas→tengah→bawah)
-  List<Color> _getGradientColors() {
-    if (_tabIndex == 2) {
-      // ── PROFILE TAB → Gradient ungu khas halaman profil ────
-      return const [
-        AppColors.profileGradientTop,    // Ungu tua di atas
-        AppColors.profileGradientMid,    // Ungu sedang di tengah
-        AppColors.profileGradientBottom, // Ungu sangat gelap di bawah
-      ];
-    } else {
-      // ── HOME / ACADEMY / PACKAGES → Gradient hitam web ─────
-      return const [
-        AppColors.webGradientTop,    // Hitam gelap di atas
-        AppColors.webGradientMid,    // Hitam pekat di tengah
-        AppColors.webGradientBottom, // Hampir hitam total di bawah
-      ];
-    }
+  /// Navigasi ke tab Package (index 3).
+  /// Menggunakan animateTo() yang selalu bisa dipanggil berulang.
+  void _navigateToPackage() {
+    _tabController.animateTo(3);
   }
 
   // ── TAB CONTENT BUILDER ───────────────────────────────────────
 
-  /// Membangun dan mengembalikan widget konten utama berdasarkan
-  /// item bottom nav (_selectedIndex) yang sedang aktif.
-  ///
-  /// - Case 0 (Beranda): Menampilkan sistem tab 4-halaman dengan
-  ///   DefaultTabController. Tab bar di atas, konten di bawah.
-  /// - Case 1 (Berita): Placeholder teks — halaman belum dibuat.
-  /// - Case 2 (Modul): Placeholder teks — halaman belum dibuat.
   Widget _buildBody() {
     switch (_selectedIndex) {
 
     // ── BOTTOM NAV 0: BERANDA ─────────────────────────────
-    // Menampilkan sistem tab 4 halaman:
-    // Home | Academy | Profile | Packages
       case 0:
-        return DefaultTabController(
-          length: 4, // Jumlah tab yang tersedia
-          child: Column(
-            children: [
+        return Column(
+          children: [
 
-              const SizedBox(height: 20), // Jarak dari AppBar ke tab bar
+            const SizedBox(height: 20),
 
-              // ── TAB BAR ───────────────────────────────────
-              // Container pembungkus tab bar dengan style
-              // rounded (sudut melengkung) dan background gelap.
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  height: 40, // Tinggi tab bar
-                  decoration: BoxDecoration(
-                    color: AppColors.tabInactiveBackground, // Warna bg tab bar
-                    borderRadius: BorderRadius.circular(20), // Sudut membulat
-                  ),
-                  child: const TabBar(
-                    // Daftar tab yang ditampilkan
-                    tabs: [
-                      Tab(text: "Home"),     // index 0
-                      Tab(text: "Academy"),  // index 1
-                      Tab(text: "Profile"),  // index 2
-                      Tab(text: "Packages"), // index 3
-                    ],
-                  ),
+            // ── TAB BAR ───────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.tabInactiveBackground,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-
-              const SizedBox(height: 10), // Jarak antara tab bar dan konten
-
-              // ── TAB CONTENT (TabBarView) ──────────────────
-              // Setiap child di sini sesuai urutan Tab di atas.
-              // Expanded agar konten mengisi sisa ruang layar.
-              Expanded(
-                child: TabBarView(
-                  children: [
-
-                    // ── TAB 0: HOME ──────────────────────────
-                    // HomeScreen menerima data kartu dari dummyCards.
-                    // dummyCards didefinisikan di data/dummy_data.dart.
-                    HomePage(
-                      scrollToPricing: _scrollToPricingOnHome,
-                      onScrollCompleted: () {
-                        setState(() {
-                          _scrollToPricingOnHome = false; // Reset flag setelah scroll
-                        });
-                      },
-                    ),
-
-                    // ── TAB 1: ACADEMY ───────────────────────
-                    // Placeholder sementara.
-                    // TODO: Ganti dengan AcademyScreen() yang sebenarnya
-                    AcademyPage(
-                      onNavigateToPricing: _navigateToHomeAndScroll,
-                    ),
-
-                    // ── TAB 2: PROFILE ───────────────────────
-                    // Placeholder sementara.
-                    // TODO: Ganti dengan ProfileScreen() yang sebenarnya
-                    const Center(
-                      child: Text(
-                        'Hello World - Profile',
-                        style: AppTextStyles.bodyPlaceholder,
-                      ),
-                    ),
-
-                    // ── TAB 3: PACKAGES ──────────────────────
-                    // Placeholder sementara.
-                    // TODO: Ganti dengan PackagesScreen() yang sebenarnya
-                    const Center(
-                      child: Text(
-                        'Hello World - Packages',
-                        style: AppTextStyles.bodyPlaceholder,
-                      ),
-                    ),
+                child: TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: "Home"),     // index 0
+                    Tab(text: "Academy"),  // index 1
+                    Tab(text: "About"),    // index 2
+                    Tab(text: "Packages"), // index 3
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ── TAB CONTENT (TabBarView) ──────────────────
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+
+                  // ── TAB 0: HOME ──────────────────────────
+                  HomePage(
+                    onNavigateToPackage: _navigateToPackage,
+                  ),
+
+                  // ── TAB 1: ACADEMY ───────────────────────
+                  AcademyPage(
+                    onNavigateToPricing: _navigateToPackage,
+                  ),
+
+                  // ── TAB 2: ABOUT ────────────────────────
+                  AboutPage(
+                    onNavigateToAcademy: _navigateToacademy,
+                    onNavigateToPackage: _navigateToPackage,
+                  ),
+                  // ── TAB 3: PACKAGES ──────────────────────
+                  const PackagePage(),
+
+                ],
+              ),
+            ),
+          ],
         );
 
     // ── BOTTOM NAV 1: BERITA ──────────────────────────────

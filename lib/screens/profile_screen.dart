@@ -9,7 +9,9 @@ import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -296,7 +298,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                context.go('/main', extra: {'isLoggedIn': true, 'tabIndex': 1});
+              },
               child: const Text(
                 'Lihat semua paket',
                 style: TextStyle(

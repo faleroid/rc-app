@@ -54,12 +54,67 @@ class AppStrings {
       'ex ea commodo consequat. Duis aute irure dolor in reprehenderit in '
       'konsisten dan terukur.';
 
-  // Profile page
-  static const String profileName    = 'Rico';
-  static const String paketPremium   = 'Paket Premium';
-  static const String paketDaysLeft  = '30 Days Left';
-  static const String menuPassword   = 'Password';
-  static const String menuHelp       = 'Help Center';
-  static const String menuTerms      = 'Terms of Use';
-  static const String menuPrivacy    = 'Privacy Policy';
+  // About page — Hero
+  static const String aboutTitle     = 'About';
+  static const String aboutBrand     = 'Ricocapital';
+  static const String aboutSubtitle  =
+      'Membangun masa depan finansial melalui edukasi blockchain '
+      'dan cryptocurrency yang berkualitas tinggi';
+
+  // About page — Expert Team
+  static const String aboutTeamTitle = 'Meet Our Expert Team';
+
+  // About page — Vision
+  static const String aboutVisionTitle = 'Vision & Mission';
+  static const String aboutVisionBody  =
+      'Menjadi platform edukasi blockchain dan cryptocurrency terdepan '
+      'di Indonesia yang mampu menciptakan generasi investor dan trader '
+      'yang cerdas, kompeten, dan berkontribusi dalam membangun ekosistem '
+      'finansial digital yang sehat dan berkelanjutan.';
+
+  // About page — Mission bullets
+  static const List<String> aboutMissionItems = [
+    'Memberikan edukasi blockchain yang komprehensif dan mudah dipahami',
+    'Membangun komunitas trader dan investor cryptocurrency yang solid',
+    'Menyediakan tools dan strategi trading yang profitable dan aman',
+    'Mendorong adopsi teknologi blockchain di Indonesia',
+  ];
+
+  // About page — Dedication
+  static const String aboutDedicationTitle    = 'Our Dedication';
+  static const String aboutDedicationSubtitle =
+      'Komitmen kami untuk memajukan pendidikan crypto dan blockchain di Indonesia';
+
+  // Dedication cards
+  static const String dedicationEduTitle  = 'Edukasi Berkualitas';
+  static const String dedicationEduBody   =
+      'Menyediakan materi pembelajaran yang terstruktur dan mudah dipahami, '
+      'dari basic hingga advanced level untuk semua kalangan.';
+  static const String dedicationComTitle  = 'Membangun Komunitas';
+  static const String dedicationComBody   =
+      'Menciptakan ekosistem komunitas yang solid dan saling mendukung '
+      'untuk sharing knowledge dan pengalaman trading.';
+  static const String dedicationInoTitle  = 'Inovasi Berkelanjutan';
+  static const String dedicationInoBody   =
+      'Terus berinovasi dalam metode pembelajaran dan teknologi '
+      'untuk memberikan pengalaman belajar yang terbaik.';
+
+  // Stats
+  static const String statActiveUsers     = '300+';
+  static const String statActiveUsersLbl  = 'Active Users';
+  static const String statCommunity       = '700+';
+  static const String statCommunityLbl    = 'Community Members';
+  static const String statSuccessRate     = '85%';
+  static const String statSuccessRateLbl  = 'Success Rate';
+  static const String statSupport         = '24/7';
+  static const String statSupportLbl      = 'Support';
+
+  // CTA
+  static const String ctaAboutTitle       = 'Ready to Join Our';
+  static const String ctaAboutAccent      = 'Community?';
+  static const String ctaAboutBody        =
+      'Bergabunglah dengan ribuan trader sukses dan mulai perjalanan '
+      'crypto Anda bersama Ricocapital';
+  static const String btnStartLearning    = 'Start Learning Now';
+  static const String btnViewCurriculum   = 'View Curriculum';
 }

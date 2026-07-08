@@ -16,13 +16,11 @@ import '../widgets/auto_scroll_ticker.dart';
 /// Mengikuti style www.ricocapital.id (Black/Red/Yellow-Orange)
 /// ============================================================
 class HomePage extends StatefulWidget {
-  final bool scrollToPricing;
-  final VoidCallback? onScrollCompleted;
+  final VoidCallback? onNavigateToPackage;
 
   const HomePage({
     super.key,
-    this.scrollToPricing = false,
-    this.onScrollCompleted,
+    this.onNavigateToPackage,
   });
 
   @override
@@ -30,8 +28,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final GlobalKey _pricingKey = GlobalKey();
-
   // ─── YouTube Controller ──────────────────────────────────────
   late final YoutubePlayerController _ytController;
 
@@ -50,42 +46,12 @@ class _HomePageState extends State<HomePage> {
         playsInline: true,
       ),
     );
-
-    if (widget.scrollToPricing) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToPricing();
-        widget.onScrollCompleted?.call();
-      });
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.scrollToPricing && !oldWidget.scrollToPricing) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToPricing();
-        widget.onScrollCompleted?.call();
-      });
-    }
   }
 
   @override
   void dispose() {
     _ytController.close();
     super.dispose();
-  }
-
-
-  void _scrollToPricing() {
-    final context = _pricingKey.currentContext;
-    if (context != null) {
-      Scrollable.ensureVisible(
-        context,
-        duration: AppDurations.slow,
-        curve: Curves.easeInOut,
-      );
-    }
   }
 
   @override
@@ -208,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                     AppPrimaryButton(
                       label: "JOIN US",
                       backgroundColor: AppColors.webRed,
-                      onTap: _scrollToPricing,
+                      onTap: widget.onNavigateToPackage,
                     ),
                   ],
                 ),
@@ -353,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                     AppPrimaryButton(
                       label: "TAKE ACTION",
                       backgroundColor: AppColors.webRed,
-                      onTap: _scrollToPricing,
+                      onTap: widget.onNavigateToPackage,
                     ),
                   ],
                 ),
@@ -647,7 +613,7 @@ class _HomePageState extends State<HomePage> {
                           gradient: const LinearGradient(
                             colors: [Color(0xFFE53E3E), Color(0xFFC53030)],
                           ),
-                          onTap: () {},
+                          onTap:widget.onNavigateToPackage,
                         ),
                       ),
                     ],
@@ -719,96 +685,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // ─── PRICING SECTION ────────────────────────────────
-              Padding(
-                key: _pricingKey,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xl,
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      "Pilih Paket Yang Tepat Untuk Anda",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: AppFontSizes.xl2,
-                        fontFamily: AppFonts.display,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    const Text(
-                      "Bergabunglah dengan ribuan trader sukses dan mulai perjalanan trading crypto Anda hari ini",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textWhite70,
-                        fontSize: AppFontSizes.sm,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      width: 80,
-                      height: 3,
-                      decoration: BoxDecoration(
-                        color: AppColors.webRed,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-
-                    const SizedBox(height: AppSpacing.xl2),
-
-                    // Ethereum Card
-                    _buildPricingCard(
-                      name: "Ethereum",
-                      price: "Rp 200.000",
-                      originalPrice: "Rp 350.000",
-                      period: "bulan",
-                      description:
-                      "Mulai perjalanan investasimu dengan fleksibel, bayar bulanan & langsung nikmati semua benefit eksklusif.",
-                      benefits: [
-                        "Sinyal Spot & Future (Winrate 85%)",
-                        "Fast News Update",
-                        "Private Module Access",
-                        "Monthly Zoom Class",
-                        "Direct Consultation with Experienced Mentors",
-                        "Trade Plan & Money Management Strategies",
-                      ],
-                      disabledBenefits: [
-                        "One on One Future Mentoring Sessions",
-                      ],
-                      btnLabel: "Pilih Ethereum",
-                    ),
-
-                    const SizedBox(height: AppSpacing.xl),
-
-                    // Bitcoin Card
-                    _buildPricingCard(
-                      name: "Bitcoin",
-                      price: "Rp 2.000.000",
-                      originalPrice: "Rp 3.500.000",
-                      period: "tahun",
-                      description:
-                      "Belajar lebih serius & hemat dengan akses setahun penuh untuk semua kelas dan komunitas premium.",
-                      benefits: [
-                        "Sinyal Spot & Future (Winrate 85%)",
-                        "Fast News Update",
-                        "Private Module Access",
-                        "Monthly Zoom Class",
-                        "Direct Consultation with Experienced Mentors",
-                        "Trade Plan & Money Management Strategies",
-                        "One on One Future Mentoring Sessions",
-                      ],
-                      disabledBenefits: [],
-                      btnLabel: "Pilih Bitcoin",
                     ),
                   ],
                 ),
@@ -1187,171 +1063,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildPricingCard({
-    required String name,
-    required String price,
-    required String originalPrice,
-    required String period,
-    required String description,
-    required List<String> benefits,
-    required List<String> disabledBenefits,
-    required String btnLabel,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: AppColors.cardDark,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.cardBorder, width: 1.5),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  color: AppColors.textWhite,
-                  fontSize: AppFontSizes.xl2,
-                  fontFamily: AppFonts.display,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.webRed.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                  border: Border.all(
-                    color: AppColors.webRed.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: const Text(
-                  "Hemat 43%",
-                  style: TextStyle(
-                    color: AppColors.webRed,
-                    fontSize: AppFontSizes.xs,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            description,
-            style: const TextStyle(
-              color: AppColors.textWhite70,
-              fontSize: AppFontSizes.sm,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Price info
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                price,
-                style: const TextStyle(
-                  color: AppColors.textWhite,
-                  fontSize: AppFontSizes.xl3 - 2,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                "/$period",
-                style: const TextStyle(
-                  color: AppColors.textWhite54,
-                  fontSize: AppFontSizes.sm,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            originalPrice,
-            style: const TextStyle(
-              color: AppColors.textWhite30,
-              fontSize: AppFontSizes.sm,
-              decoration: TextDecoration.lineThrough,
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.xl),
-          const Divider(color: AppColors.divider, height: 1),
-          const SizedBox(height: AppSpacing.xl),
-
-          // Benefits
-          ...benefits.map((benefit) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.check_circle,
-                    color: Colors.greenAccent, size: 18),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    benefit,
-                    style: const TextStyle(
-                      color: AppColors.textWhite,
-                      fontSize: AppFontSizes.sm,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )),
-
-          // Disabled Benefits
-          ...disabledBenefits.map((benefit) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.cancel, color: Colors.grey, size: 18),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    benefit,
-                    style: const TextStyle(
-                      color: AppColors.textWhite30,
-                      fontSize: AppFontSizes.sm,
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )),
-
-          const SizedBox(height: AppSpacing.xl),
-
-          Center(
-            child: AppPrimaryButton(
-              label: btnLabel,
-              width: double.infinity,
-              gradient: const LinearGradient(
-                colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
-              ),
-              textColor: Colors.black,
-              onTap: () {},
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

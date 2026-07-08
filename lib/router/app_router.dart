@@ -19,7 +19,8 @@ final GoRouter appRouter = GoRouter(
         final extraData = state.extra as Map<String, dynamic>? ?? {};
         final isLoggedIn = extraData['isLoggedIn'] as bool? ?? false;
         final initialIndex = extraData['index'] as int? ?? 0;
-        return MainScreen(isLoggedIn: isLoggedIn, initialIndex: initialIndex);
+        final initialTabIndex = extraData['tabIndex'] as int? ?? 0;
+        return MainScreen(isLoggedIn: isLoggedIn, initialIndex: initialIndex, initialTabIndex: initialTabIndex);
       },
     ),
     GoRoute(
