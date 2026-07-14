@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'constants/app_colors.dart';
@@ -13,83 +12,23 @@ import 'screens/package.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
+import 'constants/assets.dart';
 
-// ================================================================
-// FILE: main.dart
-// DESKRIPSI: Titik masuk utama aplikasi RicoCapital.
-//
-// ALUR APLIKASI:
-//   1. main() → MyApp → SplashScreen
-//   2. SplashScreen cek token (auto-login)
-//      - Ada token  → MainScreen(isLoggedIn: true)
-//      - Tidak ada  → LoginScreen
-//   3. MainScreen mengelola seluruh navigasi:
-//      - Tab atas  : Home | Academy | Profile | Packages
-//      - Bottom Nav: Beranda | Berita | Modul
-//      - Gradient background dinamis sesuai tab aktif
-//
-// DEPENDENCIES:
-//   constants/app_colors.dart    → semua warna aplikasi
-//   constants/app_text_styles.dart → semua style teks
-//   theme/app_theme.dart         → tema global MaterialApp
-//   data/dummy_data.dart         → data dummy untuk development
-//   screens/home_screen.dart     → halaman beranda utama
-//   screens/login_screen.dart    → halaman login
-//   service/token_service.dart   → cek/simpan/hapus token auth
-//   repositories/auth_repository.dart → logika login/logout ke API
-//   widgets/auto_scroll_ticker.dart   → widget scroll otomatis
-// ================================================================
+import 'dart:ui'; // For PointerDeviceKind
 
-import 'dart:ui'; // Untuk PointerDeviceKind (deteksi jenis input perangkat)
-
-
-// ================================================================
-// FUNGSI MAIN
-// Fungsi pertama yang dipanggil saat aplikasi dijalankan.
-// Langsung menjalankan MyApp sebagai widget root.
-// ================================================================
 void main() {
   runApp(const MyApp());
 }
 
-// ================================================================
-// CLASS: MyCustomScrollBehavior
-//
-// FUNGSI: Memperluas perilaku scroll default Flutter agar mendukung
-//         berbagai jenis perangkat input, tidak hanya touchscreen.
-//
-// MENGAPA DIBUTUHKAN:
-//   Secara default, Flutter hanya mengizinkan drag/scroll via sentuhan.
-//   Kelas ini menambahkan dukungan mouse & trackpad, sehingga aplikasi
-//   tetap bisa di-scroll saat dijalankan di:
-//   - Emulator Android/iOS di laptop (via mouse)
-//   - Flutter Web
-//   - Flutter Desktop
-// ================================================================
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,    // Sentuhan jari di layar HP/tablet
-    PointerDeviceKind.mouse,    // Klik dan seret dengan mouse
-    PointerDeviceKind.trackpad, // Geser dengan trackpad laptop
+    PointerDeviceKind.touch, // Touch screen
+    PointerDeviceKind.mouse, // Mouse drag
+    PointerDeviceKind.trackpad, // Trackpad
   };
 }
 
-// ================================================================
-// CLASS: MyApp
-//
-// FUNGSI: Widget root aplikasi. Semua konfigurasi global didefinisikan
-//         di sini dan akan berlaku di seluruh halaman aplikasi.
-//
-// TANGGUNG JAWAB:
-//   - Mengatur tema visual global (warna, font, style) via AppTheme.darkTheme
-//   - Mengaktifkan scroll multi-device via MyCustomScrollBehavior
-//   - Menentukan halaman pertama yang ditampilkan → SplashScreen
-//   - Menyembunyikan banner "DEBUG" di pojok kanan atas
-//
-// CATATAN: Widget ini StatelessWidget karena tidak punya state yang
-//          berubah — konfigurasinya statis di seluruh siklus hidup app.
-// ================================================================
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -103,23 +42,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// ================================================================
-// CLASS: SplashScreen
-//
-// FUNGSI: Layar loading sementara yang ditampilkan saat aplikasi
-//         pertama kali dibuka. Tugasnya adalah memeriksa apakah
-//         pengguna sudah login sebelumnya (ada token tersimpan).
-//
-// ALUR KERJA:
-//   1. Tampilkan loading spinner (CircularProgressIndicator)
-//   2. Panggil TokenService untuk baca token dari local storage
-//   3. Jika token ADA  → langsung ke MainScreen (sudah login)
-//   4. Jika token TIDAK ADA → ke LoginScreen (harus login dulu)
-//
-// MENGAPA StatefulWidget:
-//   Karena perlu menjalankan kode async di initState() untuk
-//   mengecek token sebelum navigasi dilakukan.
-// ================================================================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -128,41 +50,22 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  // ── LIFECYCLE ────────────────────────────────────────────────
-
-  /// Dipanggil otomatis oleh Flutter saat widget pertama kali dibuat.
-  /// Langsung trigger pengecekan status login.
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus(); // Mulai cek token segera setelah widget muncul
+    _checkLoginStatus(); // Check login status on startup
   }
 
-  // ── METHODS ──────────────────────────────────────────────────
-
-  /// Mengecek apakah pengguna sudah pernah login dengan membaca
-  /// token yang tersimpan di local storage perangkat.
-  ///
-  /// - Menggunakan TokenService untuk operasi storage yang aman.
-  /// - Navigasi dilakukan dengan pushReplacement agar SplashScreen
-  ///   tidak bisa di-back oleh pengguna setelah berpindah halaman.
-  /// - Pengecekan `mounted` mencegah error jika widget sudah
-  ///   dihancurkan sebelum operasi async selesai.
   void _checkLoginStatus() async {
-    final tokenService = TokenService(); // Inisialisasi layanan token
-    final token = await tokenService.getToken(); // Baca token dari storage
+    final tokenService = TokenService(); // Token service instance
+    final token = await tokenService.getToken(); // Retrieve token from storage
 
-    // Guard: Pastikan widget masih aktif sebelum navigasi
-    // (Mencegah error "setState called after dispose")
     if (!mounted) return;
 
     if (token != null) {
       context.go('/main', extra: {'isLoggedIn': true});
     } else {
       context.go('/login');
-      // ── TOKEN DITEMUKAN → Pengguna sudah pernah login ──────
-      // Langsung masuk ke MainScreen tanpa perlu login lagi.
-      // isLoggedIn: true → AppBar akan tampilkan tombol "Logout"
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const MainScreen(isLoggedIn: true),
@@ -170,62 +73,26 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     }
   }
-  // ── BUILD ─────────────────────────────────────────────────────
 
-  /// Tampilan saat SplashScreen aktif: hanya loading spinner di tengah.
-  /// Warna spinner mengikuti warna primary dari AppColors.
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(
-        // Spinner putar tanda sedang memproses (cek token)
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
+      body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
   }
 }
 
-// ================================================================
-// CLASS: MainScreen
-//
-// FUNGSI: Kerangka utama aplikasi setelah pengguna berhasil
-//         terautentikasi. Mengelola seluruh navigasi dan tampilan
-//         konten berdasarkan tab dan bottom nav yang dipilih.
-//
-// STRUKTUR LAYAR:
-//   ┌─────────────────────────────────┐
-//   │  AppBar (Logo + Login/Logout)   │  ← Selalu terlihat
-//   ├─────────────────────────────────┤
-//   │  Tab Bar (Home|Academy|Profile  │  ← Hanya di bottom index 0
-//   │           |Packages)            │
-//   ├─────────────────────────────────┤
-//   │                                 │
-//   │     Konten Halaman Aktif        │  ← Berubah sesuai tab
-//   │                                 │
-//   ├─────────────────────────────────┤
-//   │  Bottom Nav (Beranda|Berita     │  ← Selalu terlihat
-//   │              |Modul)            │
-//   └─────────────────────────────────┘
-//
-// STATE YANG DIKELOLA:
-//   _selectedIndex      → item bottom nav aktif (0=Beranda, 1=Berita, 2=Modul)
-//   _tabIndex           → tab aktif di atas (0=Home, 1=Academy, 2=Profile, 3=Packages)
-//   _bottomNavIndex     → sinkron dengan _selectedIndex untuk bottom nav widget
-//   _scrollToPricingOnHome → flag auto-scroll ke section Pricing di HomePage
-//
-// PARAMETER:
-//   isLoggedIn → diterima dari SplashScreen/LoginScreen, menentukan
-//                apakah AppBar tampilkan tombol "Login" atau "Logout"
-// ================================================================
 class MainScreen extends StatefulWidget {
-  /// Status autentikasi pengguna.
-  /// true  → tampilkan tombol "Logout" di AppBar
-  /// false → tampilkan tombol "Login" di AppBar
   final bool isLoggedIn;
   final int initialIndex;
   final int initialTabIndex;
 
-  const MainScreen({super.key, this.isLoggedIn = false, this.initialIndex = 0, this.initialTabIndex = 0});
+  const MainScreen({
+    super.key,
+    this.isLoggedIn = false,
+    this.initialIndex = 0,
+    this.initialTabIndex = 0,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -233,17 +100,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
-  // ── STATE VARIABLES ──────────────────────────────────────────
-
-  /// Index item yang aktif di BottomNavigationBar.
-  /// 0 = Beranda (menampilkan tab system)
-  /// 1 = Berita
-  /// 2 = Modul
   int _selectedIndex = 0;
   String _userName = 'Profile';
-
-  /// TabController eksplisit — memungkinkan navigasi programatik
-  /// ke tab mana pun, berulang kali tanpa masalah.
   late TabController _tabController;
 
   @override
@@ -282,55 +140,46 @@ class _MainScreenState extends State<MainScreen>
     }
   }
 
-  // ── HELPER METHODS ────────────────────────────────────────────
-
-  /// Dipanggil saat user menekan item di BottomNavigationBar.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  /// Navigasi ke tab Academy (index 1).
-  /// Menggunakan animateTo() yang selalu bisa dipanggil berulang.
   void _navigateToacademy() {
     _tabController.animateTo(1);
   }
 
-  /// Navigasi ke tab Package (index 3).
-  /// Menggunakan animateTo() yang selalu bisa dipanggil berulang.
   void _navigateToPackage() {
     _tabController.animateTo(3);
   }
 
-  // ── TAB CONTENT BUILDER ───────────────────────────────────────
-
   Widget _buildBody() {
     switch (_selectedIndex) {
-
-    // ── BOTTOM NAV 0: BERANDA ─────────────────────────────
+      // Bottom Nav: Home
       case 0:
         return Column(
           children: [
-
             const SizedBox(height: 20),
 
-            // ── TAB BAR ───────────────────────────────────
+            // Tab Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.tabInactiveBackground,
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.borderColor, width: 0.5),
                 ),
                 child: TabBar(
                   controller: _tabController,
+                  dividerColor: Colors.transparent,
                   tabs: const [
-                    Tab(text: "Home"),     // index 0
-                    Tab(text: "Academy"),  // index 1
-                    Tab(text: "About"),    // index 2
-                    Tab(text: "Packages"), // index 3
+                    Tab(text: "Home"),
+                    Tab(text: "Academy"),
+                    Tab(text: "About"),
+                    Tab(text: "Packages"),
                   ],
                 ),
               ),
@@ -338,79 +187,70 @@ class _MainScreenState extends State<MainScreen>
 
             const SizedBox(height: 10),
 
-            // ── TAB CONTENT (TabBarView) ──────────────────
+            // Tab Content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
+                  // Tab 0: Home
+                  HomePage(onNavigateToPackage: _navigateToPackage),
 
-                  // ── TAB 0: HOME ──────────────────────────
-                  HomePage(
-                    onNavigateToPackage: _navigateToPackage,
-                  ),
+                  // Tab 1: Academy
+                  AcademyPage(onNavigateToPricing: _navigateToPackage),
 
-                  // ── TAB 1: ACADEMY ───────────────────────
-                  AcademyPage(
-                    onNavigateToPricing: _navigateToPackage,
-                  ),
-
-                  // ── TAB 2: ABOUT ────────────────────────
+                  // Tab 2: About
                   AboutPage(
                     onNavigateToAcademy: _navigateToacademy,
                     onNavigateToPackage: _navigateToPackage,
                   ),
-                  // ── TAB 3: PACKAGES ──────────────────────
+                  // Tab 3: Packages
                   const PackagePage(),
-
                 ],
               ),
             ),
           ],
         );
-
-    // ── BOTTOM NAV 1: BERITA ──────────────────────────────
-    // Placeholder untuk halaman Berita.
-    // TODO: Buat BeritaScreen() dan ganti widget ini
       case 1:
         return const NewsScreen();
 
       case 2:
         return const Center(
-          child: Text(
-            'Modul Screen',
-            style: AppTextStyles.bodyPlaceholder,
-          ),
+          child: Text('Modul Screen', style: AppTextStyles.bodyPlaceholder),
         );
-
-    // ── DEFAULT (fallback) ────────────────────────────────
-    // Jika _selectedIndex tidak cocok dengan case manapun,
-    // tampilkan widget kosong (tidak seharusnya terjadi).
       default:
         return const SizedBox.shrink();
     }
   }
 
-  // ── BUILD ─────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ── APP BAR ────────────────────────────────────────────
-      // Header di paling atas dengan judul app dan tombol Login/Logout.
-      // Tombol yang ditampilkan bergantung pada widget.isLoggedIn.
       appBar: AppBar(
-        title: const Text('RicoCapital App'), // Judul di AppBar
-
-        // ── TOMBOL AKSI DI KANAN APPBAR ─────────────────────
-        // actions adalah daftar widget di sisi kanan AppBar.
-        // Hanya ada satu widget di sini: tombol Login atau Logout.
+        title: Image.asset(
+          AppImages.logo,
+          width: 50,
+          height: 50,
+          errorBuilder: (context, error, stackTrace) => Container(
+            width: 30,
+            height: 30,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.currency_bitcoin,
+              color: AppColors.textWhite,
+              size: 18,
+            ),
+          ),
+        ),
+        backgroundColor: AppColors.background,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
               vertical: 8.0,
             ),
-
-            // ── KONDISI: SUDAH LOGIN atau BELUM? ────────────
             child: widget.isLoggedIn
                 ? GestureDetector(
                     onTap: () {
@@ -456,55 +296,46 @@ class _MainScreenState extends State<MainScreen>
                       context.go('/login');
                     },
                     child: const Text('Login', style: AppTextStyles.buttonBold),
-
-            // ── SUDAH LOGIN → Tampilkan tombol LOGOUT ────
+                  ),
           ),
-          )
         ],
       ),
 
-      // ── BODY ───────────────────────────────────────────────
-      // Konten utama yang berubah sesuai _selectedIndex.
-      // _buildBody() menentukan widget mana yang ditampilkan.
       body: _buildBody(),
 
-      // ── BOTTOM NAVIGATION BAR ──────────────────────────────
-      // Navigasi bawah dengan 3 item: Beranda | Berita | Modul.
-      // Dibungkus Container untuk menambahkan border atas dan
-      // warna background kustom.
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppColors.background, // Background sesuai tema gelap
+          color: AppColors.background, // Dark background
           border: Border(
             top: BorderSide(
-              color: AppColors.borderColor, // Garis tipis di atas bottom nav
-              width: AppColors.borderWidth, // Ketebalan garis (dari AppColors)
+              color: AppColors.borderColor, // Top border
+              width: AppColors.borderWidth,
             ),
           ),
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.transparent, // Transparan → pakai warna Container
-          elevation: 0,                         // Hapus shadow bawaan Flutter
-          type: BottomNavigationBarType.fixed,  // Lebar item tetap (tidak menyusut)
-          currentIndex: _selectedIndex,          // Item yang sedang aktif
-          selectedItemColor: AppColors.primary,  // Warna item aktif (merah)
-          unselectedItemColor: Colors.white,     // Warna item non-aktif (putih)
-          onTap: _onItemTapped,                  // Callback saat item ditekan
+          backgroundColor: Colors.transparent, // Transparent to use container background
+          elevation: 0, // Remove shadow
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: Colors.white,
+          onTap: _onItemTapped, // Handle tap
 
           items: const [
-            // ── ITEM 0: BERANDA ───────────────────────────
+            // Home
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined, color: AppColors.primary),
               label: 'Beranda',
             ),
 
-            // ── ITEM 1: BERITA ────────────────────────────
+            // News
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined, color: AppColors.primary),
               label: 'Berita',
             ),
 
-            // ── ITEM 2: MODUL ─────────────────────────────
+            // Module
             BottomNavigationBarItem(
               icon: Icon(Icons.menu_book_outlined, color: AppColors.primary),
               label: 'Modul',
