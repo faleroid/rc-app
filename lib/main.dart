@@ -135,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus(); // Mulai cek token segera setelah widget muncul
+    // _checkLoginStatus(); // Mulai cek token segera setelah widget muncul
   }
 
   // ── METHODS ──────────────────────────────────────────────────
