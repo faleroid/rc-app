@@ -8,6 +8,7 @@ import 'screens/home_screen.dart';
 import 'screens/news_screen.dart';
 import 'screens/academy_page.dart';
 import 'screens/about_page.dart';
+import 'screens/course_list_screen.dart';
 import 'screens/package.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
@@ -214,9 +215,7 @@ class _MainScreenState extends State<MainScreen>
         return const NewsScreen();
 
       case 2:
-        return const Center(
-          child: Text('Modul Screen', style: AppTextStyles.bodyPlaceholder),
-        );
+        return const CourseListScreen();
       default:
         return const SizedBox.shrink();
     }
