@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/font.dart';
 import '../constants/margin.dart';
-/// ============================================================
-/// APP THEME — RicoCapital
-/// Mendefinisikan tema global MaterialApp dari AppConstants.
-/// ============================================================
+// App Theme for RicoCapital App
 class AppTheme {
   AppTheme._();
 

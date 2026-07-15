@@ -4,9 +4,7 @@ import '../constants/margin.dart';
 import '../constants/assets.dart';
 import '../constants/font.dart';
 import '../constants/strings.dart';
-// ─────────────────────────────────────────────────────────────
-// 2. APP HEADER (Logo + AppName + Login Button)
-// ─────────────────────────────────────────────────────────────
+
 class AppHeader extends StatelessWidget {
   final VoidCallback? onLoginTap;
 
