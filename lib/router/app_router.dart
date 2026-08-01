@@ -7,6 +7,7 @@ import '../screens/verify_password_screen.dart';
 import '../screens/update_username_screen.dart';
 import '../screens/news_screen.dart';
 import '../screens/detail_news_screen.dart';
+import '../screens/module_detail_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -20,7 +21,11 @@ final GoRouter appRouter = GoRouter(
         final isLoggedIn = extraData['isLoggedIn'] as bool? ?? false;
         final initialIndex = extraData['index'] as int? ?? 0;
         final initialTabIndex = extraData['tabIndex'] as int? ?? 0;
-        return MainScreen(isLoggedIn: isLoggedIn, initialIndex: initialIndex, initialTabIndex: initialTabIndex);
+        return MainScreen(
+          isLoggedIn: isLoggedIn,
+          initialIndex: initialIndex,
+          initialTabIndex: initialTabIndex,
+        );
       },
     ),
     GoRoute(
@@ -62,6 +67,17 @@ final GoRouter appRouter = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      // URL pattern: /courses/1/modules/1
+      path: '/courses/:courseId/modules/:moduleId',
+      builder: (context, state) {
+        // Ekstrak parameter dari URL
+        final courseId = int.parse(state.pathParameters['courseId']!);
+        final moduleId = int.parse(state.pathParameters['moduleId']!);
+
+        return ModuleDetailScreen(courseId: courseId, moduleId: moduleId);
+      },
     ),
   ],
 );

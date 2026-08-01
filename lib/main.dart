@@ -313,7 +313,8 @@ class _MainScreenState extends State<MainScreen>
           ),
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.transparent, // Transparent to use container background
+          backgroundColor:
+              Colors.transparent, // Transparent to use container background
           elevation: 0, // Remove shadow
           type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
