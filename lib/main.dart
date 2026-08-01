@@ -68,11 +68,6 @@ class _SplashScreenState extends State<SplashScreen> {
       context.go('/main', extra: {'isLoggedIn': true});
     } else {
       context.go('/login');
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(isLoggedIn: true),
-        ),
-      );
     }
   }
 
