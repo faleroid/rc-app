@@ -1,5 +1,6 @@
 // lib/screens/course_list_screen.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/course_model.dart';
 import '../repositories/course_repository.dart';
 import '../widgets/module_card.dart';
@@ -106,8 +107,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
                       module.thumbnailUrl ??
                       'https://picsum.photos/seed/${module.id + 15}/400/300',
                   onTap: () {
-                    // TODO: Navigate to module detail
-                    // context.push('/courses/${course.id}/modules/${module.id}');
+                    context.push('/courses/${course.id}/modules/${module.id}');
                   },
                 ),
               );
