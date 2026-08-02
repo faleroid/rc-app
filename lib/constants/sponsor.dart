@@ -14,12 +14,25 @@ class AppSponsors {
   AppSponsors._();
 
   static const List<SponsorItem> gridSponsors = [
-    // ── Row 1 (Top — 3 items) ──
-    SponsorItem(name: 'Binance Labs'),   // ← Tambahkan logoUrl: 'https://...' nanti
-    SponsorItem(name: 'Bloomberg'),
-    SponsorItem(name: 'Bybit'),
-    // ── Row 2 (Bottom — 2 items, centered) ──
-    SponsorItem(name: 'CoinMarketCap'),
-    SponsorItem(name: 'LunarCrush'),
+    SponsorItem(
+      name: 'Belmawa',
+      logoUrl: 'https://www.ricocapital.id/images/supported/belmawa.png',
+    ),
+    SponsorItem(
+      name: 'Dikti Saintek',
+      logoUrl: 'https://www.ricocapital.id/images/supported/dikti.png',
+    ),
+    SponsorItem(
+      name: 'P2MW',
+      logoUrl: 'https://www.ricocapital.id/images/supported/p2mw.png',
+    ),
+    SponsorItem(
+      name: 'Tut Wuri Handayani',
+      logoUrl: 'https://www.ricocapital.id/images/supported/tutwuri.png',
+    ),
+    SponsorItem(
+      name: 'Unsoed',
+      logoUrl: 'https://www.ricocapital.id/images/supported/unsoed.png',
+    ),
   ];
 }

@@ -44,6 +44,7 @@ class _HomePageState extends State<HomePage> {
         showFullscreenButton: true,
         mute: false,
         playsInline: true,
+        origin: 'https://www.youtube-nocookie.com',
       ),
     );
   }
@@ -487,121 +488,25 @@ class _HomePageState extends State<HomePage> {
 
                       const SizedBox(height: AppSpacing.xl),
 
-                      // Mock Discord Message Widget
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-                          color: const Color(
-                            0xFF1E1F22,
-                          ), // Discord dark theme background
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Founder Avatar
-                            const CircleAvatar(
-                              radius: 18,
-                              backgroundColor: AppColors.webRed,
-                              child: Text(
-                                "R",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                      // Discord Exclusive Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                        child: Image.network(
+                          'https://www.ricocapital.id/images/CTA-home.jpeg',
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                height: 200,
+                                color: AppColors.cardDark,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    color: AppColors.textWhite30,
+                                    size: 40,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        "A Rico Yoananda Rahardja",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: AppFontSizes.sm,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.xs),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                          vertical: 1,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.webRed,
-                                          borderRadius:
-                                          BorderRadius.circular(3),
-                                        ),
-                                        child: const Text(
-                                          "FOUNDER",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 7,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.xs),
-                                      const Text(
-                                        "11:50 AM",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  const Text(
-                                    "Perkembangan market bitcoin (BTC) saat ini sangat menarik. Resistance mingguan sedang diuji. Jika berhasil breakout, target berikutnya adalah kenaikan signifikan untuk Altcoins. Tetap waspada dan ikuti trade plan!",
-                                    style: TextStyle(
-                                      color: Color(
-                                        0xFFDBDEE1,
-                                      ), // Discord light text
-                                      fontSize: AppFontSizes.sm - 1,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.sm),
-
-                                  // Discord Post Image (Mock chart)
-                                  Container(
-                                    height: 120,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black26,
-                                      borderRadius: BorderRadius.circular(
-                                        AppRadius.sm,
-                                      ),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(
-                                        AppRadius.sm,
-                                      ),
-                                      child: Image.network(
-                                        'https://www.ricocapital.id/Signal.png',
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                        const Center(
-                                          child: Icon(
-                                            Icons.show_chart,
-                                            color: Colors.greenAccent,
-                                            size: 40,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                         ),
                       ),
 
@@ -663,7 +568,7 @@ class _HomePageState extends State<HomePage> {
                       itemSpacing: AppSpacing.md,
                       children: AppTickerImages.tradingTicker.map((url) {
                         return Container(
-                          width: 160,
+                          width: 320, // 16:9 aspect ratio (320x180)
                           height: 180,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -711,73 +616,47 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: AppSpacing.xl),
 
-                    // ─── Part 1: Static Brick-Wall Grid ──────────────
-                    LayoutBuilder(
-                      builder: (context, constraints) {
+                    // ─── Part 1: Static Brick-Wall Grid (2-2-1 Formation) ──────────────
+                    Builder(
+                      builder: (context) {
                         final sponsors = AppSponsors.gridSponsors;
-                        final isMobile = constraints.maxWidth < 500;
 
-                        if (isMobile) {
-                          // Mobile: 2-2-1 pattern
-                          return Column(
-                            children: [
-                              // Row 1: 2 logos
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (sponsors.isNotEmpty) _buildSponsorChip(sponsors[0]),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (sponsors.length > 1) _buildSponsorChip(sponsors[1]),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              // Row 2: 2 logos
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (sponsors.length > 2) _buildSponsorChip(sponsors[2]),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (sponsors.length > 3) _buildSponsorChip(sponsors[3]),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              // Row 3: 1 logo centered
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (sponsors.length > 4) _buildSponsorChip(sponsors[4]),
-                                ],
-                              ),
-                            ],
-                          );
-                        } else {
-                          // Desktop/Tablet: 3+2 staggered brick-wall
-                          return Column(
-                            children: [
-                              // Row 1: 3 logos
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (sponsors.isNotEmpty) _buildSponsorChip(sponsors[0]),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (sponsors.length > 1) _buildSponsorChip(sponsors[1]),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (sponsors.length > 2) _buildSponsorChip(sponsors[2]),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              // Row 2: 2 logos (centered, offset under gaps)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (sponsors.length > 3) _buildSponsorChip(sponsors[3]),
-                                  const SizedBox(width: AppSpacing.md),
-                                  if (sponsors.length > 4) _buildSponsorChip(sponsors[4]),
-                                ],
-                              ),
-                            ],
-                          );
-                        }
+                        return Column(
+                          children: [
+                            // Row 1: 2 logos
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (sponsors.isNotEmpty)
+                                  _buildSponsorChip(sponsors[0]),
+                                const SizedBox(width: AppSpacing.md),
+                                if (sponsors.length > 1)
+                                  _buildSponsorChip(sponsors[1]),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            // Row 2: 2 logos
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (sponsors.length > 2)
+                                  _buildSponsorChip(sponsors[2]),
+                                const SizedBox(width: AppSpacing.md),
+                                if (sponsors.length > 3)
+                                  _buildSponsorChip(sponsors[3]),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            // Row 3: 1 logo centered
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (sponsors.length > 4)
+                                  _buildSponsorChip(sponsors[4]),
+                              ],
+                            ),
+                          ],
+                        );
                       },
                     ),
 
