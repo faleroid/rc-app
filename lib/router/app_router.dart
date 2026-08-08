@@ -8,12 +8,23 @@ import '../screens/update_username_screen.dart';
 import '../screens/news_screen.dart';
 import '../screens/detail_news_screen.dart';
 import '../screens/module_detail_screen.dart';
+import '../screens/payment_webview_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/payment-webview',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return PaymentWebviewScreen(
+          redirectUrl: extra['redirectUrl'],
+          paymentId: extra['paymentId'],
+        );
+      },
+    ),
     GoRoute(
       path: '/main',
       builder: (context, state) {

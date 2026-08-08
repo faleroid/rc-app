@@ -4,12 +4,292 @@ import '../constants/margin.dart';
 import '../constants/app_colors.dart';
 import '../widgets/pricing_card.dart';
 
-class PackagePage extends StatelessWidget {
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../constants/font.dart';
+import '../constants/margin.dart';
+import '../constants/app_colors.dart';
+import '../widgets/pricing_card.dart';
+import '../repositories/payment_repository.dart';
+import '../models/payment_model.dart';
+
+class PackagePage extends StatefulWidget {
   final VoidCallback? onNavigateToPricing;
   const PackagePage({
     super.key,
     this.onNavigateToPricing,
   });
+
+  @override
+  State<PackagePage> createState() => _PackagePageState();
+}
+
+class _PackagePageState extends State<PackagePage> {
+  final PaymentRepository _repository = PaymentRepository();
+  final _storage = const FlutterSecureStorage();
+  
+  bool _isLoading = true;
+  String? _errorMessage;
+  
+  List<MembershipPackageModel> _packages = [];
+  CurrentMembershipModel? _currentMembership;
+
+  // Countdown Logic
+  Timer? _countdownTimer;
+  Timer? _pollingTimer; // Untuk background polling
+  int _secondsRemaining = 0;
+  int? _activePaymentId;
+  String? _activeRedirectUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+    _checkPersistedCountdown();
+  }
+
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _checkPersistedCountdown() async {
+    final endTimeStr = await _storage.read(key: 'payment_countdown_end');
+    final paymentIdStr = await _storage.read(key: 'payment_active_id');
+    final redirectUrl = await _storage.read(key: 'payment_redirect_url');
+
+    if (endTimeStr != null && paymentIdStr != null && redirectUrl != null) {
+      final endTime = DateTime.parse(endTimeStr);
+      final now = DateTime.now();
+      final diff = endTime.difference(now).inSeconds;
+
+      if (diff > 0) {
+        _activePaymentId = int.parse(paymentIdStr);
+        _activeRedirectUrl = redirectUrl;
+        _startCountdown(int.parse(paymentIdStr), redirectUrl, seconds: diff);
+      } else {
+        await _clearPersistedCountdown();
+      }
+    }
+  }
+
+  Future<void> _persistCountdown(int paymentId, String redirectUrl, int duration) async {
+    final endTime = DateTime.now().add(Duration(seconds: duration));
+    await _storage.write(key: 'payment_countdown_end', value: endTime.toIso8601String());
+    await _storage.write(key: 'payment_active_id', value: paymentId.toString());
+    await _storage.write(key: 'payment_redirect_url', value: redirectUrl);
+  }
+
+  Future<void> _clearPersistedCountdown() async {
+    await _storage.delete(key: 'payment_countdown_end');
+    await _storage.delete(key: 'payment_active_id');
+    await _storage.delete(key: 'payment_redirect_url');
+  }
+
+  Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final result = await _repository.getMembershipUpgradeInfo();
+      setState(() {
+        _packages = result['packages'];
+        _currentMembership = result['currentMembership'];
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _startCountdown(int paymentId, String redirectUrl, {int seconds = 600}) {
+    _countdownTimer?.cancel();
+    _pollingTimer?.cancel();
+    
+    setState(() {
+      _activePaymentId = paymentId;
+      _activeRedirectUrl = redirectUrl;
+      _secondsRemaining = seconds;
+    });
+
+    if (seconds == 600) {
+       _persistCountdown(paymentId, redirectUrl, seconds);
+    }
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        if (mounted) setState(() => _secondsRemaining--);
+      } else {
+        _stopCountdown();
+      }
+    });
+
+    // Background Polling setiap 30 detik
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      _verifyPaymentSilently(paymentId);
+    });
+  }
+
+  Future<void> _stopCountdown() {
+    _countdownTimer?.cancel();
+    _pollingTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _secondsRemaining = 0;
+        _activePaymentId = null;
+        _activeRedirectUrl = null;
+      });
+    }
+    return _clearPersistedCountdown();
+  }
+
+  /// Verifikasi tanpa dialog (untuk polling)
+  Future<void> _verifyPaymentSilently(int paymentId) async {
+    try {
+      final status = await _repository.checkPaymentStatus(paymentId);
+      final String paymentStatus = status['payment']['status'];
+      
+      if (paymentStatus == 'success' || paymentStatus == 'paid') {
+        _stopCountdown();
+        if (mounted) {
+          _showSuccessDialog();
+          _fetchData();
+        }
+      }
+    } catch (_) {
+      // Ignore polling errors
+    }
+  }
+
+  Future<void> _handlePayment(MembershipPackageModel package) async {
+    // Cek jika sudah memiliki paket yang sama
+    if (_currentMembership?.package['id'] == package.id) {
+      _showInfoDialog(
+        "Paket Aktif",
+        "Anda sudah memiliki paket ${package.name} yang aktif hingga ${_currentMembership?.expiresAt ?? '-'}.",
+      );
+      return;
+    }
+
+    try {
+      // Tampilkan loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.webRed)),
+      );
+
+      final response = await _repository.createPayment(package.id);
+      
+      if (!mounted) return;
+      context.pop(); // Tutup loading
+
+      // Buka Webview
+      final bool? result = await context.push<bool>(
+        '/payment-webview',
+        extra: {
+          'redirectUrl': response.redirectUrl,
+          'paymentId': response.paymentId,
+        },
+      );
+
+      // Jika user keluar (result false atau null)
+      if (result != true) {
+        _startCountdown(response.paymentId, response.redirectUrl);
+      } else {
+        // Jika sukses (webview memanggil finish)
+        _verifyPayment(response.paymentId);
+      }
+
+    } catch (e) {
+      if (mounted) {
+        context.pop(); // Tutup loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.redAccent),
+        );
+      }
+    }
+  }
+
+  Future<void> _verifyPayment(int paymentId) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.webRed)),
+    );
+
+    try {
+      final status = await _repository.checkPaymentStatus(paymentId);
+      if (!mounted) return;
+      context.pop(); // Tutup loading
+
+      final String paymentStatus = status['payment']['status'];
+      
+      if (paymentStatus == 'success' || paymentStatus == 'paid') {
+        _stopCountdown();
+        _showSuccessDialog();
+        _fetchData(); // Refresh data membership
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Status Pembayaran: $paymentStatus")),
+        );
+      }
+    } catch (e) {
+      if (mounted) context.pop();
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardDark,
+        title: const Text("Berhasil!", style: TextStyle(color: Colors.white)),
+        content: const Text(
+          "Pembayaran Anda telah diverifikasi. Akun VIP Anda kini aktif.",
+          style: TextStyle(color: AppColors.textWhite70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("OK", style: TextStyle(color: AppColors.webRed)),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showInfoDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardDark,
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        content: Text(content, style: const TextStyle(color: AppColors.textWhite70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Tutup", style: TextStyle(color: AppColors.webRed)),
+          )
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(int seconds) {
+    final m = (seconds / 60).floor();
+    final s = seconds % 60;
+    return "${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,69 +331,133 @@ class PackagePage extends StatelessWidget {
               ),
             ),
 
+            if (_secondsRemaining > 0) ...[
+              const SizedBox(height: AppSpacing.xl),
+              _buildCountdownBanner(),
+            ],
+
             const SizedBox(height: AppSpacing.xl2),
 
-            // Ethereum Card
-            PricingCard(
-              name: "Ethereum",
-              price: "Rp 200.000",
-              originalPrice: "Rp 350.000",
-              discountLabel: "Hemat 43%",
-              period: "bulan",
-              description:
-              "Mulai perjalanan investasimu dengan fleksibel, bayar bulanan & langsung nikmati semua benefit eksklusif.",
-              benefits: const [
-                "Sinyal Spot & Future (Winrate 85%)",
-                "Fast News Update",
-                "Private Module Access",
-                "Monthly Zoom Class",
-                "Direct Consultation with Experienced Mentors",
-                "Trade Plan & Money Management Strategies",
-              ],
-              disabledBenefits: const [
-                "One on One Future Mentoring Sessions",
-              ],
-              btnLabel: "Pilih Ethereum",
-              gradient: const LinearGradient(
-                colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
-              ),
-              onTap: () {
-                // TODO: Proses pemilihan paket Ethereum
-              },
-            ),
+            if (_isLoading)
+              _buildSkeleton()
+            else if (_errorMessage != null)
+              _buildError()
+            else
+              ..._packages.map((package) {
+                final bool isUpgrade = _currentMembership != null && 
+                    _currentMembership!.package['id'] != null &&
+                    _currentMembership!.package['price'] < package.price;
+                
+                final bool isActive = _currentMembership?.package['id'] == package.id;
 
-            const SizedBox(height: AppSpacing.xl),
-
-            // Bitcoin Card
-            PricingCard(
-              name: "Bitcoin",
-              price: "Rp 2.000.000",
-              originalPrice: "Rp 3.500.000",
-              discountLabel: "Hemat 43%",
-              period: "tahun",
-              description:
-              "Belajar lebih serius & hemat dengan akses setahun penuh untuk semua kelas dan komunitas premium.",
-              benefits: const [
-                "Sinyal Spot & Future (Winrate 85%)",
-                "Fast News Update",
-                "Private Module Access",
-                "Monthly Zoom Class",
-                "Direct Consultation with Experienced Mentors",
-                "Trade Plan & Money Management Strategies",
-                "One on One Future Mentoring Sessions",
-              ],
-              disabledBenefits: const [],
-              btnLabel: "Pilih Bitcoin",
-              gradient: const LinearGradient(
-                colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
-              ),
-              onTap: () {
-                // TODO: Proses pemilihan paket Bitcoin
-              },
-            ),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                  child: PricingCard(
+                    name: package.name,
+                    price: package.formattedPrice,
+                    originalPrice: package.formattedOriginalPrice ?? "",
+                    discountLabel: "Hemat ${((1 - (package.price / (package.originalPrice ?? package.price))) * 100).round()}%",
+                    period: package.duration,
+                    description: package.description,
+                    benefits: package.benefits,
+                    disabledBenefits: const [],
+                    btnLabel: isActive 
+                        ? "Paket Aktif" 
+                        : (isUpgrade ? "Upgrade Paket" : "Pilih ${package.name}"),
+                    gradient: const LinearGradient(
+                      colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
+                    ),
+                    onTap: isActive ? null : () => _handlePayment(package),
+                  ),
+                );
+              }),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCountdownBanner() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.webRed.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.webRed.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.timer_outlined, color: AppColors.webRed),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Menunggu Pembayaran",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Selesaikan pembayaran dalam ${_formatTime(_secondsRemaining)}",
+                  style: const TextStyle(color: AppColors.textWhite70, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (_activeRedirectUrl != null && _activePaymentId != null) {
+                final bool? result = await context.push<bool>(
+                  '/payment-webview',
+                  extra: {
+                    'redirectUrl': _activeRedirectUrl,
+                    'paymentId': _activePaymentId,
+                  },
+                );
+                if (result == true) {
+                  _verifyPayment(_activePaymentId!);
+                }
+              }
+            },
+            child: const Text("Lanjut", style: TextStyle(color: AppColors.webRed, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeleton() {
+    return Column(
+      children: List.generate(2, (index) => 
+        Container(
+          height: 300,
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: AppSpacing.xl),
+          decoration: BoxDecoration(
+            color: AppColors.cardDark.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          child: const Center(child: CircularProgressIndicator(color: AppColors.textWhite30)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    return Column(
+      children: [
+        const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          _errorMessage ?? "Gagal memuat paket",
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.textWhite70),
+        ),
+        TextButton(
+          onPressed: _fetchData,
+          child: const Text("Coba Lagi", style: TextStyle(color: AppColors.webRed)),
+        ),
+      ],
     );
   }
 }

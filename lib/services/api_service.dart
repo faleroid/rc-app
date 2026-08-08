@@ -8,10 +8,10 @@ class ApiService {
   ApiService() {
     _dio = Dio(
       BaseOptions(
-        // baseUrl: 'http://10.0.2.2:8000/api', // emulator
-        baseUrl: 'http://192.168.1.22:8000/api', // real device
-        connectTimeout: const Duration(seconds: 60),
-        receiveTimeout: const Duration(seconds: 60),
+        // Tip: Gunakan IP laptop Anda jika testing via HP fisik di jaringan Wi-Fi yang sama
+        baseUrl: 'http://192.168.100.133:8000/api',
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
