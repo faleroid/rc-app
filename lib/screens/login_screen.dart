@@ -195,7 +195,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.grey, fontSize: AppFontSizes.sm),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      context.go('/main', extra: {'isLoggedIn': false, 'index': 0, 'tabIndex': 3});
+                    },
                     child: const Text(
                       'Daftar Disini',
                       style: TextStyle(
