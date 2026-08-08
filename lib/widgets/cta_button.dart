@@ -25,6 +25,8 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDisabled = onTap == null;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -34,15 +36,17 @@ class AppPrimaryButton extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: gradient == null ? (backgroundColor ?? AppColors.primary) : null,
-          gradient: gradient,
+          color: isDisabled
+              ? Colors.grey.shade800
+              : (gradient == null ? (backgroundColor ?? AppColors.primary) : null),
+          gradient: isDisabled ? null : gradient,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: textColor ?? AppColors.textWhite,
+            color: isDisabled ? Colors.grey : (textColor ?? AppColors.textWhite),
             fontSize: AppFontSizes.md,
             fontFamily: AppFonts.primary,
             fontWeight: FontWeight.bold,

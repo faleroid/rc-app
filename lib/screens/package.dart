@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-import '../constants/font.dart';
-import '../constants/margin.dart';
-import '../constants/app_colors.dart';
-import '../widgets/pricing_card.dart';
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +7,9 @@ import '../constants/margin.dart';
 import '../constants/app_colors.dart';
 import '../widgets/pricing_card.dart';
 import '../repositories/payment_repository.dart';
+import '../repositories/auth_repository.dart';
 import '../models/payment_model.dart';
+import '../services/token_service.dart';
 
 class PackagePage extends StatefulWidget {
   final VoidCallback? onNavigateToPricing;
@@ -28,13 +24,25 @@ class PackagePage extends StatefulWidget {
 
 class _PackagePageState extends State<PackagePage> {
   final PaymentRepository _repository = PaymentRepository();
+  final AuthRepository _authRepository = AuthRepository();
+  final TokenService _tokenService = TokenService();
   final _storage = const FlutterSecureStorage();
   
   bool _isLoading = true;
+  bool _isLoggedIn = false;
   String? _errorMessage;
   
   List<MembershipPackageModel> _packages = [];
   CurrentMembershipModel? _currentMembership;
+
+  // Form Registration
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _domicileController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   // Countdown Logic
   Timer? _countdownTimer;
@@ -46,14 +54,32 @@ class _PackagePageState extends State<PackagePage> {
   @override
   void initState() {
     super.initState();
-    _fetchData();
-    _checkPersistedCountdown();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await _checkLoginStatus();
+    await _fetchData();
+    await _checkPersistedCountdown();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final token = await _tokenService.getToken();
+    setState(() {
+      _isLoggedIn = token != null;
+    });
   }
 
   @override
   void dispose() {
     _countdownTimer?.cancel();
     _pollingTimer?.cancel();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _domicileController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -171,62 +197,106 @@ class _PackagePageState extends State<PackagePage> {
   }
 
   Future<void> _handlePayment(MembershipPackageModel package) async {
-    // Cek jika sudah memiliki paket yang sama
-    if (_currentMembership?.package['id'] == package.id) {
-      _showInfoDialog(
-        "Paket Aktif",
-        "Anda sudah memiliki paket ${package.name} yang aktif hingga ${_currentMembership?.expiresAt ?? '-'}.",
-      );
-      return;
-    }
-
-    try {
-      // Tampilkan loading dialog
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.webRed)),
-      );
-
-      final response = await _repository.createPayment(package.id);
-      
-      if (!mounted) return;
-      context.pop(); // Tutup loading
-
-      // Buka Webview
-      final bool? result = await context.push<bool>(
-        '/payment-webview',
-        extra: {
-          'redirectUrl': response.redirectUrl,
-          'paymentId': response.paymentId,
-        },
-      );
-
-      // Jika user keluar (result false atau null)
-      if (result != true) {
-        _startCountdown(response.paymentId, response.redirectUrl);
-      } else {
-        // Jika sukses (webview memanggil finish)
-        _verifyPayment(response.paymentId);
+    if (!_isLoggedIn) {
+      // Logic Registrasi & Bayar
+      if (!_formKey.currentState!.validate()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Silakan lengkapi formulir pendaftaran di bawah')),
+        );
+        return;
       }
 
-    } catch (e) {
-      if (mounted) {
-        context.pop(); // Tutup loading
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.redAccent),
+      try {
+        _showLoadingDialog();
+        
+        final registerRes = await _authRepository.register(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phoneNumber: _phoneController.text.trim(),
+          domicile: _domicileController.text.trim(),
+          password: _passwordController.text,
+          passwordConfirmation: _confirmPasswordController.text,
         );
+
+        if (!registerRes.success || registerRes.token == null) {
+          if (mounted) {
+            context.pop();
+            _showErrorDialog(registerRes.message);
+          }
+          return;
+        }
+
+        await _tokenService.saveToken(registerRes.token!);
+        setState(() {
+          _isLoggedIn = true;
+        });
+
+        // Lanjut ke pembayaran
+        final response = await _repository.createPayment(package.id);
+        
+        if (!mounted) return;
+        context.pop(); // Tutup loading
+
+        _openPaymentWebview(response);
+
+      } catch (e) {
+        if (mounted) {
+          context.pop();
+          _showErrorDialog(e.toString());
+        }
+      }
+    } else {
+      // Member biasa
+      if (_currentMembership?.package['id'] == package.id) {
+        _showInfoDialog(
+          "Paket Aktif",
+          "Anda sudah memiliki paket ${package.name} yang aktif hingga ${_currentMembership?.expiresAt ?? '-'}.",
+        );
+        return;
+      }
+
+      try {
+        _showLoadingDialog();
+        final response = await _repository.createPayment(package.id);
+        if (!mounted) return;
+        context.pop(); // Tutup loading
+        _openPaymentWebview(response);
+      } catch (e) {
+        if (mounted) {
+          context.pop();
+          _showErrorDialog(e.toString());
+        }
       }
     }
   }
 
-  Future<void> _verifyPayment(int paymentId) async {
+  void _openPaymentWebview(PaymentStoreResponse response) async {
+    final bool? result = await context.push<bool>(
+      '/payment-webview',
+      extra: {
+        'redirectUrl': response.redirectUrl,
+        'paymentId': response.paymentId,
+      },
+    );
+
+    if (result != true) {
+      _startCountdown(response.paymentId, response.redirectUrl);
+    } else {
+      // Jika sukses (webview memanggil finish)
+      _verifyPayment(response.paymentId);
+    }
+  }
+
+  void _showLoadingDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => const Center(child: CircularProgressIndicator(color: AppColors.webRed)),
     );
+  }
 
+  Future<void> _verifyPayment(int paymentId) async {
+    _showLoadingDialog();
     try {
       final status = await _repository.checkPaymentStatus(paymentId);
       if (!mounted) return;
@@ -282,6 +352,12 @@ class _PackagePageState extends State<PackagePage> {
           )
         ],
       ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
     );
   }
 
@@ -344,11 +420,21 @@ class _PackagePageState extends State<PackagePage> {
               _buildError()
             else
               ..._packages.map((package) {
-                final bool isUpgrade = _currentMembership != null && 
-                    _currentMembership!.package['id'] != null &&
-                    _currentMembership!.package['price'] < package.price;
+                // Member Logic: Disable lower tiers
+                bool isActive = false;
+                bool isLowerTier = false;
+                bool isUpgrade = false;
+
+                if (_isLoggedIn && _currentMembership != null) {
+                  final activePackageId = _currentMembership!.package['id'];
+                  final activePrice = _currentMembership!.package['price'] ?? 0;
+                  
+                  isActive = activePackageId == package.id;
+                  isLowerTier = package.price <= activePrice && !isActive;
+                  isUpgrade = package.price > activePrice;
+                }
                 
-                final bool isActive = _currentMembership?.package['id'] == package.id;
+                final bool isDisabled = isActive || isLowerTier;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.xl),
@@ -363,16 +449,138 @@ class _PackagePageState extends State<PackagePage> {
                     disabledBenefits: const [],
                     btnLabel: isActive 
                         ? "Paket Aktif" 
-                        : (isUpgrade ? "Upgrade Paket" : "Pilih ${package.name}"),
+                        : (isLowerTier ? "Sudah Terlewati" : (isUpgrade ? "Upgrade Paket" : (_isLoggedIn ? "Pilih ${package.name}" : "Pilih & Daftar"))),
                     gradient: const LinearGradient(
                       colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
                     ),
-                    onTap: isActive ? null : () => _handlePayment(package),
+                    onTap: isDisabled ? null : () => _handlePayment(package),
                   ),
                 );
               }),
+
+            if (!_isLoggedIn) ...[
+              const SizedBox(height: AppSpacing.xl2),
+              const Divider(color: AppColors.divider),
+              const SizedBox(height: AppSpacing.xl2),
+              _buildRegistrationForm(),
+            ],
+            
+            const SizedBox(height: AppSpacing.xl3),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRegistrationForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            "Belum Punya Akun? Daftar Sekarang",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: AppFontSizes.xl,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          const Text(
+            "Lengkapi data diri Anda untuk membuat akun dan melanjutkan pembayaran.",
+            style: TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.sm),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.xl2),
+          
+          _buildTextField(
+            controller: _nameController,
+            label: "Full Name",
+            icon: Icons.person_outline,
+            validator: (v) => v!.isEmpty ? "Nama lengkap wajib diisi" : null,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildTextField(
+            controller: _emailController,
+            label: "Email Address",
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            validator: (v) => v!.isEmpty || !v.contains('@') ? "Email tidak valid" : null,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildTextField(
+            controller: _phoneController,
+            label: "Phone Number",
+            icon: Icons.phone_outlined,
+            keyboardType: TextInputType.phone,
+            validator: (v) => v!.isEmpty ? "Nomor telepon wajib diisi" : null,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildTextField(
+            controller: _domicileController,
+            label: "Domicile (City/Region)",
+            icon: Icons.location_on_outlined,
+            validator: (v) => v!.isEmpty ? "Domisili wajib diisi" : null,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildTextField(
+            controller: _passwordController,
+            label: "Password",
+            icon: Icons.lock_outline,
+            obscureText: true,
+            validator: (v) => v!.length < 8 ? "Minimal 8 karakter" : null,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildTextField(
+            controller: _confirmPasswordController,
+            label: "Confirm Password",
+            icon: Icons.lock_reset_outlined,
+            obscureText: true,
+            validator: (v) => v != _passwordController.text ? "Password tidak cocok" : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool obscureText = false,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: AppColors.webRed),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: AppColors.cardBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: AppColors.webRed),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
+        filled: true,
+        fillColor: AppColors.cardDark,
       ),
     );
   }

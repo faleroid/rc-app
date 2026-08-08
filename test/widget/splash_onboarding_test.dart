@@ -116,6 +116,9 @@ void main() {
 
       expect(find.text('RicoCapital'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('Animasi/transisi dari SplashScreen ke OnboardingScreen', (WidgetTester tester) async {

@@ -152,22 +152,27 @@ void main() {
     testWidgets('3 kartu paket ditampilkan dengan nama, harga, dan benefit yang benar', (WidgetTester tester) async {
       await tester.pumpWidget(createWidgetUnderTest(const MockSubscriptionPage()));
 
-      // Nama Paket
+      // Nama Paket 1 & 2
       expect(find.byKey(const Key('package_name_1')), findsOneWidget);
       expect(find.byKey(const Key('package_name_2')), findsOneWidget);
-      expect(find.byKey(const Key('package_name_3')), findsOneWidget);
       expect(find.text('Starter Plan'), findsOneWidget);
       expect(find.text('Pro Plan'), findsOneWidget);
-      expect(find.text('VIP Ultimate'), findsOneWidget);
 
       // Harga
       expect(find.text('Rp 99.000'), findsOneWidget);
       expect(find.text('Rp 199.000'), findsOneWidget);
-      expect(find.text('Rp 499.000'), findsOneWidget);
 
       // Benefit spot-check
       expect(find.text('Signal Crypto'), findsOneWidget);
       expect(find.text('Video Edukasi Full'), findsOneWidget);
+
+      // Scroll ke bawah untuk melihat paket ke-3
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('package_name_3')), findsOneWidget);
+      expect(find.text('VIP Ultimate'), findsOneWidget);
+      expect(find.text('Rp 499.000'), findsOneWidget);
       expect(find.text('1-on-1 Mentoring'), findsOneWidget);
     });
 
