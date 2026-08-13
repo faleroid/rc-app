@@ -174,7 +174,11 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                       // Video Lainnya Section
                       const Text(
                         'Modul Lainnya',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 16),
 

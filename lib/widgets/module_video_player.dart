@@ -59,7 +59,7 @@ class _ModuleVideoPlayerState extends State<ModuleVideoPlayer> {
       if (mounted) {
         setState(() {
           _hasError = true;
-          _errorMessage = 'URL video tidak valid';
+          _errorMessage = 'URL video tidak valid atau belum tersedia';
         });
       }
       return;
@@ -92,7 +92,12 @@ class _ModuleVideoPlayerState extends State<ModuleVideoPlayer> {
       if (mounted) {
         setState(() {
           _hasError = true;
-          _errorMessage = e.toString();
+          final errStr = e.toString();
+          if (errStr.contains('ExoPlaybackException') || errStr.contains('exoplayer') || url.contains('.webm')) {
+            _errorMessage = 'Format video (.webm VP9/Opus) tidak didukung oleh decoder HP/Emulator ini. Harap gunakan format MP4 (H.264/AAC).';
+          } else {
+            _errorMessage = 'Gagal memuat video: $e';
+          }
         });
       }
     }
@@ -106,7 +111,12 @@ class _ModuleVideoPlayerState extends State<ModuleVideoPlayer> {
       debugPrint('[ModuleVideoPlayer] Playback error: ${ctrl.value.errorDescription}');
       setState(() {
         _hasError = true;
-        _errorMessage = ctrl.value.errorDescription ?? 'Gagal memutar video';
+        final desc = ctrl.value.errorDescription ?? '';
+        if (desc.contains('ExoPlaybackException') || desc.contains('exoplayer') || (widget.videoUrl?.contains('.webm') ?? false)) {
+          _errorMessage = 'Format video (.webm VP9/Opus) tidak didukung oleh decoder HP/Emulator ini. Harap gunakan format MP4 (H.264/AAC).';
+        } else {
+          _errorMessage = desc.isNotEmpty ? desc : 'Gagal memutar video';
+        }
       });
       return;
     }

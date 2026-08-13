@@ -111,7 +111,7 @@ class _NewsScreenState extends State<NewsScreen> {
                         'Trending Hari Ini',
                         style: TextStyle(
                           fontSize: AppFontSizes.xl,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
@@ -179,7 +179,7 @@ class _NewsScreenState extends State<NewsScreen> {
                     'Berita Terkini',
                     style: TextStyle(
                       fontSize: AppFontSizes.xl,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
@@ -351,7 +351,7 @@ class _NewsScreenState extends State<NewsScreen> {
                           item.title,
                           style: const TextStyle(
                             fontSize: AppFontSizes.md,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w300,
                             color: Colors.white,
                             height: 1.3,
                           ),
