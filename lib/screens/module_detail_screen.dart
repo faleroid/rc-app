@@ -1,12 +1,10 @@
 // lib/screens/module_detail_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../models/module_detail_model.dart';
 import '../repositories/course_repository.dart';
 import '../constants/app_colors.dart';
-import '../widgets/youtube_module_player.dart';
+import '../widgets/module_video_player.dart';
 
 class ModuleDetailScreen extends StatefulWidget {
   final int courseId;
@@ -33,16 +31,6 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
       widget.courseId,
       widget.moduleId,
     );
-  }
-
-  String _formatDate(String dateStr) {
-    if (dateStr.isEmpty) return '';
-    try {
-      final date = DateTime.parse(dateStr).toLocal();
-      return DateFormat('dd MMM yyyy').format(date);
-    } catch (e) {
-      return dateStr;
-    }
   }
 
   @override
@@ -120,7 +108,7 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
             ),
             title: Text(
               'Modul ${nav.current} dari ${nav.total}',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
             centerTitle: true,
             backgroundColor: AppColors.background,
@@ -131,10 +119,10 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header YouTube Video Player Banner
-                YouTubeModulePlayer(
-                  videoId: module.youtubeVideoId,
-                  fallbackImageUrl: module.fileUrl ?? module.videoUrl,
+                // Header Video Player Banner (Cloudflare R2 MP4 Streaming)
+                ModuleVideoPlayer(
+                  videoUrl: module.videoStreamUrl,
+                  fallbackImageUrl: module.fileUrl,
                 ),
 
                 // Content Details
@@ -151,50 +139,6 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      
-                      // Subtitle (Date, Duration, Size)
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          if (module.createdAt.isNotEmpty) ...[
-                            Text(
-                              _formatDate(module.createdAt),
-                              style: const TextStyle(
-                                color: AppColors.textWhite70,
-                                fontSize: 13,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                            const Text(
-                              ' • ',
-                              style: TextStyle(color: AppColors.textWhite54),
-                            ),
-                          ],
-                          Text(
-                            'Durasi: ${module.formattedDuration}',
-                            style: const TextStyle(
-                              color: AppColors.textWhite70,
-                              fontSize: 13,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                          if (module.formattedFileSize.isNotEmpty) ...[
-                            const Text(
-                              ' • ',
-                              style: TextStyle(color: AppColors.textWhite54),
-                            ),
-                            Text(
-                              'Ukuran: ${module.formattedFileSize}',
-                              style: const TextStyle(
-                                color: AppColors.textWhite70,
-                                fontSize: 13,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
-                        ],
                       ),
                       const SizedBox(height: 16),
 
@@ -213,8 +157,7 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                             module.description,
                             style: const TextStyle(
                               color: AppColors.textWhite70,
-                              fontSize: 14,
-                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
                               height: 1.5,
                             ),
                           ),
@@ -222,79 +165,33 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                         const SizedBox(height: 24),
                       ],
 
-                      // Markdown Content (Collapsible)
-                      Theme(
-                        data: Theme.of(context).copyWith(
-                          dividerColor: Colors.transparent,
-                        ),
-                        child: ExpansionTile(
-                          initiallyExpanded: false,
-                          iconColor: Colors.white,
-                          collapsedIconColor: Colors.white,
-                          tilePadding: EdgeInsets.zero,
-                          title: const Text(
-                            'Baca Materi Modul',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: MarkdownBody(
-                                data: module.content,
-                                styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(
-                                    color: AppColors.textWhite,
-                                    fontSize: 14,
-                                    height: 1.5,
-                                  ),
-                                  h1: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  h2: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  listBullet: const TextStyle(
-                                    color: AppColors.textWhite,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      const Divider(
+                        color: Color.fromARGB(255, 80, 80, 80),
+                        thickness: 0.5,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Video Lainnya Section
                       const Text(
-                        'Video Lainnya',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        'Modul Lainnya',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       const SizedBox(height: 16),
 
                       // Render Previous/Next as "Other Videos"
-                      if (nav.previous != null)
-                        _buildVideoItem(nav.previous!),
-                      if (nav.next != null)
-                        _buildVideoItem(nav.next!),
+                      if (nav.previous != null) _buildVideoItem(nav.previous!),
+                      if (nav.next != null) _buildVideoItem(nav.next!),
 
                       // Jika tidak ada navigasi, tampilkan pesan kosong
                       if (nav.previous == null && nav.next == null)
-                        const Text(
-                          'Tidak ada video lainnya.',
-                          style: TextStyle(color: AppColors.textWhite54),
+                        Center(
+                          child: Text(
+                            'Belum ada modul lain yang tersedia di kursus ini.',
+                            style: TextStyle(
+                              color: AppColors.textWhite54,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
 
                       const SizedBox(height: 40),
@@ -347,7 +244,7 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                   const SizedBox(height: 4),
                   Text(
                     item.title,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
@@ -357,7 +254,11 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Modul ${item.sortOrder}',
+                    item.description.isNotEmpty
+                        ? item.description
+                        : 'Modul ${item.sortOrder}',
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.textWhite54,
                       fontSize: 12,

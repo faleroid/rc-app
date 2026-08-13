@@ -59,12 +59,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
               children: courses.map((course) {
                 if (course.modules.isEmpty) return const SizedBox.shrink();
 
-                return Column(
-                  children: [
-                    _buildCourseSection(course),
-                    const SizedBox(height: 24),
-                  ],
-                );
+                return Column(children: [_buildCourseSection(course)]);
               }).toList(),
             ),
           );
@@ -83,8 +78,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
           course.title,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 12),
@@ -114,30 +109,6 @@ class _CourseListScreenState extends State<CourseListScreen> {
             },
           ),
         ),
-
-        // "See all" button if modules > 2
-        if (course.modules.length > 2) ...[
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: OutlinedButton(
-              onPressed: () {
-                // TODO: Navigate to course detail
-                // context.push('/courses/${course.slug}');
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.white54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Lihat semua',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }

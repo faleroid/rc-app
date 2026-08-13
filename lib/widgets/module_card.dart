@@ -46,10 +46,10 @@ class ModuleCard extends StatelessWidget {
             height: 38, // Fixed height for max 2 lines
             child: Text(
               title,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
               maxLines: 2, // Maksimal 2 baris agar rapi
-              overflow:
-                  TextOverflow.ellipsis, // Tambahkan '...' jika teks kepanjangan
+              overflow: TextOverflow
+                  .ellipsis, // Tambahkan '...' jika teks kepanjangan
             ),
           ),
         ],
