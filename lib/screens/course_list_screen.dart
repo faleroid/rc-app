@@ -268,7 +268,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: course.modules.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final module = course.modules[index];
 
