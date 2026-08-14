@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import '../main.dart';
 import '../screens/login_screen.dart';
+import '../screens/register_screen.dart';
+import '../screens/payment_checkout_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/change_password_screen.dart';
 import '../screens/verify_password_screen.dart';
@@ -9,12 +11,37 @@ import '../screens/news_screen.dart';
 import '../screens/detail_news_screen.dart';
 import '../screens/module_detail_screen.dart';
 import '../screens/payment_webview_screen.dart';
+import '../models/payment_model.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) {
+        final initialPackageId = state.extra as int?;
+        return RegisterScreen(initialPackageId: initialPackageId);
+      },
+    ),
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final package = extra['package'] as MembershipPackageModel;
+        final userName = extra['userName'] as String? ?? 'Member';
+        final userEmail = extra['userEmail'] as String? ?? '-';
+        final userPhone = extra['userPhone'] as String? ?? '-';
+
+        return PaymentCheckoutScreen(
+          package: package,
+          userName: userName,
+          userEmail: userEmail,
+          userPhone: userPhone,
+        );
+      },
+    ),
     GoRoute(
       path: '/payment-webview',
       builder: (context, state) {

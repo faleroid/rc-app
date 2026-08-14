@@ -9,7 +9,7 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         // Tip: Gunakan IP laptop Anda jika testing via HP fisik di jaringan Wi-Fi yang sama
-        baseUrl: 'http://192.168.100.133:8000/api',
+        baseUrl: 'http://192.168.18.26:8000/api',
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

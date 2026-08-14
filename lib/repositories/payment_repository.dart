@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import '../services/api_service.dart';
 import '../models/payment_model.dart';
@@ -44,6 +45,35 @@ class PaymentRepository {
       throw Exception(response.data['message'] ?? 'Gagal membuat pembayaran');
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Gagal memproses transaksi');
+    }
+  }
+
+  /// Mengirim bukti pembayaran crypto ke backend
+  Future<Map<String, dynamic>> uploadCryptoPaymentProof({
+    required int packageId,
+    required String cryptoCurrency,
+    required File imageFile,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'crypto_currency': cryptoCurrency.toLowerCase(),
+        'proof_of_payment': await MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split('/').last,
+        ),
+      });
+
+      final response = await _apiService.dio.post(
+        '/payment/$packageId/crypto-store',
+        data: formData,
+      );
+
+      if (response.data['success'] == true) {
+        return response.data;
+      }
+      throw Exception(response.data['message'] ?? 'Gagal mengunggah bukti pembayaran');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Terjadi kesalahan saat mengunggah bukti pembayaran');
     }
   }
 

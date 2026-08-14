@@ -198,55 +198,10 @@ class _PackagePageState extends State<PackagePage> {
 
   Future<void> _handlePayment(MembershipPackageModel package) async {
     if (!_isLoggedIn) {
-      // Logic Registrasi & Bayar
-      if (!_formKey.currentState!.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Silakan lengkapi formulir pendaftaran di bawah')),
-        );
-        return;
-      }
-
-      try {
-        _showLoadingDialog();
-        
-        final registerRes = await _authRepository.register(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          phoneNumber: _phoneController.text.trim(),
-          domicile: _domicileController.text.trim(),
-          password: _passwordController.text,
-          passwordConfirmation: _confirmPasswordController.text,
-        );
-
-        if (!registerRes.success || registerRes.token == null) {
-          if (mounted) {
-            context.pop();
-            _showErrorDialog(registerRes.message);
-          }
-          return;
-        }
-
-        await _tokenService.saveToken(registerRes.token!);
-        setState(() {
-          _isLoggedIn = true;
-        });
-
-        // Lanjut ke pembayaran
-        final response = await _repository.createPayment(package.id);
-        
-        if (!mounted) return;
-        context.pop(); // Tutup loading
-
-        _openPaymentWebview(response);
-
-      } catch (e) {
-        if (mounted) {
-          context.pop();
-          _showErrorDialog(e.toString());
-        }
-      }
+      // Direct guest users to Login Screen (Gambar 2)
+      context.go('/login');
     } else {
-      // Member biasa
+      // Member logged in: check active package
       if (_currentMembership?.package['id'] == package.id) {
         _showInfoDialog(
           "Paket Aktif",
@@ -255,18 +210,16 @@ class _PackagePageState extends State<PackagePage> {
         return;
       }
 
-      try {
-        _showLoadingDialog();
-        final response = await _repository.createPayment(package.id);
-        if (!mounted) return;
-        context.pop(); // Tutup loading
-        _openPaymentWebview(response);
-      } catch (e) {
-        if (mounted) {
-          context.pop();
-          _showErrorDialog(e.toString());
-        }
-      }
+      // Navigate to Payment Checkout Screen
+      context.push(
+        '/checkout',
+        extra: {
+          'package': package,
+          'userName': 'Member',
+          'userEmail': 'member@ricocapital.id',
+          'userPhone': '-',
+        },
+      );
     }
   }
 
@@ -449,7 +402,7 @@ class _PackagePageState extends State<PackagePage> {
                     disabledBenefits: const [],
                     btnLabel: isActive 
                         ? "Paket Aktif" 
-                        : (isLowerTier ? "Sudah Terlewati" : (isUpgrade ? "Upgrade Paket" : (_isLoggedIn ? "Pilih ${package.name}" : "Pilih & Daftar"))),
+                        : (isLowerTier ? "Sudah di ambil" : (isUpgrade ? "Upgrade Paket" : (_isLoggedIn ? "Pilih ${package.name}" : "Pilih & Daftar"))),
                     gradient: const LinearGradient(
                       colors: [AppColors.webOrangeStart, AppColors.webOrangeEnd],
                     ),

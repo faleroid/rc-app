@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.go('/main', extra: {'isLoggedIn': false, 'index': 0, 'tabIndex': 3});
+                      context.go('/register');
                     },
                     child: const Text(
                       'Daftar Disini',
