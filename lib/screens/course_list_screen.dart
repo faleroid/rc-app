@@ -79,8 +79,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: courses.map((course) {
-                      if (course.modules.isEmpty)
+                      if (course.modules.isEmpty) {
                         return const SizedBox.shrink();
+                      }
 
                       return _buildCourseSection(course);
                     }).toList(),

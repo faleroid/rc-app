@@ -59,6 +59,23 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
             ),
           );
         } else if (snapshot.hasError) {
+          final errStr = snapshot.error.toString();
+          final isUnauth =
+              errStr.toLowerCase().contains('unauthenticated') ||
+              errStr.contains('401') ||
+              errStr.contains('403');
+
+          if (isUnauth) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              try {
+                context.go(
+                  '/unauthenticated',
+                  extra: 'Sesi Anda telah berakhir. Silakan login kembali.',
+                );
+              } catch (_) {}
+            });
+          }
+
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AppBar(
@@ -70,9 +87,49 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
               elevation: 0,
             ),
             body: Center(
-              child: Text(
-                snapshot.error.toString(),
-                style: const TextStyle(color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      isUnauth
+                          ? Icons.lock_person_rounded
+                          : Icons.error_outline_rounded,
+                      color: AppColors.webRed,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isUnauth ? 'Akses Dibatasi — Silakan Login' : errStr,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.webRed,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        context.go(isUnauth ? '/unauthenticated' : '/main');
+                      },
+                      child: Text(
+                        isUnauth ? 'Masuk Sekarang' : 'Kembali ke Beranda',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

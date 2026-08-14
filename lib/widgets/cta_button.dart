@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
+
 // ─────────────────────────────────────────────────────────────
 // 7. PRIMARY CTA BUTTON (Oval / Pill)
 // ─────────────────────────────────────────────────────────────
@@ -34,7 +35,9 @@ class AppPrimaryButton extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: gradient == null ? (backgroundColor ?? AppColors.primary) : null,
+          color: gradient == null
+              ? (backgroundColor ?? AppColors.primary)
+              : null,
           gradient: gradient,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
@@ -43,9 +46,9 @@ class AppPrimaryButton extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             color: textColor ?? AppColors.textWhite,
-            fontSize: AppFontSizes.md,
+            fontSize: AppFontSizes.sm,
             fontFamily: AppFonts.primary,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

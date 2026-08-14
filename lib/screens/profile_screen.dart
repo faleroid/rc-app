@@ -51,10 +51,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: CircularProgressIndicator(color: Colors.white),
             );
           } else if (snapshot.hasError) {
+            final errStr = snapshot.error.toString();
+            final isUnauth = errStr.toLowerCase().contains('unauthenticated') ||
+                errStr.contains('401') ||
+                errStr.contains('403');
+
+            if (isUnauth) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                try {
+                  context.go('/unauthenticated', extra: 'Sesi profil Anda telah berakhir. Silakan login kembali.');
+                } catch (_) {}
+              });
+            }
+
             return Center(
-              child: Text(
-                snapshot.error.toString(),
-                style: const TextStyle(color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.lock_person_rounded, color: AppColors.webRed, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      isUnauth ? 'Sesi Anda Telah Berakhir' : errStr,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.webRed,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () {
+                        context.go('/unauthenticated');
+                      },
+                      child: const Text('Masuk Sekarang', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
               ),
             );
           } else if (snapshot.hasData && snapshot.data!.data != null) {

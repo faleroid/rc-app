@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import '../models/news_model.dart';
 import '../services/api_service.dart';
 
@@ -7,13 +7,11 @@ class NewsRepository {
 
   Future<NewsPaginatedResponse> fetchNews({
     String? search,
-    int page = 1,
   }) async {
     try {
       final response = await _apiService.dio.get(
         '/news',
         queryParameters: {
-          'page': page,
           if (search != null && search.isNotEmpty) 'search': search,
         },
       );
@@ -22,22 +20,6 @@ class NewsRepository {
         return NewsPaginatedResponse.fromJson(response.data);
       } else {
         throw Exception('Gagal memuat berita');
-      }
-    } on DioException catch (e) {
-      throw Exception(
-        e.response?.data['message'] ?? 'Terjadi kesalahan jaringan',
-      );
-    }
-  }
-
-  Future<NewsDetailResponse> fetchNewsDetail(String slug) async {
-    try {
-      final response = await _apiService.dio.get('/news/$slug');
-
-      if (response.statusCode == 200) {
-        return NewsDetailResponse.fromJson(response.data);
-      } else {
-        throw Exception('Gagal memuat detail berita');
       }
     } on DioException catch (e) {
       throw Exception(
