@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 
 // ─── FONT SIZES ──────────────────────────────────────────────
 class AppFontSizes {
@@ -12,6 +13,17 @@ class AppFontSizes {
   static const double xl2   = 24.0;
   static const double xl3   = 28.0;
   static const double xl4   = 32.0;
+}
+
+// ─── FONT WEIGHTS ─────────────────────────────────────────────
+class AppFontWeights {
+  AppFontWeights._();
+
+  static const FontWeight light     = FontWeight.w300;
+  static const FontWeight regular   = FontWeight.w400;
+  static const FontWeight medium    = FontWeight.w500;
+  static const FontWeight semiBold  = FontWeight.w600;
+  static const FontWeight bold      = FontWeight.w700;
 }
 
 // ─── FONT FAMILY ─────────────────────────────────────────────

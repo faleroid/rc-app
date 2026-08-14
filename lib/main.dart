@@ -99,6 +99,7 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   String _userName = 'Profile';
+  bool _isActive = false;
   late TabController _tabController;
 
   @override
@@ -130,6 +131,7 @@ class _MainScreenState extends State<MainScreen>
       if (res.data != null) {
         setState(() {
           _userName = res.data!.name.split(' ').first;
+          _isActive = res.data!.isActive;
         });
       }
     } catch (e) {
@@ -298,47 +300,49 @@ class _MainScreenState extends State<MainScreen>
 
       body: _buildBody(),
 
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.background, // Dark background
-          border: Border(
-            top: BorderSide(
-              color: AppColors.borderColor, // Top border
-              width: AppColors.borderWidth,
-            ),
-          ),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor:
-              Colors.transparent, // Transparent to use container background
-          elevation: 0, // Remove shadow
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: Colors.white,
-          onTap: _onItemTapped, // Handle tap
+      bottomNavigationBar: (widget.isLoggedIn && _isActive)
+          ? Container(
+              decoration: const BoxDecoration(
+                color: AppColors.background, // Dark background
+                border: Border(
+                  top: BorderSide(
+                    color: AppColors.borderColor, // Top border
+                    width: AppColors.borderWidth,
+                  ),
+                ),
+              ),
+              child: BottomNavigationBar(
+                backgroundColor:
+                    Colors.transparent, // Transparent to use container background
+                elevation: 0, // Remove shadow
+                type: BottomNavigationBarType.fixed,
+                currentIndex: _selectedIndex,
+                selectedItemColor: AppColors.primary,
+                unselectedItemColor: Colors.white,
+                onTap: _onItemTapped, // Handle tap
 
-          items: const [
-            // Home
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined, color: AppColors.primary),
-              label: 'Beranda',
-            ),
+                items: const [
+                  // Home
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined, color: AppColors.primary),
+                    label: 'Beranda',
+                  ),
 
-            // News
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined, color: AppColors.primary),
-              label: 'Berita',
-            ),
+                  // News
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.article_outlined, color: AppColors.primary),
+                    label: 'Berita',
+                  ),
 
-            // Module
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book_outlined, color: AppColors.primary),
-              label: 'Modul',
-            ),
-          ],
-        ),
-      ),
+                  // Module
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.menu_book_outlined, color: AppColors.primary),
+                    label: 'Modul',
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
-import '../constants/app_font_sizes.dart';
+import '../constants/font.dart';
 import '../constants/margin.dart';
 import '../models/payment_model.dart';
 import '../repositories/auth_repository.dart';
@@ -369,7 +369,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14)),
+        Text(label, style: const TextStyle(color: Colors.white, fontWeight: AppFontWeights.semiBold, fontSize: 14)),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,

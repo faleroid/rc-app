@@ -256,7 +256,7 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
           Flexible(
             child: Text(
               value,
-              style: const TextStyle(color: Colors.white, fontSize: AppFontSizes.xs, fontWeight: FontWeight.w500),
+              style: const TextStyle(color: Colors.white, fontSize: AppFontSizes.xs, fontWeight: AppFontWeights.semiBold),
               overflow: TextOverflow.ellipsis,
             ),
           ),

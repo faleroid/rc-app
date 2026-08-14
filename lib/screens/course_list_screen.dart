@@ -35,6 +35,13 @@ class _CourseListScreenState extends State<CourseListScreen> {
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           } else if (snapshot.hasError) {
+            final err = snapshot.error.toString();
+            if (err.contains('403') ||
+                err.contains('Akses ditolak') ||
+                err.contains('tidak aktif') ||
+                err.contains('Unauthorized')) {
+              return _buildLockedView(context);
+            }
             return Center(
               child: Text(
                 'Error: ${snapshot.error}',
@@ -139,6 +146,94 @@ class _CourseListScreenState extends State<CourseListScreen> {
           ),
         ],
       ],
+    );
+  }
+
+  // Build locked view for inactive or guest users
+  Widget _buildLockedView(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  width: 2,
+                ),
+              ),
+              child: const Icon(
+                Icons.lock_outline_rounded,
+                size: 56,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.webRed.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.webRed.withValues(alpha: 0.5)),
+              ),
+              child: const Text(
+                'KHUSUS MEMBER AKTIF',
+                style: TextStyle(
+                  color: AppColors.webRed,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Akses Modul Terkunci',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Keanggotaan Anda saat ini belum aktif. Silakan pilih dan bayar paket keanggotaan untuk membuka seluruh modul & materi pembelajaran eksklusif RicoCapital.',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                elevation: 4,
+              ),
+              onPressed: () {
+                context.push('/register');
+              },
+              icon: const Icon(Icons.workspace_premium, size: 20),
+              label: const Text(
+                'Pilih Paket Keanggotaan',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

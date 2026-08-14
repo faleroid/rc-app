@@ -19,6 +19,13 @@ class UserModel {
     this.membershipExpiresAt,
   });
 
+  bool get isActive {
+    if (role == 'admin') return true;
+    if (status != 'active') return false;
+    if (membershipExpiresAt == null) return false;
+    return membershipExpiresAt!.isAfter(DateTime.now());
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] ?? 0,
