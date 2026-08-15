@@ -23,11 +23,21 @@ class _CourseListScreenState extends State<CourseListScreen> {
     _coursesFuture = _repository.fetchCourses();
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _coursesFuture = _repository.fetchCourses();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: FutureBuilder<CourseListResponse>(
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        color: AppColors.primary,
+        backgroundColor: AppColors.background,
+        child: FutureBuilder<CourseListResponse>(
         future: _coursesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -49,10 +59,18 @@ class _CourseListScreenState extends State<CourseListScreen> {
               ),
             );
           } else if (!snapshot.hasData || snapshot.data!.courses.isEmpty) {
-            return const Center(
-              child: Text(
-                'Belum ada data tersedia.',
-                style: TextStyle(color: Colors.white),
+            return LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: constraints.maxHeight,
+                  child: const Center(
+                    child: Text(
+                      'Belum ada data tersedia.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
             );
           }
@@ -73,6 +91,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
           }
 
           return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -99,7 +118,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
           );
         },
       ),
-    );
+    ),
+  );
   }
 
   // Header Modul Terbaru Full Width Mentok Layar
@@ -301,87 +321,127 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
   // Build locked view for inactive or guest users
   Widget _buildLockedView(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  width: 2,
-                ),
-              ),
-              child: const Icon(
-                Icons.lock_outline_rounded,
-                size: 56,
-                color: AppColors.primary,
+    // Wrapped in LayoutBuilder + SingleChildScrollView to support pull-to-refresh
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: constraints.maxHeight,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.lock_outline_rounded,
+                      size: 56,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.webRed.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.webRed.withValues(alpha: 0.5)),
+                    ),
+                    child: const Text(
+                      'KHUSUS MEMBER AKTIF',
+                      style: TextStyle(
+                        color: AppColors.webRed,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Akses Modul Terkunci',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Keanggotaan Anda saat ini belum aktif. Silakan pilih dan bayar paket keanggotaan untuk membuka seluruh modul & materi pembelajaran eksklusif RicoCapital.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  // Hint pull-to-refresh
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.arrow_downward, color: Colors.white38, size: 14),
+                      SizedBox(width: 6),
+                      Text(
+                        'Tarik ke bawah untuk cek status pembayaran',
+                        style: TextStyle(color: Colors.white38, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Tombol refresh manual
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    onPressed: _refresh,
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text(
+                      'Cek Status Pembayaran',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 4,
+                    ),
+                    onPressed: () {
+                      context.push('/register');
+                    },
+                    icon: const Icon(Icons.workspace_premium, size: 20),
+                    label: const Text(
+                      'Pilih Paket Keanggotaan',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.webRed.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.webRed.withValues(alpha: 0.5)),
-              ),
-              child: const Text(
-                'KHUSUS MEMBER AKTIF',
-                style: TextStyle(
-                  color: AppColors.webRed,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Akses Modul Terkunci',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Keanggotaan Anda saat ini belum aktif. Silakan pilih dan bayar paket keanggotaan untuk membuka seluruh modul & materi pembelajaran eksklusif RicoCapital.',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                elevation: 4,
-              ),
-              onPressed: () {
-                context.push('/register');
-              },
-              icon: const Icon(Icons.workspace_premium, size: 20),
-              label: const Text(
-                'Pilih Paket Keanggotaan',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -27,6 +27,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _profileFuture = _repository.getProfile();
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      _profileFuture = _repository.getProfile();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +49,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
-      body: FutureBuilder<ProfileResponse>(
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        color: AppColors.primary,
+        backgroundColor: AppColors.background,
+        child: FutureBuilder<ProfileResponse>(
         future: _profileFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -97,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final user = snapshot.data!.data!;
 
             return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildProfileHeader(UserModel user) {
