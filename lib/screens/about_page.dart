@@ -37,53 +37,53 @@ class AboutPage extends StatelessWidget {
   static const List<_TeamMember> _teamMembers = [
     // Baris 1: CEO dan COO
     _TeamMember(
-      name: 'anggota1',
+      name: 'A Rico Yoananda Rahardja',
       position: 'Chief Executive Officer',
       imageUrl: 'assets/images/anggota/CEO_rico.png',
     ),
     _TeamMember(
-      name: 'anggota2',
+      name: 'Nugrahhadi Al Khawarizmi',
       position: 'Chief Operating Officer',
       imageUrl: 'assets/images/anggota/COO_hadi.jpg',
     ),
 
     // Baris 2: CTO
     _TeamMember(
-      name: 'anggota3',
+      name: 'Muhammad Sholahatul Haq',
       position: 'Chief Technology Officer',
       imageUrl: 'assets/images/anggota/CTO_haq.png',
     ),
     _TeamMember(
-      name: 'anggota4',
+      name: 'Naufal Satrio Putra',
       position: 'Chief Technology Officer',
       imageUrl: 'assets/images/anggota/CTO_naufal.png',
     ),
     _TeamMember(
-      name: 'anggota5',
+      name: 'Renggo Harya Pandora',
       position: 'Chief Technology Officer',
       imageUrl: 'assets/images/anggota/CTO_renggo.png',
     ),
 
     // Baris 3: CFO
     _TeamMember(
-      name: 'anggota6',
+      name: 'Afifah Husna Zhafira',
       position: 'Chief Financial Officer',
       imageUrl: 'assets/images/anggota/CFO_fira.png',
     ),
     _TeamMember(
-      name: 'anggota7',
+      name: 'Gregat Filhaq Sejati',
       position: 'Chief Financial Officer',
       imageUrl: 'assets/images/anggota/CFO_gregat.png',
     ),
 
     // Baris 4: CCO
     _TeamMember(
-      name: 'anggota8',
+      name: 'Taufik Fajar Ikhsan',
       position: 'Chief Creative Officer',
       imageUrl: 'assets/images/anggota/CCO_fajar.png',
     ),
     _TeamMember(
-      name: 'anggota9',
+      name: 'Nugrahhadi Al Khawarizmi',
       position: 'Chief Creative Officer',
       imageUrl: 'assets/images/anggota/CCO_nadif.png',
     ),
