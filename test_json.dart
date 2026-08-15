@@ -7,40 +7,39 @@ void main() {
     "message": "Module successfully retrieved",
     "data": {
         "module": {
-            "id": 1,
-            "course_id": 1,
-            "title": "Pengenalan Analisis Fundamental",
-            "slug": "pengenalan-analisis-fundamental",
-            "description": null,
-            "content": null,
-            "duration_minutes": 30,
-            "created_at": null,
-            "updated_at": "2026-06-29T15:47:33.000000Z",
-            "formatted_duration": "30m",
-            "formatted_file_size": null,
-            "file_url": null
+            "id": 12,
+            "title": "Test Cloudfare",
+            "slug": "test-cloudfare",
+            "description": "Ini deskripsi dari cloudfare",
+            "status": "published",
+            "created_at": "2026-08-12T04:28:59.000000Z",
+            "updated_at": "2026-08-12T04:41:58.000000Z",
+            "video_url": null,
+            "formatted_duration": "1m",
+            "formatted_file_size": "2.67 MB",
+            "youtube_embed_url": null,
+            "file_url": "http://localhost:8000/media/r2/videos/courses/pengenalan-trading-pemula/test-cloudfare-OLzuBp5P.mp4",
+            "video_playback_url": "https://pub-6f2c5d84691f614d1086d8c432e49386.r2.dev/videos/courses/pengenalan-trading-pemula/test-cloudfare-OLzuBp5P.mp4"
         },
         "navigation": {
             "previous": null,
-            "next": {
-                "id": 2,
-                "title": "Indikator Ekonomi Penting",
-                "slug": "indikator-ekonomi-penting",
-                "sort_order": 2
-            },
+            "next": null,
             "current": 1,
-            "total": 3
+            "total": 1
         }
     }
 }''';
+
   try {
     final parsed = jsonDecode(jsonString);
     final response = ModuleDetailResponse.fromJson(parsed);
-    print("Success!");
-    print("description: ${response.module.description}");
+    print("Parsing success!");
+    print("Title: ${response.module.title}");
     print("fileUrl: ${response.module.fileUrl}");
+    print("videoPlaybackUrl: ${response.module.videoPlaybackUrl}");
+    print("videoStreamUrl: ${response.module.videoStreamUrl}");
   } catch (e, stackTrace) {
-    print(e);
+    print("Error: $e");
     print(stackTrace);
   }
 }

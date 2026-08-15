@@ -59,20 +59,42 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
           final courses = snapshot.data!.courses;
 
+          // Cari modul terbaru (ID terbesar) dari seluruh course untuk featured header
+          CourseModel? featuredCourse;
+          ModuleMiniModel? latestModule;
+
+          for (final course in courses) {
+            for (final module in course.modules) {
+              if (latestModule == null || module.id > latestModule.id) {
+                latestModule = module;
+                featuredCourse = course;
+              }
+            }
+          }
+
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: courses.map((course) {
-                if (course.modules.isEmpty) return const SizedBox.shrink();
+              children: [
+                // Header Modul Video Terbaru (Full Width Tanpa Padding)
+                if (featuredCourse != null && latestModule != null)
+                  _buildFeaturedHeader(featuredCourse, latestModule),
 
-                return Column(
-                  children: [
-                    _buildCourseSection(course),
-                    const SizedBox(height: 24),
-                  ],
-                );
-              }).toList(),
+                // Daftar Section Course (Dengan Padding)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: courses.map((course) {
+                      if (course.modules.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return _buildCourseSection(course);
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -80,29 +102,181 @@ class _CourseListScreenState extends State<CourseListScreen> {
     );
   }
 
-  // Build one course section with its module cards
+  // Header Modul Terbaru Full Width Mentok Layar
+  Widget _buildFeaturedHeader(CourseModel course, ModuleMiniModel module) {
+    final thumbnailUrl =
+        module.thumbnailUrl ??
+        'https://picsum.photos/seed/${module.id + 15}/800/450';
+
+    return GestureDetector(
+      onTap: () {
+        context.push('/courses/${course.id}/modules/${module.id}');
+      },
+      child: SizedBox(
+        width: double.infinity,
+        height: 240,
+        child: Stack(
+          children: [
+            // Background Thumbnail Image
+            Positioned.fill(
+              child: Image.network(
+                thumbnailUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: AppColors.cardDark,
+                  child: const Center(
+                    child: Icon(
+                      Icons.video_library,
+                      size: 48,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Gradient Overlay untuk kontras teks
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.01),
+                      Colors.black.withValues(alpha: 0.6),
+                      Colors.black.withValues(alpha: 0.85),
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                  ),
+                ),
+              ),
+            ),
+
+            // Text Info & Tombol "Tonton Sekarang"
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Tag / Nama Course
+                  Text(
+                    course.title.toUpperCase(),
+                    style: const TextStyle(
+                      color: AppColors.primaryLight,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.8,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Judul Modul Video
+                  Text(
+                    module.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tombol "Tonton Sekarang" & Durasi
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Tonton Sekarang',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (module.durationMinutes > 0) ...[
+                        const SizedBox(width: 14),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              color: Colors.white70,
+                              size: 15,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              '${module.durationMinutes} menit',
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Build satu section course beserta list modul horizontal
   Widget _buildCourseSection(CourseModel course) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Course title as section header
+        // Course Title Header
         Text(
           course.title,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 12),
 
-        // Module cards horizontal list
+        // Horizontal Module Cards List
         SizedBox(
           height: 160,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: course.modules.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final module = course.modules[index];
 
@@ -121,30 +295,6 @@ class _CourseListScreenState extends State<CourseListScreen> {
             },
           ),
         ),
-
-        // "See all" button if modules > 2
-        if (course.modules.length > 2) ...[
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: OutlinedButton(
-              onPressed: () {
-                // TODO: Navigate to course detail
-                // context.push('/courses/${course.slug}');
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.white54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Lihat semua',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }

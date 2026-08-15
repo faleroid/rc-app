@@ -1,92 +1,87 @@
-class CreatorModel {
-  final int id;
-  final String name;
-
-  CreatorModel({required this.id, required this.name});
-
-  factory CreatorModel.fromJson(Map<String, dynamic> json) {
-    return CreatorModel(id: json['id'] ?? 0, name: json['name'] ?? '');
-  }
-}
-
-class NewsArticleModel {
-  final int id;
+﻿class NewsArticleModel {
+  final String id;
   final String title;
-  final String slug;
-  final String excerpt;
-  final String? content;
-  final String thumbnail;
-  final DateTime createdAt;
-  final CreatorModel? creator;
+  final String description;
+  final String link;
+  final String source;
+  final String? sourceKey;
+  final String? language;
+  final String? pubDate;
+  final String? category;
+  final String? region;
+  final String? timeAgo;
 
   NewsArticleModel({
     required this.id,
     required this.title,
-    required this.slug,
-    required this.excerpt,
-    this.content,
-    required this.thumbnail,
-    required this.createdAt,
-    this.creator,
+    required this.description,
+    required this.link,
+    required this.source,
+    this.sourceKey,
+    this.language,
+    this.pubDate,
+    this.category,
+    this.region,
+    this.timeAgo,
   });
 
   factory NewsArticleModel.fromJson(Map<String, dynamic> json) {
     return NewsArticleModel(
-      id: json['id'] ?? 0,
+      id: json['id']?.toString() ?? '',
       title: json['title'] ?? '',
-      slug: json['slug'] ?? '',
-      excerpt: json['excerpt'] ?? '',
-      content: json['content'],
-      thumbnail: json['thumbnail'] ?? '',
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : DateTime.now(),
-      creator: json['creator'] != null
-          ? CreatorModel.fromJson(json['creator'])
-          : null,
+      description: json['description'] ?? '',
+      link: json['link'] ?? '',
+      source: json['source'] ?? 'Public News',
+      sourceKey: json['sourceKey'],
+      language: json['language'],
+      pubDate: json['pubDate'],
+      category: json['category'],
+      region: json['region'],
+      timeAgo: json['timeAgo'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'link': link,
+      'source': source,
+      'sourceKey': sourceKey,
+      'language': language,
+      'pubDate': pubDate,
+      'category': category,
+      'region': region,
+      'timeAgo': timeAgo,
+    };
   }
 }
 
 class NewsPaginatedResponse {
   final bool success;
   final List<NewsArticleModel> articles;
-  final int currentPage;
-  final String? nextPageUrl;
 
   NewsPaginatedResponse({
     required this.success,
     required this.articles,
-    required this.currentPage,
-    this.nextPageUrl,
   });
 
   factory NewsPaginatedResponse.fromJson(Map<String, dynamic> json) {
-    final dataObject = json['data'] ?? {};
-    final listData = dataObject['data'] as List? ?? [];
+    final dataObject = json['data'];
+    List listData = [];
+
+    if (dataObject is Map<String, dynamic>) {
+      listData = dataObject['articles'] as List? ?? [];
+    } else if (dataObject is List) {
+      listData = dataObject;
+    } else if (json['articles'] is List) {
+      listData = json['articles'] as List;
+    }
 
     return NewsPaginatedResponse(
-      success: json['success'] ?? false,
-      articles: listData.map((e) => NewsArticleModel.fromJson(e)).toList(),
-      currentPage: dataObject['current_page'] ?? 1,
-      nextPageUrl: dataObject['next_page_url'],
-    );
-  }
-}
-
-class NewsDetailResponse {
-  final bool success;
-  final NewsArticleModel data;
-
-  NewsDetailResponse({
-    required this.success,
-    required this.data,
-  });
-
-  factory NewsDetailResponse.fromJson(Map<String, dynamic> json) {
-    return NewsDetailResponse(
-      success: json['success'] ?? false,
-      data: NewsArticleModel.fromJson(json['data'] ?? {}),
+      success: json['success'] ?? true,
+      articles: listData.map((e) => NewsArticleModel.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
 }

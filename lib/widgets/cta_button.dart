@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
+
 // ─────────────────────────────────────────────────────────────
 // 7. PRIMARY CTA BUTTON (Oval / Pill)
 // ─────────────────────────────────────────────────────────────
@@ -25,8 +26,6 @@ class AppPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDisabled = onTap == null;
-
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -36,20 +35,20 @@ class AppPrimaryButton extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: isDisabled
-              ? Colors.grey.shade800
-              : (gradient == null ? (backgroundColor ?? AppColors.primary) : null),
-          gradient: isDisabled ? null : gradient,
+          color: gradient == null
+              ? (backgroundColor ?? AppColors.primary)
+              : null,
+          gradient: gradient,
           borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: isDisabled ? Colors.grey : (textColor ?? AppColors.textWhite),
-            fontSize: AppFontSizes.md,
+            color: textColor ?? AppColors.textWhite,
+            fontSize: AppFontSizes.sm,
             fontFamily: AppFonts.primary,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

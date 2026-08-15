@@ -1,14 +1,18 @@
+import '../services/api_service.dart';
+
 class NavigationItemModel {
   final int id;
   final String title;
   final String slug;
   final int sortOrder;
+  final String description;
 
   NavigationItemModel({
     required this.id,
     required this.title,
     required this.slug,
     required this.sortOrder,
+    this.description = '',
   });
 
   factory NavigationItemModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +21,7 @@ class NavigationItemModel {
       title: json['title']?.toString() ?? '',
       slug: json['slug']?.toString() ?? '',
       sortOrder: json['sort_order'] is int ? json['sort_order'] : int.tryParse(json['sort_order']?.toString() ?? '0') ?? 0,
+      description: json['description']?.toString() ?? '',
     );
   }
 }
@@ -57,7 +62,7 @@ class ModuleDetailModel {
   final String formattedDuration;
   final String? fileUrl;
   final String? videoUrl;
-  final String? youtubeEmbedUrl;
+  final String? videoPlaybackUrl;
   final String createdAt;
   final String formattedFileSize;
 
@@ -70,35 +75,51 @@ class ModuleDetailModel {
     required this.formattedDuration,
     this.fileUrl,
     this.videoUrl,
-    this.youtubeEmbedUrl,
+    this.videoPlaybackUrl,
     required this.createdAt,
     required this.formattedFileSize,
   });
 
-  /// Helper untuk mengekstrak Video ID YouTube dari atribut URL yang tersedia
-  String? get youtubeVideoId {
-    final candidateUrls = [youtubeEmbedUrl, videoUrl, fileUrl];
-    for (final rawUrl in candidateUrls) {
-      if (rawUrl == null || rawUrl.trim().isEmpty) continue;
-      final url = rawUrl.trim();
-
-      // Matching regex untuk berbagai format URL YouTube (watch, embed, youtu.be, dll)
-      final RegExp regExp = RegExp(
-        r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})',
-        caseSensitive: false,
-      );
-      final match = regExp.firstMatch(url);
-      if (match != null && match.group(1) != null) {
-        return match.group(1);
-      }
-
-      // Jika URL sudah dalam format Raw Video ID 11 karakter
-      final cleanId = url.split('&').first.split('?').first;
-      if (RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(cleanId)) {
-        return cleanId;
+  /// Priority getter untuk URL streaming video (Cloudflare R2 / Direct MP4)
+  String? get videoStreamUrl {
+    String? raw;
+    if (videoPlaybackUrl != null && videoPlaybackUrl!.trim().isNotEmpty) {
+      raw = videoPlaybackUrl!.trim();
+    } else if (fileUrl != null && fileUrl!.trim().isNotEmpty) {
+      raw = fileUrl!.trim();
+    } else if (videoUrl != null && videoUrl!.trim().isNotEmpty) {
+      final url = videoUrl!.trim();
+      final isYouTube = url.contains('youtube.com') || url.contains('youtu.be');
+      if (!isYouTube) {
+        raw = url;
       }
     }
-    return null;
+
+    if (raw == null) return null;
+    return resolveMediaUrl(raw);
+  }
+
+  /// Helper untuk meresolve localhost URL menjadi host IP tempat API server berjalan
+  static String resolveMediaUrl(String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return trimmed;
+
+    if (trimmed.startsWith('http://localhost') || trimmed.startsWith('http://127.0.0.1')) {
+      try {
+        final baseApi = ApiService().dio.options.baseUrl;
+        final Uri? apiUri = Uri.tryParse(baseApi);
+        if (apiUri != null && apiUri.host.isNotEmpty) {
+          final String targetHost = apiUri.port != 0 && apiUri.port != 80 && apiUri.port != 443
+              ? '${apiUri.host}:${apiUri.port}'
+              : apiUri.host;
+          return trimmed.replaceFirst(RegExp(r'http://(localhost|127\.0\.0\.1)(:\d+)?'), 'http://$targetHost');
+        }
+      } catch (e) {
+        // Fallback
+      }
+    }
+
+    return trimmed;
   }
 
   factory ModuleDetailModel.fromJson(Map<String, dynamic> json) {
@@ -111,7 +132,7 @@ class ModuleDetailModel {
       formattedDuration: json['formatted_duration']?.toString() ?? '',
       fileUrl: json['file_url']?.toString(),
       videoUrl: json['video_url']?.toString(),
-      youtubeEmbedUrl: json['youtube_embed_url']?.toString(),
+      videoPlaybackUrl: json['video_playback_url']?.toString(),
       createdAt: json['created_at']?.toString() ?? '',
       formattedFileSize: json['formatted_file_size']?.toString() ?? '',
     );

@@ -1,4 +1,4 @@
-import 'package:go_router/go_router.dart';
+﻿import 'package:go_router/go_router.dart';
 import '../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
@@ -8,8 +8,8 @@ import '../screens/change_password_screen.dart';
 import '../screens/verify_password_screen.dart';
 import '../screens/update_username_screen.dart';
 import '../screens/news_screen.dart';
-import '../screens/detail_news_screen.dart';
 import '../screens/module_detail_screen.dart';
+import '../screens/unauthenticated_screen.dart';
 import '../screens/payment_webview_screen.dart';
 import '../models/payment_model.dart';
 
@@ -18,6 +18,13 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/unauthenticated',
+      builder: (context, state) {
+        final message = state.extra as String?;
+        return UnauthenticatedScreen(message: message);
+      },
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) {
@@ -86,7 +93,6 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/update-username',
       builder: (context, state) {
-        // Menangkap nama saat ini yang dilempar dari halaman Profile
         final currentName = state.extra as String? ?? '';
         return UpdateUsernameScreen(currentName: currentName);
       },
@@ -94,23 +100,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/news',
       builder: (context, state) => const NewsScreen(),
-      routes: [
-        // Rute anak (anak dari /news, jadinya /news/judul-berita-abc)
-        GoRoute(
-          path: ':slug',
-          builder: (context, state) {
-            // Mengambil parameter slug dari URL/Alamat rute
-            final slug = state.pathParameters['slug'] ?? '';
-            return DetailNewsScreen(slug: slug);
-          },
-        ),
-      ],
     ),
     GoRoute(
-      // URL pattern: /courses/1/modules/1
       path: '/courses/:courseId/modules/:moduleId',
       builder: (context, state) {
-        // Ekstrak parameter dari URL
         final courseId = int.parse(state.pathParameters['courseId']!);
         final moduleId = int.parse(state.pathParameters['moduleId']!);
 

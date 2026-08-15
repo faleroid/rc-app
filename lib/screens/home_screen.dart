@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
 import '../constants/app_colors.dart';
@@ -10,6 +9,7 @@ import '../constants/sponsor.dart';
 import '../constants/strings.dart';
 import '../widgets/cta_button.dart';
 import '../widgets/auto_scroll_ticker.dart';
+import '../widgets/module_video_player.dart';
 
 /// ============================================================
 /// HOME PAGE — Halaman utama RicoCapital sesuai referensi tampilan
@@ -28,30 +28,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // ─── YouTube Controller ──────────────────────────────────────
-  late final YoutubePlayerController _ytController;
-
   @override
   void initState() {
     super.initState();
 
-    // Initialize YouTube inline player
-    _ytController = YoutubePlayerController.fromVideoId(
-      videoId: AppYouTube.testimonialVideoId,
-      autoPlay: false,
-      params: const YoutubePlayerParams(
-        showControls: true,
-        showFullscreenButton: true,
-        mute: false,
-        playsInline: true,
-        origin: 'https://www.youtube-nocookie.com',
-      ),
-    );
   }
 
   @override
   void dispose() {
-    _ytController.close();
     super.dispose();
   }
 
@@ -369,13 +353,13 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: AppSpacing.xl),
 
-                    // ─── YOUTUBE INLINE VIDEO PLAYER ──────────────────
+                    // ─── INLINE VIDEO PLAYER ──────────────────
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.lg),
-                      child: AspectRatio(
+                      child: const AspectRatio(
                         aspectRatio: 16 / 9,
-                        child: YoutubePlayer(
-                          controller: _ytController,
+                        child: ModuleVideoPlayer(
+                          videoUrl: null,
                         ),
                       ),
                     ),

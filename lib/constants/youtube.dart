@@ -7,7 +7,7 @@ class AppYouTube {
 
   /// ID Video YouTube (bagian setelah "v=" di URL).
   /// Contoh: URL https://www.youtube.com/watch?v=dQw4w9WgXcQ → ID: dQw4w9WgXcQ
-  static const String testimonialVideoId = 'uCqy9_j5iFc';
+  static const String testimonialVideoId = 'uCqy9_j5iFc&t=6s';
 }
 
 // ─── DATA TESTIMONIAL IMAGES ─────────────────────────────────
@@ -18,10 +18,11 @@ class AppTestimonials {
   AppTestimonials._();
 
   static const List<String> imageUrls = [
-    'https://www.ricocapital.id/images/testimoni/testi1.jpg',
-    'https://www.ricocapital.id/images/testimoni/testi2.jpg',
-    'https://www.ricocapital.id/images/testimoni/testi3.jpg',
-    'https://www.ricocapital.id/images/testimoni/testi5.jpg',
-    'https://www.ricocapital.id/images/testimoni/testi6.jpg',
+    // ── Tambahkan gambar testimonial baru di sini ──
+    'https://ricocapital.id/images/testimoni/testi6.jpg',
+    'https://ricocapital.id/images/testimoni/testi2.jpg',
+    'https://ricocapital.id/images/testimoni/testi1.jpg',
+    'https://ricocapital.id/images/testimoni/testi5.jpg',
+    // ── Contoh: 'https://ricocapital.id/images/testimoni/testi_baru.jpg', ──
   ];
 }

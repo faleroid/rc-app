@@ -58,14 +58,8 @@ class _BitcoinChartWidgetState extends State<BitcoinChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      // padding: const EdgeInsets.all(16),
-      // decoration: BoxDecoration(
-      //   color: AppColors.cardDark,
-      //   borderRadius: BorderRadius.circular(16),
-      //   border: Border.all(color: Colors.white10),
-      // ),
+    return SizedBox(
+      width: double.infinity,
       child: _isLoading
           ? const SizedBox(
               height: 200,
@@ -153,68 +147,71 @@ class _BitcoinChartWidgetState extends State<BitcoinChartWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header: Bitcoin info
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'BTC/USD',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppFontSizes.md,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '7 Hari Terakhir',
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: AppFontSizes.xs,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
-                    'BTC/USD',
-                    style: TextStyle(
+                  Text(
+                    priceFormatted,
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: AppFontSizes.md,
+                      fontSize: AppFontSizes.lg,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    '7 Hari Terakhir',
-                    style: TextStyle(
-                      color: Colors.white54,
-                      fontSize: AppFontSizes.xs,
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isPositive ? Icons.trending_up : Icons.trending_down,
+                          color: chartColor,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$changeFormatted ($percentFormatted%)',
+                          style: TextStyle(
+                            color: chartColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  priceFormatted,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: AppFontSizes.lg,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isPositive ? Icons.trending_up : Icons.trending_down,
-                        color: chartColor,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$changeFormatted ($percentFormatted%)',
-                        style: TextStyle(
-                          color: chartColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
 
         const SizedBox(height: 20),
@@ -303,16 +300,19 @@ class _BitcoinChartWidgetState extends State<BitcoinChartWidget> {
         const SizedBox(height: 8),
 
         // Footer: Last update
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Icon(Icons.access_time, size: 12, color: Colors.white38),
-            const SizedBox(width: 4),
-            Text(
-              'Update: ${DateFormat('HH:mm').format(DateTime.now())}',
-              style: const TextStyle(color: Colors.white38, fontSize: 10),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Icon(Icons.access_time, size: 12, color: Colors.white38),
+              const SizedBox(width: 4),
+              Text(
+                'Update: ${DateFormat('HH:mm').format(DateTime.now())}',
+                style: const TextStyle(color: Colors.white38, fontSize: 10),
+              ),
+            ],
+          ),
         ),
       ],
     );
