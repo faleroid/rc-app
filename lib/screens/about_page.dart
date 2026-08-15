@@ -35,30 +35,57 @@ class AboutPage extends StatelessWidget {
 
   // ── TEAM DATA ─────────────────────────────────────────────
   static const List<_TeamMember> _teamMembers = [
+    // Baris 1: CEO dan COO
     _TeamMember(
-      name: 'A Rico Yoananda Rahardja',
-      position: 'Founder & Chief Executive Officer',
-      imageUrl: 'https://www.ricocapital.id/images/profile/rico.png',
+      name: 'anggota1',
+      position: 'Chief Executive Officer',
+      imageUrl: 'assets/images/anggota/CEO_rico.png',
     ),
     _TeamMember(
-      name: 'Renggo Harya Pandora',
+      name: 'anggota2',
+      position: 'Chief Operating Officer',
+      imageUrl: 'assets/images/anggota/COO_hadi.jpg',
+    ),
+
+    // Baris 2: CTO
+    _TeamMember(
+      name: 'anggota3',
       position: 'Chief Technology Officer',
-      imageUrl: 'https://www.ricocapital.id/images/profile/renggo.png',
+      imageUrl: 'assets/images/anggota/CTO_haq.png',
     ),
     _TeamMember(
-      name: 'Achmad Nadif Zain',
-      position: 'Chief Creative Officer',
-      imageUrl: 'https://www.ricocapital.id/images/profile/nadif.png',
+      name: 'anggota4',
+      position: 'Chief Technology Officer',
+      imageUrl: 'assets/images/anggota/CTO_naufal.png',
     ),
     _TeamMember(
-      name: 'Gregat Filhaq Sejati',
+      name: 'anggota5',
+      position: 'Chief Technology Officer',
+      imageUrl: 'assets/images/anggota/CTO_renggo.png',
+    ),
+
+    // Baris 3: CFO
+    _TeamMember(
+      name: 'anggota6',
       position: 'Chief Financial Officer',
-      imageUrl: 'https://www.ricocapital.id/images/profile/gregat.png',
+      imageUrl: 'assets/images/anggota/CFO_fira.png',
     ),
     _TeamMember(
-      name: 'Nugrahhadi Al Khawarizmi',
-      position: 'Front-end Developer',
-      imageUrl: 'https://www.ricocapital.id/images/profile/hadi.jpg',
+      name: 'anggota7',
+      position: 'Chief Financial Officer',
+      imageUrl: 'assets/images/anggota/CFO_gregat.png',
+    ),
+
+    // Baris 4: CCO
+    _TeamMember(
+      name: 'anggota8',
+      position: 'Chief Creative Officer',
+      imageUrl: 'assets/images/anggota/CCO_fajar.png',
+    ),
+    _TeamMember(
+      name: 'anggota9',
+      position: 'Chief Creative Officer',
+      imageUrl: 'assets/images/anggota/CCO_nadif.png',
     ),
   ];
 
@@ -149,6 +176,22 @@ class AboutPage extends StatelessWidget {
     );
   }
 
+  Widget _buildTeamRow(List<_TeamMember> members) {
+    return Row(
+      children: List.generate(members.length, (i) {
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: i == 0 ? 0 : AppSpacing.xs,
+              right: i == members.length - 1 ? 0 : AppSpacing.xs,
+            ),
+            child: _buildTeamCard(members[i]),
+          ),
+        );
+      }),
+    );
+  }
+
   /// EXPERT TEAM — Grid of team member cards
   Widget _buildTeamSection() {
     return Padding(
@@ -180,37 +223,20 @@ class AboutPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
 
-          // Top row: 3 team cards
-          Row(
-            children: List.generate(3, (i) {
-              return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: i == 0 ? 0 : AppSpacing.xs,
-                    right: i == 2 ? 0 : AppSpacing.xs,
-                  ),
-                  child: _buildTeamCard(_teamMembers[i]),
-                ),
-              );
-            }),
-          ),
+          // Baris 1: CEO dan COO (2 anggota)
+          _buildTeamRow(_teamMembers.sublist(0, 2)),
           const SizedBox(height: AppSpacing.sm),
 
-          // Bottom row: 2 team cards
-          Row(
-            children: List.generate(2, (i) {
-              final idx = i + 3;
-              return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: i == 0 ? 0 : AppSpacing.xs,
-                    right: i == 1 ? 0 : AppSpacing.xs,
-                  ),
-                  child: _buildTeamCard(_teamMembers[idx]),
-                ),
-              );
-            }),
-          ),
+          // Baris 2: CTO (3 anggota)
+          _buildTeamRow(_teamMembers.sublist(2, 5)),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Baris 3: CFO (2 anggota)
+          _buildTeamRow(_teamMembers.sublist(5, 7)),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Baris 4: CCO (2 anggota)
+          _buildTeamRow(_teamMembers.sublist(7, 9)),
         ],
       ),
     );
@@ -598,6 +624,8 @@ class AboutPage extends StatelessWidget {
 
   /// Team member card — shows image, name, position
   Widget _buildTeamCard(_TeamMember member) {
+    final bool isAsset = member.imageUrl.startsWith('assets/');
+
     return Container(
       height: 160,
       decoration: BoxDecoration(
@@ -613,36 +641,18 @@ class AboutPage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             // Background image
-            Image.network(
-              member.imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                // Fallback: gradient + initials
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.6),
-                        AppColors.cardDark,
-                      ],
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _getInitials(member.name),
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: AppFontSizes.xl2,
-                        fontFamily: AppFonts.display,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+            if (isAsset)
+              Image.asset(
+                member.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => _buildFallbackAvatar(member.name),
+              )
+            else
+              Image.network(
+                member.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => _buildFallbackAvatar(member.name),
+              ),
             // Gradient overlay at bottom
             Positioned(
               bottom: 0,
@@ -806,5 +816,31 @@ class AboutPage extends StatelessWidget {
       return '${parts[0][0]}${parts[1][0]}';
     }
     return parts[0][0];
+  }
+
+  Widget _buildFallbackAvatar(String name) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.primary.withValues(alpha: 0.6),
+            AppColors.cardDark,
+          ],
+        ),
+      ),
+      child: Center(
+        child: Text(
+          _getInitials(name),
+          style: const TextStyle(
+            color: AppColors.textWhite,
+            fontSize: AppFontSizes.xl2,
+            fontFamily: AppFonts.display,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 }
