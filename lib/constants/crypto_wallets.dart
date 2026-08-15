@@ -1,10 +1,25 @@
 class CryptoWallets {
-  static const String usdtAddress = 'T9zX1Q4k2M8p7L3n5R6t0W1y2Z3a4B5c6D7e';
-  static const String usdtNetwork = 'TRC-20';
+  // USDT TRC 20
+  static const String usdtTrc20Address = 'TREdcYwqfUwbp86Vxyv319AN3Cfachpkaf';
+  static const String usdtTrc20Network = 'TRC 20';
+  static const String usdtTrc20QrAsset = 'assets/images/wallet/USDT_TRC20.jpeg';
 
-  static const String bitcoinAddress = '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa';
-  static const String bitcoinNetwork = 'Bitcoin Mainnet';
+  // USDT BEP 20
+  static const String usdtBep20Address = '0x5628a71d252e0d617c5919b545f289177237e12e';
+  static const String usdtBep20Network = 'BEP 20';
+  static const String usdtBep20QrAsset = 'assets/images/wallet/USDT_BEP20.jpeg';
 
-  static const String ethereumAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
-  static const String ethereumNetwork = 'ERC-20';
+  // BITCOIN
+  static const String bitcoinAddress = '1BmFehufuUarW1YseDw8PHgFqm3avP8ycX';
+  static const String bitcoinNetwork = 'Bitcoin';
+  static const String bitcoinQrAsset = 'assets/images/wallet/Bitcoin.jpeg';
+
+  // Legacy & Alias Getters
+  static const String usdtAddress = usdtTrc20Address;
+  static const String usdtNetwork = usdtTrc20Network;
+  static const String usdtQrAsset = usdtTrc20QrAsset;
+
+  static const String ethereumAddress = usdtBep20Address;
+  static const String ethereumNetwork = usdtBep20Network;
+  static const String ethereumQrAsset = usdtBep20QrAsset;
 }

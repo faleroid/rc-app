@@ -435,14 +435,17 @@ class _PaymentCheckoutScreenState extends State<PaymentCheckoutScreen> {
                 children: [
                   const Text('Pilih Koin Crypto:', style: TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.xs)),
                   const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    children: [
-                      _buildCryptoChip('usdt', 'USDT'),
-                      const SizedBox(width: 8),
-                      _buildCryptoChip('bitcoin', 'Bitcoin'),
-                      const SizedBox(width: 8),
-                      _buildCryptoChip('ethereum', 'Ethereum'),
-                    ],
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildCryptoChip('usdt', 'USDT (TRC-20)'),
+                        const SizedBox(width: 8),
+                        _buildCryptoChip('usdt_bep20', 'USDT (BEP-20)'),
+                        const SizedBox(width: 8),
+                        _buildCryptoChip('bitcoin', 'Bitcoin'),
+                      ],
+                    ),
                   ),
                 ],
               ),

@@ -33,11 +33,15 @@ class _CryptoPaymentDialogState extends State<CryptoPaymentDialog> {
     switch (widget.cryptoCurrency.toLowerCase()) {
       case 'bitcoin':
         return CryptoWallets.bitcoinAddress;
+      case 'usdt_bep20':
+      case 'bep20':
       case 'ethereum':
-        return CryptoWallets.ethereumAddress;
+        return CryptoWallets.usdtBep20Address;
       case 'usdt':
+      case 'usdt_trc20':
+      case 'trc20':
       default:
-        return CryptoWallets.usdtAddress;
+        return CryptoWallets.usdtTrc20Address;
     }
   }
 
@@ -45,11 +49,15 @@ class _CryptoPaymentDialogState extends State<CryptoPaymentDialog> {
     switch (widget.cryptoCurrency.toLowerCase()) {
       case 'bitcoin':
         return CryptoWallets.bitcoinNetwork;
+      case 'usdt_bep20':
+      case 'bep20':
       case 'ethereum':
-        return CryptoWallets.ethereumNetwork;
+        return CryptoWallets.usdtBep20Network;
       case 'usdt':
+      case 'usdt_trc20':
+      case 'trc20':
       default:
-        return CryptoWallets.usdtNetwork;
+        return CryptoWallets.usdtTrc20Network;
     }
   }
 
@@ -57,11 +65,31 @@ class _CryptoPaymentDialogState extends State<CryptoPaymentDialog> {
     switch (widget.cryptoCurrency.toLowerCase()) {
       case 'bitcoin':
         return 'Bitcoin (BTC)';
+      case 'usdt_bep20':
+      case 'bep20':
       case 'ethereum':
-        return 'Ethereum (ETH)';
+        return 'USDT (BEP-20)';
       case 'usdt':
+      case 'usdt_trc20':
+      case 'trc20':
       default:
         return 'USDT (TRC-20)';
+    }
+  }
+
+  String get _qrAssetPath {
+    switch (widget.cryptoCurrency.toLowerCase()) {
+      case 'bitcoin':
+        return CryptoWallets.bitcoinQrAsset;
+      case 'usdt_bep20':
+      case 'bep20':
+      case 'ethereum':
+        return CryptoWallets.usdtBep20QrAsset;
+      case 'usdt':
+      case 'usdt_trc20':
+      case 'trc20':
+      default:
+        return CryptoWallets.usdtTrc20QrAsset;
     }
   }
 
@@ -206,25 +234,32 @@ class _CryptoPaymentDialogState extends State<CryptoPaymentDialog> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // QR Code Box Placeholder
+              // QR Code Image Asset
               Center(
                 child: Container(
-                  width: 160,
-                  height: 160,
-                  padding: const EdgeInsets.all(12),
+                  width: 180,
+                  height: 180,
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.qr_code_2, size: 100, color: Colors.black),
-                      Text(
-                        _cryptoTitle.split(' ').first,
-                        style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      _qrAssetPath,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.qr_code_2, size: 100, color: Colors.black),
+                          Text(
+                            _cryptoTitle,
+                            style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
