@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
 import '../constants/app_colors.dart';
@@ -28,14 +29,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late final YoutubePlayerController _ytController;
+
   @override
   void initState() {
     super.initState();
 
+    final rawId = AppYouTube.testimonialVideoId;
+    String cleanId = rawId;
+    if (cleanId.contains('v=')) {
+      cleanId = cleanId.split('v=').last;
+    } else if (cleanId.contains('youtu.be/')) {
+      cleanId = cleanId.split('youtu.be/').last;
+    }
+    if (cleanId.contains('&')) {
+      cleanId = cleanId.split('&').first;
+    }
+    if (cleanId.contains('?')) {
+      cleanId = cleanId.split('?').first;
+    }
+
+    _ytController = YoutubePlayerController.fromVideoId(
+      videoId: cleanId,
+      autoPlay: false,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+        mute: false,
+        playsInline: true,
+        origin: 'https://www.youtube-nocookie.com',
+      ),
+    );
   }
 
   @override
   void dispose() {
+    _ytController.close();
     super.dispose();
   }
 
@@ -356,10 +385,10 @@ class _HomePageState extends State<HomePage> {
                     // ─── INLINE VIDEO PLAYER ──────────────────
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.lg),
-                      child: const AspectRatio(
+                      child: AspectRatio(
                         aspectRatio: 16 / 9,
-                        child: ModuleVideoPlayer(
-                          videoUrl: null,
+                        child: YoutubePlayer(
+                          controller: _ytController,
                         ),
                       ),
                     ),
