@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import '../helpers/mock_repositories.dart';
 
 class MidtransPaymentService {
@@ -8,7 +7,10 @@ class MidtransPaymentService {
 
   MidtransPaymentService({required this.paymentRepository});
 
-  Future<String> createTransaction(int? packageId, String? paymentMethod) async {
+  Future<String> createTransaction(
+    int? packageId,
+    String? paymentMethod,
+  ) async {
     if (packageId == null || paymentMethod == null || paymentMethod.isEmpty) {
       throw FormatException('Data transaksi tidak lengkap');
     }
@@ -67,7 +69,9 @@ void main() {
 
     setUp(() {
       mockPaymentRepository = MockPaymentRepository();
-      paymentService = MidtransPaymentService(paymentRepository: mockPaymentRepository);
+      paymentService = MidtransPaymentService(
+        paymentRepository: mockPaymentRepository,
+      );
     });
 
     test('createTransaction() → return snap_token dari API Laravel', () async {
@@ -76,23 +80,35 @@ void main() {
       const paymentMethod = 'bca_va';
 
       // Act
-      final snapToken = await paymentService.createTransaction(packageId, paymentMethod);
+      final snapToken = await paymentService.createTransaction(
+        packageId,
+        paymentMethod,
+      );
 
       // Assert
       expect(snapToken, equals('snap_token_sandbox_test_xyz123'));
     });
 
-    test('createTransaction() dengan data tidak lengkap → throw error [Negative]', () async {
-      // Arrange
-      int? packageId;
-      String? paymentMethod = '';
+    test(
+      'createTransaction() dengan data tidak lengkap → throw error [Negative]',
+      () async {
+        // Arrange
+        int? packageId;
+        String? paymentMethod = '';
 
-      // Act & Assert
-      expect(
-        () => paymentService.createTransaction(packageId, paymentMethod),
-        throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('tidak lengkap'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => paymentService.createTransaction(packageId, paymentMethod),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              contains('tidak lengkap'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('penanganan status settlement → set isSubscribed = true', () {
       // Arrange
@@ -107,45 +123,54 @@ void main() {
       expect(result['ui_state'], equals('SUCCESS'));
     });
 
-    test('penanganan status pending → tampilkan UI pending, belum aktifkan akses', () {
-      // Arrange
-      const status = 'pending';
+    test(
+      'penanganan status pending → tampilkan UI pending, belum aktifkan akses',
+      () {
+        // Arrange
+        const status = 'pending';
 
-      // Act
-      final result = paymentService.handlePaymentStatus(status);
+        // Act
+        final result = paymentService.handlePaymentStatus(status);
 
-      // Assert
-      expect(paymentService.isSubscribed, isFalse);
-      expect(result['isSubscribed'], isFalse);
-      expect(result['ui_state'], equals('PENDING_UI'));
-    });
+        // Assert
+        expect(paymentService.isSubscribed, isFalse);
+        expect(result['isSubscribed'], isFalse);
+        expect(result['ui_state'], equals('PENDING_UI'));
+      },
+    );
 
-    test('penanganan status expire → tampilkan pesan expired, tidak aktifkan akses', () {
-      // Arrange
-      const status = 'expire';
+    test(
+      'penanganan status expire → tampilkan pesan expired, tidak aktifkan akses',
+      () {
+        // Arrange
+        const status = 'expire';
 
-      // Act
-      final result = paymentService.handlePaymentStatus(status);
+        // Act
+        final result = paymentService.handlePaymentStatus(status);
 
-      // Assert
-      expect(paymentService.isSubscribed, isFalse);
-      expect(result['isSubscribed'], isFalse);
-      expect(result['ui_state'], equals('EXPIRED_UI'));
-      expect(result['message'], contains('Expired'));
-    });
+        // Assert
+        expect(paymentService.isSubscribed, isFalse);
+        expect(result['isSubscribed'], isFalse);
+        expect(result['ui_state'], equals('EXPIRED_UI'));
+        expect(result['message'], contains('Expired'));
+      },
+    );
 
-    test('penanganan status cancel → tampilkan pesan cancel, tidak aktifkan akses', () {
-      // Arrange
-      const status = 'cancel';
+    test(
+      'penanganan status cancel → tampilkan pesan cancel, tidak aktifkan akses',
+      () {
+        // Arrange
+        const status = 'cancel';
 
-      // Act
-      final result = paymentService.handlePaymentStatus(status);
+        // Act
+        final result = paymentService.handlePaymentStatus(status);
 
-      // Assert
-      expect(paymentService.isSubscribed, isFalse);
-      expect(result['isSubscribed'], isFalse);
-      expect(result['ui_state'], equals('CANCEL_UI'));
-      expect(result['message'], contains('dibatalkan'));
-    });
+        // Assert
+        expect(paymentService.isSubscribed, isFalse);
+        expect(result['isSubscribed'], isFalse);
+        expect(result['ui_state'], equals('CANCEL_UI'));
+        expect(result['message'], contains('dibatalkan'));
+      },
+    );
   });
 }

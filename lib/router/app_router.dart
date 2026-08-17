@@ -1,4 +1,4 @@
-﻿import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import '../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
@@ -11,6 +11,7 @@ import '../screens/news_screen.dart';
 import '../screens/module_detail_screen.dart';
 import '../screens/unauthenticated_screen.dart';
 import '../screens/payment_webview_screen.dart';
+import '../screens/privacy_policy_screen.dart';
 import '../models/payment_model.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -88,7 +89,15 @@ final GoRouter appRouter = GoRouter(
             return ChangePasswordScreen(currentPassword: currentPassword);
           },
         ),
+        GoRoute(
+          path: 'privacy-policy',
+          builder: (context, state) => const PrivacyPolicyScreen(),
+        ),
       ],
+    ),
+    GoRoute(
+      path: '/privacy-policy',
+      builder: (context, state) => const PrivacyPolicyScreen(),
     ),
     GoRoute(
       path: '/update-username',

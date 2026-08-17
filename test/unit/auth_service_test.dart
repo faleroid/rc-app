@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import '../helpers/mock_repositories.dart';
 
 class AuthService {
@@ -62,83 +61,125 @@ void main() {
       );
     });
 
-    test('login() dengan email & password valid → return token Sanctum', () async {
-      // Arrange
-      const email = 'trader@ricocapital.id';
-      const password = 'Password123!';
+    test(
+      'login() dengan email & password valid → return token Sanctum',
+      () async {
+        // Arrange
+        const email = 'trader@ricocapital.id';
+        const password = 'Password123!';
 
-      // Act
-      final token = await authService.login(email, password);
+        // Act
+        final token = await authService.login(email, password);
 
-      // Assert
-      expect(token, isNotEmpty);
-      expect(token, contains('sanctum'));
-      expect(await mockTokenService.getToken(), equals(token));
-    });
+        // Assert
+        expect(token, isNotEmpty);
+        expect(token, contains('sanctum'));
+        expect(await mockTokenService.getToken(), equals(token));
+      },
+    );
 
-    test('login() dengan kredensial salah → throw exception error message [Negative]', () async {
-      // Arrange
-      const email = 'wrong@ricocapital.id';
-      const password = 'wrongpass';
+    test(
+      'login() dengan kredensial salah → throw exception error message [Negative]',
+      () async {
+        // Arrange
+        const email = 'wrong@ricocapital.id';
+        const password = 'wrongpass';
 
-      // Act & Assert
-      expect(
-        () => authService.login(email, password),
-        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Kredensial login salah'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => authService.login(email, password),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Kredensial login salah'),
+            ),
+          ),
+        );
+      },
+    );
 
-    test('login() dengan field kosong → return validasi error [Negative]', () async {
-      // Arrange
-      const email = '';
-      const password = '';
+    test(
+      'login() dengan field kosong → return validasi error [Negative]',
+      () async {
+        // Arrange
+        const email = '';
+        const password = '';
 
-      // Act & Assert
-      expect(
-        () => authService.login(email, password),
-        throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('tidak boleh kosong'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => authService.login(email, password),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              contains('tidak boleh kosong'),
+            ),
+          ),
+        );
+      },
+    );
 
-    test('register() dengan data lengkap & valid → berhasil & return token', () async {
-      // Arrange
-      const name = 'New Trader';
-      const email = 'newtrader@ricocapital.id';
-      const password = 'Password123!';
+    test(
+      'register() dengan data lengkap & valid → berhasil & return token',
+      () async {
+        // Arrange
+        const name = 'New Trader';
+        const email = 'newtrader@ricocapital.id';
+        const password = 'Password123!';
 
-      // Act
-      final token = await authService.register(name, email, password);
+        // Act
+        final token = await authService.register(name, email, password);
 
-      // Assert
-      expect(token, isNotEmpty);
-      expect(await mockTokenService.getToken(), equals(token));
-    });
+        // Assert
+        expect(token, isNotEmpty);
+        expect(await mockTokenService.getToken(), equals(token));
+      },
+    );
 
-    test('register() dengan email yang sudah terdaftar → return error 422 [Negative]', () async {
-      // Arrange
-      const name = 'Duplicate User';
-      const email = 'duplicate@ricocapital.id';
-      const password = 'Password123!';
+    test(
+      'register() dengan email yang sudah terdaftar → return error 422 [Negative]',
+      () async {
+        // Arrange
+        const name = 'Duplicate User';
+        const email = 'duplicate@ricocapital.id';
+        const password = 'Password123!';
 
-      // Act & Assert
-      expect(
-        () => authService.register(name, email, password),
-        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('HTTP 422'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => authService.register(name, email, password),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('HTTP 422'),
+            ),
+          ),
+        );
+      },
+    );
 
-    test('register() dengan password < 8 karakter → gagal validasi [Negative]', () async {
-      // Arrange
-      const name = 'Trader';
-      const email = 'short@ricocapital.id';
-      const password = 'short';
+    test(
+      'register() dengan password < 8 karakter → gagal validasi [Negative]',
+      () async {
+        // Arrange
+        const name = 'Trader';
+        const email = 'short@ricocapital.id';
+        const password = 'short';
 
-      // Act & Assert
-      expect(
-        () => authService.register(name, email, password),
-        throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('minimal 8 karakter'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => authService.register(name, email, password),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              contains('minimal 8 karakter'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('logout() → hapus token dari storage lokal', () async {
       // Arrange
@@ -164,16 +205,25 @@ void main() {
       expect(result, isTrue);
     });
 
-    test('changePassword() dengan password lama salah → return error [Negative]', () async {
-      // Arrange
-      const oldPass = 'WrongOldPass';
-      const newPass = 'NewSecretPass123!';
+    test(
+      'changePassword() dengan password lama salah → return error [Negative]',
+      () async {
+        // Arrange
+        const oldPass = 'WrongOldPass';
+        const newPass = 'NewSecretPass123!';
 
-      // Act & Assert
-      expect(
-        () => authService.changePassword(oldPass, newPass),
-        throwsA(isA<Exception>().having((e) => e.toString(), 'message', contains('Password lama tidak sesuai'))),
-      );
-    });
+        // Act & Assert
+        expect(
+          () => authService.changePassword(oldPass, newPass),
+          throwsA(
+            isA<Exception>().having(
+              (e) => e.toString(),
+              'message',
+              contains('Password lama tidak sesuai'),
+            ),
+          ),
+        );
+      },
+    );
   });
 }

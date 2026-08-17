@@ -1,4 +1,5 @@
 /// Test Fixtures & Helper Functions for RicoCapital Apps Testing
+library;
 
 /// Kredensial Midtrans Sandbox untuk Testing Manual/Otomatis
 final Map<String, dynamic> midtransSandboxCredentials = {

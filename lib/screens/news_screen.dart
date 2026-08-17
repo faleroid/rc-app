@@ -7,6 +7,7 @@ import '../repositories/news_repository.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
 import '../widgets/bitcoin_chart_widget.dart';
+import '../utils/date_formatter.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -177,7 +178,10 @@ class _NewsScreenState extends State<NewsScreen> {
   // --- WIDGET KOMPONEN HASIL EXTRACT ---
 
   Widget _buildBreakingNewsBanner(NewsArticleModel item) {
-    final formattedDate = item.timeAgo ?? item.pubDate ?? '';
+    final formattedDate = DateFormatter.formatNewsDate(
+      timeAgo: item.timeAgo,
+      pubDate: item.pubDate,
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -263,7 +267,10 @@ class _NewsScreenState extends State<NewsScreen> {
   }
 
   Widget _buildArticleRowItem(NewsArticleModel item) {
-    final formattedDate = item.timeAgo ?? item.pubDate ?? '';
+    final formattedDate = DateFormatter.formatNewsDate(
+      timeAgo: item.timeAgo,
+      pubDate: item.pubDate,
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

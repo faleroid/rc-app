@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
 import '../constants/font.dart';
-import '../constants/margin.dart';
 import '../models/payment_model.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/payment_repository.dart';
@@ -251,17 +250,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 20),
 
                 // Terms Card
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.redAccent.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
-                  ),
-                  child: const Text(
-                    'By creating an account, you agree to our Terms of Service and Privacy Policy',
-                    style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
-                    textAlign: TextAlign.center,
+                InkWell(
+                  onTap: () => context.push('/privacy-policy'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
+                    ),
+                    child: const Text(
+                      'By creating an account, you agree to our Terms of Service and Privacy Policy',
+                      style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
