@@ -10,6 +10,7 @@ class ChatBotScreen extends StatefulWidget {
   final int? moduleId;
   final String? courseTitle;
   final String? moduleTitle;
+  final bool isModal;
 
   const ChatBotScreen({
     super.key,
@@ -17,7 +18,34 @@ class ChatBotScreen extends StatefulWidget {
     this.moduleId,
     this.courseTitle,
     this.moduleTitle,
+    this.isModal = false,
   });
+
+  /// Helper static method to display ChatBot as a modern Modal Bottom Sheet
+  static Future<void> showModal(
+    BuildContext context, {
+    int? courseId,
+    int? moduleId,
+    String? courseTitle,
+    String? moduleTitle,
+  }) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.88,
+        child: ChatBotScreen(
+          courseId: courseId,
+          moduleId: moduleId,
+          courseTitle: courseTitle,
+          moduleTitle: moduleTitle,
+          isModal: true,
+        ),
+      ),
+    );
+  }
 
   @override
   State<ChatBotScreen> createState() => _ChatBotScreenState();
@@ -98,152 +126,194 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final content = Column(
+      children: [
+        // Modal Drag Handle Indicator (when opened as Bottom Sheet)
+        if (widget.isModal) ...[
+          const SizedBox(height: 8),
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white30,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+
+        // Header Bar
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+          decoration: const BoxDecoration(
+            color: AppColors.cardDark,
+            border: Border(bottom: BorderSide(color: AppColors.cardBorder, width: 0.5)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'AI Asisten Pembelajaran',
+                      style: TextStyle(color: Colors.white, fontSize: AppFontSizes.md, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      widget.moduleTitle ?? widget.courseTitle ?? 'RicoCapital Academy',
+                      style: const TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.xs),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              if (widget.isModal)
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  onPressed: () => Navigator.pop(context),
+                ),
+            ],
+          ),
+        ),
+
+        // Chat Messages List
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(AppSpacing.md),
+            itemCount: _messages.length,
+            itemBuilder: (context, index) {
+              final msg = _messages[index];
+              return _buildMessageBubble(msg);
+            },
+          ),
+        ),
+
+        // Loading Indicator
+        if (_isLoading)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardDark,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'AI sedang mencari materi...',
+                        style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.xs),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Quick Prompts Chips
+        if (_messages.length <= 2)
+          Container(
+            height: 40,
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              children: [
+                _buildQuickChip('Apa poin utama materi ini?'),
+                const SizedBox(width: 8),
+                _buildQuickChip('Rangkumkan penjelasan modul ini'),
+                const SizedBox(width: 8),
+                _buildQuickChip('Bagaimana strategi risk management?'),
+              ],
+            ),
+          ),
+
+        // Bottom Input Bar
+        Container(
+          padding: EdgeInsets.only(
+            left: AppSpacing.sm,
+            right: AppSpacing.sm,
+            top: AppSpacing.sm,
+            bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.sm,
+          ),
+          decoration: const BoxDecoration(
+            color: AppColors.cardDark,
+            border: Border(top: BorderSide(color: AppColors.cardBorder, width: 0.5)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  style: const TextStyle(color: Colors.white, fontSize: AppFontSizes.sm),
+                  decoration: InputDecoration(
+                    hintText: 'Tanyakan materi kelas...',
+                    hintStyle: const TextStyle(color: Colors.white38, fontSize: AppFontSizes.sm),
+                    filled: true,
+                    fillColor: AppColors.background,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  onSubmitted: (_) => _sendMessage(),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: _isLoading ? null : () => _sendMessage(),
+                icon: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (widget.isModal) {
+      return Container(
+        decoration: const BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(top: false, child: content),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.cardDark,
-        elevation: 1,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'AI Asisten Pembelajaran',
-                    style: TextStyle(color: Colors.white, fontSize: AppFontSizes.md, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    widget.courseTitle ?? 'RicoCapital Academy',
-                    style: const TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.xs),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Chat Messages List
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final msg = _messages[index];
-                  return _buildMessageBubble(msg);
-                },
-              ),
-            ),
-
-            // Loading Indicator
-            if (_isLoading)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardDark,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            'AI sedang mencari materi...',
-                            style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.xs),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-            // Sample Quick Prompts if messages are few
-            if (_messages.length <= 2)
-              Container(
-                height: 40,
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  children: [
-                    _buildQuickChip('Apa poin utama materi ini?'),
-                    const SizedBox(width: 8),
-                    _buildQuickChip('Rangkumkan penjelasan modul ini'),
-                    const SizedBox(width: 8),
-                    _buildQuickChip('Bagaimana strategi risk management?'),
-                  ],
-                ),
-              ),
-
-            // Bottom Input Bar
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: const BoxDecoration(
-                color: AppColors.cardDark,
-                border: Border(top: BorderSide(color: AppColors.cardBorder, width: 0.5)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      style: const TextStyle(color: Colors.white, fontSize: AppFontSizes.sm),
-                      decoration: InputDecoration(
-                        hintText: 'Tanyakan materi kelas...',
-                        hintStyle: const TextStyle(color: Colors.white38, fontSize: AppFontSizes.sm),
-                        filled: true,
-                        fillColor: AppColors.background,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      onSubmitted: (_) => _sendMessage(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: _isLoading ? null : () => _sendMessage(),
-                    icon: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: SafeArea(child: content),
     );
   }
 

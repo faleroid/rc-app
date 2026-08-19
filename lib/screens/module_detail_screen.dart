@@ -5,6 +5,7 @@ import '../models/module_detail_model.dart';
 import '../repositories/course_repository.dart';
 import '../constants/app_colors.dart';
 import '../widgets/module_video_player.dart';
+import 'chat_bot_screen.dart';
 
 class ModuleDetailScreen extends StatefulWidget {
   final int courseId;
@@ -184,11 +185,12 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
           backgroundColor: AppColors.background,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
-              context.push('/chat', extra: {
-                'courseId': widget.courseId,
-                'moduleId': widget.moduleId,
-                'moduleTitle': module.title,
-              });
+              ChatBotScreen.showModal(
+                context,
+                courseId: widget.courseId,
+                moduleId: widget.moduleId,
+                moduleTitle: module.title,
+              );
             },
             backgroundColor: AppColors.primary,
             icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),

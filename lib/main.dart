@@ -10,6 +10,7 @@ import 'screens/academy_page.dart';
 import 'screens/about_page.dart';
 import 'screens/course_list_screen.dart';
 import 'screens/package.dart';
+import 'screens/chat_bot_screen.dart';
 import 'services/token_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
@@ -298,6 +299,23 @@ class _MainScreenState extends State<MainScreen>
       ),
 
       body: _buildBody(),
+
+      floatingActionButton: (widget.isLoggedIn && _isActive)
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                ChatBotScreen.showModal(context);
+              },
+              backgroundColor: AppColors.primary,
+              icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),
+              label: const Text(
+                'Tanya AI',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
 
       bottomNavigationBar: (widget.isLoggedIn && _isActive)
           ? Container(
