@@ -182,6 +182,21 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
 
         return Scaffold(
           backgroundColor: AppColors.background,
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              context.push('/chat', extra: {
+                'courseId': widget.courseId,
+                'moduleId': widget.moduleId,
+                'moduleTitle': module.title,
+              });
+            },
+            backgroundColor: AppColors.primary,
+            icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),
+            label: const Text(
+              'Tanya AI',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: AppColors.primary),

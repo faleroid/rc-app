@@ -1,4 +1,4 @@
-﻿import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import '../main.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
@@ -9,6 +9,7 @@ import '../screens/verify_password_screen.dart';
 import '../screens/update_username_screen.dart';
 import '../screens/news_screen.dart';
 import '../screens/module_detail_screen.dart';
+import '../screens/chat_bot_screen.dart';
 import '../screens/unauthenticated_screen.dart';
 import '../screens/payment_webview_screen.dart';
 import '../models/payment_model.dart';
@@ -18,6 +19,18 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/chat',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>? ?? {};
+        return ChatBotScreen(
+          courseId: extra['courseId'] as int?,
+          moduleId: extra['moduleId'] as int?,
+          courseTitle: extra['courseTitle'] as String?,
+          moduleTitle: extra['moduleTitle'] as String?,
+        );
+      },
+    ),
     GoRoute(
       path: '/unauthenticated',
       builder: (context, state) {

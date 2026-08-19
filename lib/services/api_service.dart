@@ -11,13 +11,14 @@ class ApiService {
     _dio = Dio(
       BaseOptions(
         // baseUrl: 'http://10.0.2.2:8000/api', // emulator
-        baseUrl: 'http://10.120.17.123:8000/api', // real device
+        baseUrl: 'http://192.168.18.26:8000/api', // real device
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
+
       ),
     );
 
