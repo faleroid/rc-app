@@ -5,6 +5,8 @@ import '../constants/margin.dart';
 import '../models/chat_model.dart';
 import '../repositories/chat_repository.dart';
 
+import '../services/chat_history_service.dart';
+
 class ChatBotScreen extends StatefulWidget {
   final int? courseId;
   final int? moduleId;
@@ -53,6 +55,7 @@ class ChatBotScreen extends StatefulWidget {
 
 class _ChatBotScreenState extends State<ChatBotScreen> {
   final ChatRepository _repository = ChatRepository();
+  final ChatHistoryService _historyService = ChatHistoryService();
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessageModel> _messages = [];
@@ -61,7 +64,22 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   @override
   void initState() {
     super.initState();
-    _addInitialGreeting();
+    _loadSavedHistory();
+  }
+
+  void _loadSavedHistory() async {
+    final savedMessages = await _historyService.loadMessages();
+
+    if (mounted) {
+      setState(() {
+        if (savedMessages.isNotEmpty) {
+          _messages.addAll(savedMessages);
+        } else {
+          _addInitialGreeting();
+        }
+      });
+      _scrollToBottom();
+    }
   }
 
   void _addInitialGreeting() {
@@ -102,6 +120,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         _isLoading = false;
       });
       _scrollToBottom();
+      _historyService.saveMessages(_messages);
     }
   }
 

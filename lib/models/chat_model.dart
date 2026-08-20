@@ -16,6 +16,14 @@ class ChatSourceModel {
       courseTitle: json['course_title'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'module_id': moduleId,
+      'module_title': moduleTitle,
+      'course_title': courseTitle,
+    };
+  }
 }
 
 class ChatMessageModel {
@@ -57,5 +65,34 @@ class ChatMessageModel {
       isInScope: isInScope,
       sources: sources,
     );
+  }
+
+  factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
+    var rawSources = json['sources'] as List<dynamic>? ?? [];
+    List<ChatSourceModel> parsedSources = rawSources
+        .map((s) => ChatSourceModel.fromJson(s as Map<String, dynamic>))
+        .toList();
+
+    return ChatMessageModel(
+      id: json['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      text: json['text'] ?? '',
+      isUser: json['is_user'] ?? false,
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'])
+          : DateTime.now(),
+      isInScope: json['is_in_scope'] ?? true,
+      sources: parsedSources,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'text': text,
+      'is_user': isUser,
+      'timestamp': timestamp.toIso8601String(),
+      'is_in_scope': isInScope,
+      'sources': sources.map((s) => s.toJson()).toList(),
+    };
   }
 }
