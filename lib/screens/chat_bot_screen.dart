@@ -360,11 +360,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    msg.text,
+                    _cleanDisplayText(msg.text),
                     style: TextStyle(
                       color: isUser ? Colors.white : (msg.isInScope ? Colors.white : Colors.white70),
                       fontSize: AppFontSizes.sm,
-                      height: 1.4,
+                      height: 1.45,
                     ),
                   ),
                   if (!isUser && msg.sources.isNotEmpty) ...[
@@ -398,5 +398,20 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         ],
       ),
     );
+  }
+
+  String _cleanDisplayText(String text) {
+    var clean = text;
+    // Remove header symbols
+    clean = clean.replaceAll(RegExp(r'^#{1,6}\s*', multiLine: true), '');
+    // Remove divider lines
+    clean = clean.replaceAll(RegExp(r'^[\-*_]{3,}$', multiLine: true), '');
+    // Remove bold/italic asterisks
+    clean = clean.replaceAll('**', '').replaceAll('*', '');
+    // Normalize list bullets
+    clean = clean.replaceAll(RegExp(r'^\s*[\*\-]\s+', multiLine: true), '• ');
+    // Remove duplicate blank lines
+    clean = clean.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+    return clean.trim();
   }
 }
