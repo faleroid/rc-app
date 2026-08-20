@@ -10,7 +10,6 @@ import '../constants/sponsor.dart';
 import '../constants/strings.dart';
 import '../widgets/cta_button.dart';
 import '../widgets/auto_scroll_ticker.dart';
-import '../widgets/module_video_player.dart';
 
 /// ============================================================
 /// HOME PAGE — Halaman utama RicoCapital sesuai referensi tampilan
@@ -19,10 +18,7 @@ import '../widgets/module_video_player.dart';
 class HomePage extends StatefulWidget {
   final VoidCallback? onNavigateToPackage;
 
-  const HomePage({
-    super.key,
-    this.onNavigateToPackage,
-  });
+  const HomePage({super.key, this.onNavigateToPackage});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -265,9 +261,7 @@ class _HomePageState extends State<HomePage> {
 
               // ─── FEATURES CARDS LIST ───────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Column(
                   children: const [
                     WebFeatureCard(
@@ -276,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                       title: "Modul Ebook",
                       imageUrl: "https://www.ricocapital.id/Module.png",
                       description:
-                      "Belajar crypto dari nol hingga mampu mengelola portofolio dengan eBooks praktis yang bisa diakses kapan saja. Modul diperbarui tiap bulan berdasarkan riset langsung dari pakar, sehingga materi selalu relevan dengan perkembangan terbaru dari cryptocurrency dan blockchain.",
+                          "Belajar crypto dari nol hingga mampu mengelola portofolio dengan eBooks praktis yang bisa diakses kapan saja. Modul diperbarui tiap bulan berdasarkan riset langsung dari pakar, sehingga materi selalu relevan dengan perkembangan terbaru dari cryptocurrency dan blockchain.",
                     ),
                     WebFeatureCard(
                       badgeText: "85% Win Rate",
@@ -284,25 +278,25 @@ class _HomePageState extends State<HomePage> {
                       title: "Sinyal Harian",
                       imageUrl: "https://www.ricocapital.id/Signal.png",
                       description:
-                      "Ricocapital menghadirkan riset pasar dan sinyal trading untuk membantu kalian yang ingin langsung merasakan peluang profit di market crypto. Dengan historis winrate di atas 85% setiap bulannya, sinyal ini dirancang untuk membimbing kalian meraih profit yang konsisten dan terukur.",
+                          "Ricocapital menghadirkan riset pasar dan sinyal trading untuk membantu kalian yang ingin langsung merasakan peluang profit di market crypto. Dengan historis winrate di atas 85% setiap bulannya, sinyal ini dirancang untuk membimbing kalian meraih profit yang konsisten dan terukur.",
                     ),
                     WebFeatureCard(
                       badgeText: "Live Updates",
                       badgeColor: Colors.cyanAccent,
                       title: "Research & Berita Harian",
                       imageUrl:
-                      "https://www.ricocapital.id/Research%20Berita%20Harian.png",
+                          "https://www.ricocapital.id/Research%20Berita%20Harian.png",
                       description:
-                      "Ricocapital menyajikan riset mendalam mengenai perkembangan industri crypto, dilengkapi dengan berita A1 yang selalu terupdate seputar cryptocurrency dan blockchain. Semua informasi disusun secara informatif, akurat, dan berbasis riset para ahli, sehingga kamu selalu selangkah lebih maju dalam memahami tren dan peluang di dunia digital aset.",
+                          "Ricocapital menyajikan riset mendalam mengenai perkembangan industri crypto, dilengkapi dengan berita A1 yang selalu terupdate seputar cryptocurrency dan blockchain. Semua informasi disusun secara informatif, akurat, dan berbasis riset para ahli, sehingga kamu selalu selangkah lebih maju dalam memahami tren dan peluang di dunia digital aset.",
                     ),
                     WebFeatureCard(
                       badgeText: "24/7 Support",
                       badgeColor: Colors.lightGreenAccent,
                       title: "Kelas & Konsultasi Private",
                       imageUrl:
-                      "https://www.ricocapital.id/Kelas%20&%20Konsultasi%20Private.png",
+                          "https://www.ricocapital.id/Kelas%20&%20Konsultasi%20Private.png",
                       description:
-                      "Kami menyediakan sesi mentoring eksklusif 1-on-1 bersama para ahli, dirancang khusus untuk mendampingi perjalanan belajar sesuai kebutuhan dan level pemahamanmu. Selain itu, tersedia layanan konsultasi private 24/7 yang memungkinkan kamu mendapatkan arahan langsung kapan saja. Dengan pendekatan personal.",
+                          "Kami menyediakan sesi mentoring eksklusif 1-on-1 bersama para ahli, dirancang khusus untuk mendampingi perjalanan belajar sesuai kebutuhan dan level pemahamanmu. Selain itu, tersedia layanan konsultasi private 24/7 yang memungkinkan kamu mendapatkan arahan langsung kapan saja. Dengan pendekatan personal.",
                     ),
                   ],
                 ),
@@ -365,8 +359,11 @@ class _HomePageState extends State<HomePage> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.play_circle_fill,
-                              color: Colors.cyan, size: 20),
+                          Icon(
+                            Icons.play_circle_fill,
+                            color: Colors.cyan,
+                            size: 20,
+                          ),
                           SizedBox(width: AppSpacing.xs),
                           Text(
                             "KATA MEREKA YANG SUDAH BERGABUNG",
@@ -387,9 +384,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                       child: AspectRatio(
                         aspectRatio: 16 / 9,
-                        child: YoutubePlayer(
-                          controller: _ytController,
-                        ),
+                        child: YoutubePlayer(controller: _ytController),
                       ),
                     ),
 
@@ -422,13 +417,25 @@ class _HomePageState extends State<HomePage> {
                         physics: const BouncingScrollPhysics(),
                         children: [
                           _buildPnlCard(
-                              "BTC/USDT Long", "+145.20%", Colors.greenAccent),
+                            "BTC/USDT Long",
+                            "+145.20%",
+                            Colors.greenAccent,
+                          ),
                           _buildPnlCard(
-                              "ETH/USDT Short", "+92.45%", Colors.greenAccent),
+                            "ETH/USDT Short",
+                            "+92.45%",
+                            Colors.greenAccent,
+                          ),
                           _buildPnlCard(
-                              "SOL/USDT Long", "+210.80%", Colors.greenAccent),
+                            "SOL/USDT Long",
+                            "+210.80%",
+                            Colors.greenAccent,
+                          ),
                           _buildPnlCard(
-                              "LINK/USDT Long", "+65.15%", Colors.greenAccent),
+                            "LINK/USDT Long",
+                            "+65.15%",
+                            Colors.greenAccent,
+                          ),
                         ],
                       ),
                     ),
@@ -464,8 +471,9 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.deepPurpleAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppRadius.pill),
                           border: Border.all(
-                            color: Colors.deepPurpleAccent
-                                .withValues(alpha: 0.3),
+                            color: Colors.deepPurpleAccent.withValues(
+                              alpha: 0.3,
+                            ),
                           ),
                         ),
                         child: const Text(
@@ -531,7 +539,7 @@ class _HomePageState extends State<HomePage> {
                           gradient: const LinearGradient(
                             colors: [Color(0xFFE53E3E), Color(0xFFC53030)],
                           ),
-                          onTap:widget.onNavigateToPackage,
+                          onTap: widget.onNavigateToPackage,
                         ),
                       ),
                     ],
@@ -543,9 +551,7 @@ class _HomePageState extends State<HomePage> {
 
               // ─── BELAJAR TRADING SECTION ─────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.xl,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
                 child: Column(
                   children: [
                     const Padding(
@@ -592,13 +598,17 @@ class _HomePageState extends State<HomePage> {
                             child: Image.network(
                               url,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                color: AppColors.cardDark,
-                                child: const Center(
-                                  child: Icon(Icons.image_not_supported,
-                                      color: AppColors.textWhite30, size: 32),
-                                ),
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    color: AppColors.cardDark,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        color: AppColors.textWhite30,
+                                        size: 32,
+                                      ),
+                                    ),
+                                  ),
                             ),
                           ),
                         );
@@ -696,10 +706,14 @@ class _HomePageState extends State<HomePage> {
                             child: Image.network(
                               url,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => const Center(
-                                child: Icon(Icons.business,
-                                    color: AppColors.textWhite30, size: 24),
-                              ),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Center(
+                                    child: Icon(
+                                      Icons.business,
+                                      color: AppColors.textWhite30,
+                                      size: 24,
+                                    ),
+                                  ),
                             ),
                           ),
                         );
@@ -759,8 +773,11 @@ class _HomePageState extends State<HomePage> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.check_circle_outline,
-                              color: Colors.green, size: 16),
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: Colors.green,
+                            size: 16,
+                          ),
                           SizedBox(width: AppSpacing.xs),
                           Text(
                             "Trusted by 300+ Users & 700+ Community",
@@ -893,32 +910,30 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: sponsor.logoUrl != null
           ? Image.network(
-        sponsor.logoUrl!,
-        height: 24,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) => Text(
-          sponsor.name,
-          style: const TextStyle(
-            color: AppColors.textWhite70,
-            fontSize: AppFontSizes.sm,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      )
+              sponsor.logoUrl!,
+              height: 24,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Text(
+                sponsor.name,
+                style: const TextStyle(
+                  color: AppColors.textWhite70,
+                  fontSize: AppFontSizes.sm,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
           : Text(
-        sponsor.name,
-        style: const TextStyle(
-          color: AppColors.textWhite70,
-          fontSize: AppFontSizes.sm,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+              sponsor.name,
+              style: const TextStyle(
+                color: AppColors.textWhite70,
+                fontSize: AppFontSizes.sm,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
     );
   }
 
@@ -949,10 +964,7 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: AppSpacing.xs),
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.textWhite54,
-            fontSize: 9,
-          ),
+          style: const TextStyle(color: AppColors.textWhite54, fontSize: 9),
         ),
       ],
     );
@@ -983,10 +995,7 @@ class WebFeatureCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cardDark,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(
-          color: AppColors.cardBorder,
-          width: 1.5,
-        ),
+        border: Border.all(color: AppColors.cardBorder, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1210,12 +1219,12 @@ class _TestimonialImageSliderState extends State<_TestimonialImageSlider> {
                       ),
                       boxShadow: scale > 1.0
                           ? [
-                        BoxShadow(
-                          color: AppColors.webRed.withValues(alpha: 0.15),
-                          blurRadius: 12,
-                          spreadRadius: 2,
-                        ),
-                      ]
+                              BoxShadow(
+                                color: AppColors.webRed.withValues(alpha: 0.15),
+                                blurRadius: 12,
+                                spreadRadius: 2,
+                              ),
+                            ]
                           : null,
                     ),
                     child: ClipRRect(

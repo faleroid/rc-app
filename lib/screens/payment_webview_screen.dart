@@ -3,7 +3,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../repositories/payment_repository.dart';
 import '../constants/app_colors.dart';
-import '../constants/margin.dart';
 
 class PaymentWebviewScreen extends StatefulWidget {
   final String redirectUrl;
@@ -41,7 +40,7 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
               _handlePaymentResult(true, "Pembayaran Berhasil!");
               return NavigationDecision.prevent;
             }
-            
+
             if (url.contains('/unfinish')) {
               _handlePaymentResult(false, "Pembayaran Belum Selesai");
               return NavigationDecision.prevent;
@@ -61,13 +60,13 @@ class _PaymentWebviewScreenState extends State<PaymentWebviewScreen> {
 
   Future<void> _handlePaymentResult(bool isSuccess, String message) async {
     if (!mounted) return;
-    
+
     if (!isSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message), backgroundColor: Colors.orange),
       );
     }
-    
+
     context.pop(isSuccess); // Tutup dengan membawa status keberhasilan
   }
 

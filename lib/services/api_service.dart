@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dio/dio.dart';
 import 'token_service.dart';
@@ -7,7 +9,19 @@ class ApiService {
   final TokenService _tokenService = TokenService();
   late final Dio _dio;
 
-  ApiService() {
+  /// Deterministic Base URL depending on environment & platform
+  /// - Web / Windows Desktop: http://127.0.0.1:8000/api
+  /// - Android Emulator: http://10.0.2.2:8000/api
+  /// - HP Fisik (Wi-Fi): http://192.168.2.133:8000/apis
+  static String get defaultBaseUrl {
+    if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      return 'http://127.0.0.1:8000/api';
+    }
+    // Ganti ke 'http://10.0.2.2:8000/api' jika menggunakan Android Emulator
+    return 'http://192.168.18.227:8000/api';
+  }
+
+  ApiService({String? baseUrl}) {
     _dio = Dio(
       BaseOptions(
         // baseUrl: 'http://10.0.2.2:8000/api', // emulator

@@ -315,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: const Color.fromARGB(26, 169, 0, 0),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.5),
+          color: AppColors.primary.withValues(alpha: 0.5),
           width: 1,
         ), // Aksen border merah
       ),
@@ -428,6 +428,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildListTile(
             'Privacy Policy',
             leadingIcon: Icons.security_outlined,
+            onTap: () {
+              context.push('/profile/privacy-policy');
+            },
           ),
         ],
       ),

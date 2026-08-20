@@ -17,8 +17,11 @@ import 'router/app_router.dart';
 import 'constants/assets.dart';
 
 import 'dart:ui'; // For PointerDeviceKind
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   runApp(const MyApp());
 }
 

@@ -12,6 +12,7 @@ import '../screens/module_detail_screen.dart';
 import '../screens/chat_bot_screen.dart';
 import '../screens/unauthenticated_screen.dart';
 import '../screens/payment_webview_screen.dart';
+import '../screens/privacy_policy_screen.dart';
 import '../models/payment_model.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -101,7 +102,15 @@ final GoRouter appRouter = GoRouter(
             return ChangePasswordScreen(currentPassword: currentPassword);
           },
         ),
+        GoRoute(
+          path: 'privacy-policy',
+          builder: (context, state) => const PrivacyPolicyScreen(),
+        ),
       ],
+    ),
+    GoRoute(
+      path: '/privacy-policy',
+      builder: (context, state) => const PrivacyPolicyScreen(),
     ),
     GoRoute(
       path: '/update-username',
