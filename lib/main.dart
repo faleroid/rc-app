@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_text_styles.dart';
@@ -12,6 +12,7 @@ import 'screens/course_list_screen.dart';
 import 'screens/package.dart';
 import 'screens/chat_bot_screen.dart';
 import 'services/token_service.dart';
+import 'services/announcement_tracker_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
 import 'constants/assets.dart';
@@ -118,6 +119,7 @@ class _MainScreenState extends State<MainScreen>
 
     if (widget.isLoggedIn) {
       _fetchProfile();
+      AnnouncementTrackerService().checkUnreadAnnouncements();
     }
   }
 
@@ -252,33 +254,77 @@ class _MainScreenState extends State<MainScreen>
               vertical: 8.0,
             ),
             child: widget.isLoggedIn
-                ? GestureDetector(
-                    onTap: () {
-                      context.push('/profile');
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 14,
-                          child: Icon(
-                            Icons.person,
-                            color: Color(0xFF3B0764),
-                            size: 18,
-                          ),
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Pengumuman VIP Button with Unread Badge Counter
+                      ValueListenableBuilder<int>(
+                        valueListenable:
+                            AnnouncementTrackerService().unreadCountNotifier,
+                        builder: (context, unreadCount, child) {
+                          return IconButton(
+                            icon: Badge(
+                              isLabelVisible: unreadCount > 0,
+                              label: Text(
+                                unreadCount > 99
+                                    ? '99+'
+                                    : unreadCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              backgroundColor: AppColors.webRed,
+                              child: const Icon(
+                                Icons.campaign_outlined,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                            tooltip: 'Pengumuman VIP',
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            constraints: const BoxConstraints(),
+                            onPressed: () async {
+                              await context.push('/announcements');
+                              AnnouncementTrackerService()
+                                  .checkUnreadAnnouncements();
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Profile Avatar & Name
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/profile');
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 14,
+                              child: Icon(
+                                Icons.person,
+                                color: Color(0xFF3B0764),
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _userName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: AppFontSizes.sm,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _userName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: AppFontSizes.sm,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                 : TextButton(
                     style: TextButton.styleFrom(

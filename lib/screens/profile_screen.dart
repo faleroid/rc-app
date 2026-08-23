@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../models/auth_model.dart';
 import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
 import '../repositories/auth_repository.dart';
+import '../services/announcement_tracker_service.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
 
@@ -23,12 +24,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _profileFuture = _repository.getProfile();
+    AnnouncementTrackerService().checkUnreadAnnouncements();
   }
 
   Future<void> _refresh() async {
     setState(() {
       _profileFuture = _repository.getProfile();
     });
+    AnnouncementTrackerService().checkUnreadAnnouncements();
   }
 
   @override
@@ -350,7 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         border: Border.all(
           color: AppColors.primary.withValues(alpha: 0.5),
           width: 1,
-        ), // Aksen border merah
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,6 +449,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Column(
         children: [
+          ValueListenableBuilder<int>(
+            valueListenable: AnnouncementTrackerService().unreadCountNotifier,
+            builder: (context, unreadCount, child) {
+              return _buildListTile(
+                'Pengumuman VIP',
+                leadingIcon: Icons.campaign_outlined,
+                badgeCount: unreadCount,
+                onTap: () async {
+                  await context.push('/announcements');
+                  AnnouncementTrackerService().checkUnreadAnnouncements();
+                },
+              );
+            },
+          ),
+          _buildDivider(),
           _buildListTile(
             'Password',
             leadingIcon: Icons.lock_outline,
@@ -476,17 +494,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildListTile(
     String title, {
     required IconData leadingIcon,
+    int badgeCount = 0,
     VoidCallback? onTap,
   }) {
     return ListTile(
       leading: Icon(leadingIcon, color: Colors.white70),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: AppFontSizes.md,
-          fontWeight: FontWeight.w500,
-        ),
+      title: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: AppFontSizes.md,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (badgeCount > 0) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.webRed,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                badgeCount > 99 ? '99+' : badgeCount.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
       trailing: const Icon(Icons.chevron_right, color: Colors.white54),
       onTap: onTap,
