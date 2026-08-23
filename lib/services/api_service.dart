@@ -9,11 +9,18 @@ class ApiService {
   final TokenService _tokenService = TokenService();
   late final Dio _dio;
 
+  /// Mode konfigurasi environment API:
+  /// - set `true` untuk menggunakan server hosting produksi
+  /// - set `false` untuk beralih kembali ke local development
+  static const bool isProduction = true;
+  static const String productionBaseUrl = 'https://ricocapital.id/api';
+
   /// Deterministic Base URL depending on environment & platform
-  /// - Web / Windows Desktop: http://127.0.0.1:8000/api
-  /// - Android Emulator: http://10.0.2.2:8000/api
-  /// - HP Fisik (Wi-Fi): http://10.44.215.86:8000/api
   static String get defaultBaseUrl {
+    if (isProduction) {
+      return productionBaseUrl;
+    }
+
     if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return 'http://127.0.0.1:8000/api';
     }

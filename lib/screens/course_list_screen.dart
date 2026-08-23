@@ -1,4 +1,4 @@
-// lib/screens/course_list_screen.dart
+﻿// lib/screens/course_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/course_model.dart';

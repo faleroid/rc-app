@@ -1,4 +1,4 @@
-// lib/screens/module_detail_screen.dart
+﻿// lib/screens/module_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/module_detail_model.dart';
@@ -95,11 +95,16 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                     ),
                     const SizedBox(height: 24),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.webRed.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.webRed.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: AppColors.webRed.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: const Text(
                         'KHUSUS MEMBER AKTIF',
@@ -123,7 +128,9 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      err.contains('403') || err.contains('Akses ditolak') || err.contains('tidak aktif')
+                      err.contains('403') ||
+                              err.contains('Akses ditolak') ||
+                              err.contains('tidak aktif')
                           ? 'Keanggotaan Anda belum aktif. Silakan pilih dan bayar paket keanggotaan untuk membuka modul ini.'
                           : err,
                       style: const TextStyle(
@@ -138,7 +145,10 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 14,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -150,7 +160,10 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
                       icon: const Icon(Icons.workspace_premium, size: 20),
                       label: const Text(
                         'Pilih Paket Keanggotaan',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -196,7 +209,10 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
             icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),
             label: const Text(
               'Tanya AI',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           appBar: AppBar(
@@ -325,7 +341,7 @@ class _ModuleDetailScreenState extends State<ModuleDetailScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                'https://picsum.photos/seed/${item.id + 20}/200/150',
+                item.realThumbnailUrl,
                 width: 140,
                 height: 90,
                 fit: BoxFit.cover,

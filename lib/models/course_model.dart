@@ -1,4 +1,4 @@
-// lib/models/course_model.dart
+﻿// lib/models/course_model.dart
 
 class ModuleMiniModel {
   final int id;
@@ -6,6 +6,7 @@ class ModuleMiniModel {
   final int durationMinutes;
   final String title;
   final String? thumbnailUrl;
+  final String? videoUrl;
 
   ModuleMiniModel({
     required this.id,
@@ -13,7 +14,25 @@ class ModuleMiniModel {
     required this.durationMinutes,
     required this.title,
     this.thumbnailUrl,
+    this.videoUrl,
   });
+
+  /// Real Video Thumbnail (YouTube HQ Thumbnail atau thumbnail kustom dari API)
+  String get realThumbnailUrl {
+    if (thumbnailUrl != null && thumbnailUrl!.trim().isNotEmpty) {
+      return thumbnailUrl!.trim();
+    }
+    if (videoUrl != null && videoUrl!.trim().isNotEmpty) {
+      final regExp = RegExp(
+        r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?\/ ]{11})',
+      );
+      final match = regExp.firstMatch(videoUrl!.trim());
+      if (match != null && match.group(1) != null) {
+        return 'https://img.youtube.com/vi/${match.group(1)}/hqdefault.jpg';
+      }
+    }
+    return '';
+  }
 
   factory ModuleMiniModel.fromJson(Map<String, dynamic> json) {
     return ModuleMiniModel(
@@ -22,6 +41,7 @@ class ModuleMiniModel {
       durationMinutes: json['duration_minutes'] ?? 0,
       title: json['title'] ?? 'Modul ${json['id']}',
       thumbnailUrl: json['thumbnail'] ?? json['thumbnail_url'],
+      videoUrl: json['video_url'] ?? json['youtube_embed_url'],
     );
   }
 }
@@ -30,8 +50,7 @@ class CourseModel {
   final int id;
   final String title;
   final String slug;
-  final List<ModuleMiniModel>
-  modules; // Menyimpan daftar modul di dalam course ini
+  final List<ModuleMiniModel> modules;
 
   CourseModel({
     required this.id,
@@ -41,11 +60,9 @@ class CourseModel {
   });
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
-    // Mapping array modules ke dalam List<ModuleMiniModel>
     var modulesList = json['modules'] as List? ?? [];
-    List<ModuleMiniModel> parsedModules = modulesList
-        .map((m) => ModuleMiniModel.fromJson(m))
-        .toList();
+    List<ModuleMiniModel> parsedModules =
+        modulesList.map((m) => ModuleMiniModel.fromJson(m)).toList();
 
     return CourseModel(
       id: json['id'] ?? 0,
