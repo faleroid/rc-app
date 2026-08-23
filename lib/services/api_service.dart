@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dio/dio.dart';
@@ -68,11 +68,26 @@ class ApiService {
                 ? e.response?.data['message']?.toString()
                 : null;
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              try {
-                appRouter.go('/unauthenticated', extra: serverMsg);
-              } catch (_) {}
-            });
+            try {
+              final currentLocation =
+                  appRouter.routerDelegate.currentConfiguration.uri.toString();
+              final isPublicRoute = currentLocation.startsWith('/main') ||
+                  currentLocation == '/' ||
+                  currentLocation.startsWith('/splash') ||
+                  currentLocation.startsWith('/login') ||
+                  currentLocation.startsWith('/register') ||
+                  currentLocation.startsWith('/privacy-policy') ||
+                  currentLocation.startsWith('/terms-of-use') ||
+                  currentLocation.startsWith('/help-center');
+
+              if (!isPublicRoute) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  try {
+                    appRouter.go('/unauthenticated', extra: serverMsg);
+                  } catch (_) {}
+                });
+              }
+            } catch (_) {}
           }
           return handler.next(e);
         },

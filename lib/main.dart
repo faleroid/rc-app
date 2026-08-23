@@ -68,11 +68,22 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    if (token != null) {
-      context.go('/main', extra: {'isLoggedIn': true});
-    } else {
-      context.go('/main', extra: {'isLoggedIn': false});
+    if (token != null && token.isNotEmpty) {
+      try {
+        final profileRepo = ProfileRepository();
+        final res = await profileRepo.getProfile();
+        if (res.data != null) {
+          if (!mounted) return;
+          context.go('/main', extra: {'isLoggedIn': true});
+          return;
+        }
+      } catch (_) {
+        await tokenService.deleteToken();
+      }
     }
+
+    if (!mounted) return;
+    context.go('/main', extra: {'isLoggedIn': false});
   }
 
   @override
