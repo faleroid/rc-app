@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
@@ -68,68 +68,24 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // ─── BLURRY GLOWING BLOB BACKGROUND LAYER ────────────────
+        // ─── AMBIENT CENTER GLOW ─────────────────────────────────
         Positioned.fill(
           child: IgnorePointer(
-            child: Stack(
-              children: [
-                // Top-Left red glow
-                Positioned(
-                  top: -100,
-                  left: -150,
-                  child: Container(
-                    width: 350,
-                    height: 350,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          AppColors.webRed.withValues(alpha: 0.12),
-                          AppColors.webRed.withValues(alpha: 0.04),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
+            child: Center(
+              child: Container(
+                width: 450,
+                height: 450,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.webRed.withValues(alpha: 0.10),
+                      AppColors.primary.withValues(alpha: 0.03),
+                      Colors.transparent,
+                    ],
                   ),
                 ),
-                // Middle-Right purple/blue glow
-                Positioned(
-                  top: 500,
-                  right: -150,
-                  child: Container(
-                    width: 400,
-                    height: 400,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Colors.deepPurpleAccent.withValues(alpha: 0.08),
-                          Colors.blueAccent.withValues(alpha: 0.03),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Lower-Left red glow
-                Positioned(
-                  bottom: 400,
-                  left: -150,
-                  child: Container(
-                    width: 450,
-                    height: 450,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          AppColors.webRed.withValues(alpha: 0.08),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
