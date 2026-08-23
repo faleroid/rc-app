@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'constants/app_colors.dart';
 import 'constants/app_text_styles.dart';
@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null) {
       context.go('/main', extra: {'isLoggedIn': true});
     } else {
-      context.go('/login');
+      context.go('/main', extra: {'isLoggedIn': false});
     }
   }
 
@@ -364,7 +364,7 @@ class _MainScreenState extends State<MainScreen>
                       ),
                     ),
                     onPressed: () {
-                      context.go('/login');
+                      context.push('/login');
                     },
                     child: const Text('Login', style: AppTextStyles.buttonBold),
                   ),

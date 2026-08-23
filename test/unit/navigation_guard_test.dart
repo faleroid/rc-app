@@ -8,6 +8,9 @@ class NavigationGuard {
 
   String navigateTo(String targetRoute) {
     if (!isLoggedIn) {
+      if (targetRoute == '/main' || targetRoute == '/splash') {
+        return targetRoute;
+      }
       return '/login';
     }
 
@@ -33,12 +36,23 @@ class NavigationGuard {
 
 void main() {
   group('5. NAVIGATION GUARD UNIT TESTS (Arrange-Act-Assert)', () {
-    test('user belum login mencoba akses halaman utama → harus redirect ke LoginScreen', () {
+    test('user belum login mencoba akses halaman utama → tetap diizinkan akses /main (beranda)', () {
       // Arrange
       final guard = NavigationGuard(isLoggedIn: false, isSubscribed: false);
 
       // Act
       final destination = guard.navigateTo('/main');
+
+      // Assert
+      expect(destination, equals('/main'));
+    });
+
+    test('user belum login mencoba akses halaman terproteksi (profile) → redirect ke LoginScreen', () {
+      // Arrange
+      final guard = NavigationGuard(isLoggedIn: false, isSubscribed: false);
+
+      // Act
+      final destination = guard.navigateTo('/profile');
 
       // Assert
       expect(destination, equals('/login'));

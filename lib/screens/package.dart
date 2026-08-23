@@ -198,8 +198,8 @@ class _PackagePageState extends State<PackagePage> {
 
   Future<void> _handlePayment(MembershipPackageModel package) async {
     if (!_isLoggedIn) {
-      // Direct guest users to Login Screen (Gambar 2)
-      context.go('/login');
+      // Direct guest users to Login Screen
+      context.push('/login');
     } else {
       // Member logged in: check active package
       if (_currentMembership?.package['id'] == package.id) {
