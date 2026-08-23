@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/auth_model.dart';
 import '../models/profile_model.dart';
 import '../repositories/profile_repository.dart';
@@ -402,40 +403,104 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _launchExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tidak dapat membuka $url'),
+            backgroundColor: AppColors.webRed,
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal membuka tautan komunitas.'),
+            backgroundColor: AppColors.webRed,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildCommunitySection() {
     return Row(
       children: [
-        Expanded(child: _buildCommunityCard('Discord', Icons.discord)),
+        Expanded(
+          child: _buildCommunityCard(
+            title: 'Discord',
+            icon: Icons.discord,
+            brandColor: const Color(0xFF5865F2),
+            onTap: () => _launchExternalUrl('https://discord.gg/Az32k28bq'),
+          ),
+        ),
         const SizedBox(width: 16),
-        Expanded(child: _buildCommunityCard('Whatsapp', Icons.chat_bubble)),
+        Expanded(
+          child: _buildCommunityCard(
+            title: 'WhatsApp',
+            icon: Icons.chat_bubble,
+            brandColor: const Color(0xFF25D366),
+            onTap: () => _launchExternalUrl('https://wa.me/6281330581505'),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildCommunityCard(String title, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: BoxDecoration(
-        color: AppColors.cardDark,
+  Widget _buildCommunityCard({
+    required String title,
+    required IconData icon,
+    required Color brandColor,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white12),
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            backgroundColor: AppColors.primary,
-            radius: 25,
-            child: Icon(icon, color: Colors.white, size: 28),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          decoration: BoxDecoration(
+            color: AppColors.cardDark,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: brandColor.withValues(alpha: 0.3),
+              width: 1.2,
             ),
           ),
-        ],
+          child: Column(
+            children: [
+              CircleAvatar(
+                backgroundColor: brandColor.withValues(alpha: 0.15),
+                radius: 25,
+                child: Icon(icon, color: brandColor, size: 28),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Gabung Komunitas',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -472,11 +537,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
           _buildDivider(),
-          _buildListTile('Help Center', leadingIcon: Icons.help_outline),
+          _buildListTile(
+            'Help Center',
+            leadingIcon: Icons.help_outline,
+            onTap: () {
+              context.push('/profile/help-center');
+            },
+          ),
           _buildDivider(),
           _buildListTile(
             'Terms of Use',
             leadingIcon: Icons.description_outlined,
+            onTap: () {
+              context.push('/profile/terms-of-use');
+            },
           ),
           _buildDivider(),
           _buildListTile(

@@ -117,4 +117,8 @@ class AppStrings {
       'crypto Anda bersama Ricocapital';
   static const String btnStartLearning    = 'Start Learning Now';
   static const String btnViewCurriculum   = 'View Curriculum';
+
+  // Komunitas Links
+  static const String discordCommunityUrl = 'https://discord.gg/Az32k28bq';
+  static const String whatsappCommunityUrl = 'https://wa.me/6281330581505';
 }

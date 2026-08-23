@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
@@ -778,11 +779,13 @@ class _HomePageState extends State<HomePage> {
                           icon: Icons.chat_bubble_outline,
                           glowColor: Colors.greenAccent,
                           label: "WhatsApp",
+                          onTap: () => _launchExternalUrl('https://wa.me/6281330581505'),
                         ),
                         _buildSocialMediaIcon(
                           icon: Icons.discord,
                           glowColor: Colors.indigoAccent,
                           label: "Discord",
+                          onTap: () => _launchExternalUrl('https://discord.gg/Az32k28bq'),
                         ),
                         _buildSocialMediaIcon(
                           icon: Icons.play_circle_outline,
@@ -893,36 +896,67 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _launchExternalUrl(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tidak dapat membuka $url'),
+            backgroundColor: AppColors.webRed,
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal membuka tautan.'),
+            backgroundColor: AppColors.webRed,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildSocialMediaIcon({
     required IconData icon,
     required Color glowColor,
     required String label,
+    VoidCallback? onTap,
   }) {
-    return Column(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.cardDark,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: glowColor.withValues(alpha: 0.3)),
-            boxShadow: [
-              BoxShadow(
-                color: glowColor.withValues(alpha: 0.15),
-                blurRadius: 8,
-                spreadRadius: 1,
-              ),
-            ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.cardDark,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: glowColor.withValues(alpha: 0.3)),
+              boxShadow: [
+                BoxShadow(
+                  color: glowColor.withValues(alpha: 0.15),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: Icon(icon, color: AppColors.textWhite, size: 22),
           ),
-          child: Icon(icon, color: AppColors.textWhite, size: 22),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          label,
-          style: const TextStyle(color: AppColors.textWhite54, fontSize: 9),
-        ),
-      ],
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textWhite54, fontSize: 9),
+          ),
+        ],
+      ),
     );
   }
 }
