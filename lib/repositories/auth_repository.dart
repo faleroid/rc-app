@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import '../services/api_service.dart';
 import '../models/auth_model.dart';
 import '../services/token_service.dart';
@@ -22,8 +22,6 @@ class AuthRepository {
         );
       }
     } on DioException catch (e) {
-      print('DioException caught: ${e.toString()}');
-
       final data = e.response?.data;
       final errorMessage = (data is Map<String, dynamic>)
           ? (data['message'] ?? 'Terjadi kesalahan jaringan')
@@ -75,8 +73,8 @@ class AuthRepository {
   Future<void> logout() async {
     try {
       await _apiService.dio.post('/logout');
-    } catch (e) {
-      print('API Logout gagal/error: $e');
+    } catch (_) {
+      // Pass
     } finally {
       final tokenService = TokenService();
       await tokenService.deleteToken();

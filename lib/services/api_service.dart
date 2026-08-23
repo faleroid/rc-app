@@ -46,9 +46,16 @@ class ApiService {
         },
         onError: (DioException e, handler) async {
           final statusCode = e.response?.statusCode;
-          // Hanya 401 (Unauthenticated) yang menghapus token dan logout.
-          // 403 (Forbidden/Non-VIP) dibiarkan agar error message bisa tampil di layar UI.
-          if (statusCode == 401) {
+          final path = e.requestOptions.path;
+
+          // Jangan redirect ke unauthenticated jika error berasal dari endpoint login/register
+          final isAuthEndpoint =
+              path.contains('/login') ||
+              path.contains('/register') ||
+              path.contains('/verify-password');
+
+          // Hanya 401 (Unauthenticated pada route terproteksi) yang menghapus token dan logout.
+          if (statusCode == 401 && !isAuthEndpoint) {
             await _tokenService.deleteToken();
             final serverMsg = e.response?.data is Map
                 ? e.response?.data['message']?.toString()
