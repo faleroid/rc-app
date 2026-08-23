@@ -117,6 +117,7 @@ class _MainScreenState extends State<MainScreen>
   bool _isActive = false;
   bool _isLoggedIn = false;
   late TabController _tabController;
+  final TokenService _tokenService = TokenService();
 
   @override
   void initState() {
@@ -130,31 +131,55 @@ class _MainScreenState extends State<MainScreen>
       initialIndex: widget.initialTabIndex,
     );
 
-    // Always verify actual auth status from token storage
+    // Listen to real-time auth state changes (login / logout)
+    _tokenService.authNotifier.addListener(_onAuthStateChanged);
+    _verifyAuthStatus();
+  }
+
+  @override
+  void didUpdateWidget(covariant MainScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialIndex != oldWidget.initialIndex) {
+      setState(() {
+        _selectedIndex = widget.initialIndex;
+      });
+    }
+    if (widget.initialTabIndex != oldWidget.initialTabIndex) {
+      _tabController.animateTo(widget.initialTabIndex);
+    }
+    _verifyAuthStatus();
+  }
+
+  void _onAuthStateChanged() {
     _verifyAuthStatus();
   }
 
   Future<void> _verifyAuthStatus() async {
-    final tokenService = TokenService();
-    final token = await tokenService.getToken();
+    final token = await _tokenService.getToken();
 
     if (token != null && token.isNotEmpty) {
       if (!mounted) return;
       setState(() {
         _isLoggedIn = true;
       });
-      _fetchProfile();
+      await _fetchProfile();
       AnnouncementTrackerService().checkUnreadAnnouncements();
     } else {
       if (!mounted) return;
       setState(() {
         _isLoggedIn = false;
+        _userName = 'Profile';
+        _isActive = false;
+        if (_selectedIndex > 0) {
+          _selectedIndex = 0; // Return to Beranda tab when logged out
+        }
       });
     }
   }
 
   @override
   void dispose() {
+    _tokenService.authNotifier.removeListener(_onAuthStateChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -163,7 +188,7 @@ class _MainScreenState extends State<MainScreen>
     try {
       final repo = ProfileRepository();
       final res = await repo.getProfile();
-      if (res.data != null) {
+      if (res.data != null && mounted) {
         setState(() {
           _userName = res.data!.name.split(' ').first;
           _isActive = res.data!.isActive;
