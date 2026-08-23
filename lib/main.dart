@@ -115,12 +115,14 @@ class _MainScreenState extends State<MainScreen>
   int _selectedIndex = 0;
   String _userName = 'Profile';
   bool _isActive = false;
+  bool _isLoggedIn = false;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _isLoggedIn = widget.isLoggedIn;
 
     _tabController = TabController(
       length: 4,
@@ -128,9 +130,26 @@ class _MainScreenState extends State<MainScreen>
       initialIndex: widget.initialTabIndex,
     );
 
-    if (widget.isLoggedIn) {
+    // Always verify actual auth status from token storage
+    _verifyAuthStatus();
+  }
+
+  Future<void> _verifyAuthStatus() async {
+    final tokenService = TokenService();
+    final token = await tokenService.getToken();
+
+    if (token != null && token.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isLoggedIn = true;
+      });
       _fetchProfile();
       AnnouncementTrackerService().checkUnreadAnnouncements();
+    } else {
+      if (!mounted) return;
+      setState(() {
+        _isLoggedIn = false;
+      });
     }
   }
 
@@ -289,7 +308,7 @@ class _MainScreenState extends State<MainScreen>
               horizontal: 16.0,
               vertical: 8.0,
             ),
-            child: widget.isLoggedIn
+            child: _isLoggedIn
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -385,7 +404,7 @@ class _MainScreenState extends State<MainScreen>
 
       body: _buildBody(),
 
-      floatingActionButton: (widget.isLoggedIn && _isActive)
+      floatingActionButton: (_isLoggedIn && _isActive)
           ? FloatingActionButton.extended(
               onPressed: () {
                 ChatBotScreen.showModal(context);
@@ -402,7 +421,7 @@ class _MainScreenState extends State<MainScreen>
             )
           : null,
 
-      bottomNavigationBar: (widget.isLoggedIn && _isActive)
+      bottomNavigationBar: (_isLoggedIn && _isActive)
           ? Container(
               decoration: const BoxDecoration(
                 color: AppColors.background, // Dark background
