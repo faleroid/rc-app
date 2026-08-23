@@ -9,9 +9,7 @@ import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({
-    super.key,
-  });
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -54,159 +52,188 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: AppColors.primary,
         backgroundColor: AppColors.background,
         child: FutureBuilder<ProfileResponse>(
-        future: _profileFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            );
-          } else if (snapshot.hasError) {
-            final errStr = snapshot.error.toString();
-            final isUnauth = errStr.toLowerCase().contains('unauthenticated') ||
-                errStr.contains('401') ||
-                errStr.contains('403');
+          future: _profileFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              );
+            } else if (snapshot.hasError) {
+              final errStr = snapshot.error.toString();
+              final isUnauth =
+                  errStr.toLowerCase().contains('unauthenticated') ||
+                  errStr.contains('401') ||
+                  errStr.contains('403');
 
-            if (isUnauth) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                try {
-                  context.go('/unauthenticated', extra: 'Sesi profil Anda telah berakhir. Silakan login kembali.');
-                } catch (_) {}
-              });
-            }
+              if (isUnauth) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  try {
+                    context.go(
+                      '/unauthenticated',
+                      extra:
+                          'Sesi profil Anda telah berakhir. Silakan login kembali.',
+                    );
+                  } catch (_) {}
+                });
+              }
 
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.lock_person_rounded, color: AppColors.webRed, size: 48),
-                    const SizedBox(height: 16),
-                    Text(
-                      isUnauth ? 'Sesi Anda Telah Berakhir' : errStr,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.webRed,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.lock_person_rounded,
+                        color: AppColors.webRed,
+                        size: 48,
                       ),
-                      onPressed: () {
-                        context.go('/unauthenticated');
-                      },
-                      child: const Text('Masuk Sekarang', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      Text(
+                        isUnauth ? 'Sesi Anda Telah Berakhir' : errStr,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.webRed,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          context.go('/unauthenticated');
+                        },
+                        child: const Text(
+                          'Masuk Sekarang',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          } else if (snapshot.hasData && snapshot.data!.data != null) {
-            final user = snapshot.data!.data!;
+              );
+            } else if (snapshot.hasData && snapshot.data!.data != null) {
+              final user = snapshot.data!.data!;
 
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProfileHeader(user),
-                  const SizedBox(height: 24),
-                  _buildPremiumCard(user),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Bergabung dengan Komunitas',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: AppFontSizes.xl,
-                      fontWeight: FontWeight.bold,
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProfileHeader(user),
+                    const SizedBox(height: 24),
+                    _buildPremiumCard(user),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Bergabung dengan Komunitas',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCommunitySection(),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Lainnya',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: AppFontSizes.xl,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 16),
+                    _buildCommunitySection(),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Lainnya',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildOtherMenu(),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(
-                          color: AppColors.primary,
-                          width: 1.5,
+                    const SizedBox(height: 16),
+                    _buildOtherMenu(),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        onPressed: () async {
+                          final authRepository = AuthRepository();
+                          await authRepository.logout();
+
+                          if (!context.mounted) return;
+
+                          context.go('/main', extra: {'isLoggedIn': false});
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.logout, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: AppFontSizes.lg,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      onPressed: () async {
-                        final authRepository = AuthRepository();
-                        await authRepository.logout();
-
-                        if (!context.mounted) return;
-
-                        context.go('/main', extra: {'isLoggedIn': false});
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    const SizedBox(height: 24),
+                    const Center(
+                      child: Column(
                         children: [
-                          Icon(Icons.logout, size: 20),
-                          SizedBox(width: 8),
                           Text(
-                            'Logout',
+                            '@ Rico Capital App',
                             style: TextStyle(
-                              fontSize: AppFontSizes.lg,
-                              fontWeight: FontWeight.bold,
+                              color: Colors.white54,
+                              fontSize: AppFontSizes.xs,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Version : 1',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: AppFontSizes.xs,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          '@ Rico Capital App',
-                           style: TextStyle(color: Colors.white54, fontSize: AppFontSizes.xs),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Version : 1',
-                           style: TextStyle(color: Colors.white54, fontSize: AppFontSizes.xs),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              );
+            }
+            return const Center(
+              child: Text(
+                'Tidak ada data',
+                style: TextStyle(color: Colors.white),
               ),
             );
-          }
-          return const Center(
-            child: Text(
-              'Tidak ada data',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        },
+          },
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildProfileHeader(UserModel user) {
@@ -277,7 +304,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 6),
                 Text(
                   user.phoneNumber ?? '-',
-                  style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: AppFontSizes.sm,
+                  ),
                 ),
               ],
             ),
@@ -291,7 +321,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 6),
                 Text(
                   user.domicile ?? '-',
-                  style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: AppFontSizes.sm,
+                  ),
                 ),
               ],
             ),
@@ -333,7 +366,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 4),
           Text(
             expiredText,
-            style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: AppFontSizes.sm,
+            ),
           ),
           const SizedBox(height: 20),
           SizedBox(

@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
 
@@ -34,7 +34,10 @@ class ChatRepository {
         sources: sources,
       );
     } on DioException catch (e) {
-      final errorMsg = e.response?.data['message'] ?? 'Gagal menghubungi AI Asisten. Silakan coba lagi.';
+      String errorMsg = 'Gagal menghubungi AI Asisten. Silakan coba lagi.';
+      if (e.response?.data is Map && e.response?.data['message'] != null) {
+        errorMsg = e.response!.data['message'].toString();
+      }
       return ChatMessageModel.bot(
         text: errorMsg,
         isInScope: false,

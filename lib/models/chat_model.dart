@@ -1,4 +1,4 @@
-class ChatSourceModel {
+﻿class ChatSourceModel {
   final int? moduleId;
   final String moduleTitle;
   final String courseTitle;
@@ -12,8 +12,8 @@ class ChatSourceModel {
   factory ChatSourceModel.fromJson(Map<String, dynamic> json) {
     return ChatSourceModel(
       moduleId: json['module_id'],
-      moduleTitle: json['module_title'] ?? '',
-      courseTitle: json['course_title'] ?? '',
+      moduleTitle: json['module_title']?.toString() ?? '',
+      courseTitle: json['course_title']?.toString() ?? '',
     );
   }
 
@@ -69,16 +69,19 @@ class ChatMessageModel {
 
   factory ChatMessageModel.fromJson(Map<String, dynamic> json) {
     var rawSources = json['sources'] as List<dynamic>? ?? [];
-    List<ChatSourceModel> parsedSources = rawSources
-        .map((s) => ChatSourceModel.fromJson(s as Map<String, dynamic>))
-        .toList();
+    List<ChatSourceModel> parsedSources = rawSources.map((s) {
+      if (s is Map) {
+        return ChatSourceModel.fromJson(Map<String, dynamic>.from(s));
+      }
+      return ChatSourceModel(moduleTitle: '', courseTitle: '');
+    }).toList();
 
     return ChatMessageModel(
       id: json['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
       text: json['text'] ?? '',
       isUser: json['is_user'] ?? false,
       timestamp: json['timestamp'] != null
-          ? DateTime.parse(json['timestamp'])
+          ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
           : DateTime.now(),
       isInScope: json['is_in_scope'] ?? true,
       sources: parsedSources,

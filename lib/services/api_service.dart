@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dio/dio.dart';
@@ -12,27 +12,24 @@ class ApiService {
   /// Deterministic Base URL depending on environment & platform
   /// - Web / Windows Desktop: http://127.0.0.1:8000/api
   /// - Android Emulator: http://10.0.2.2:8000/api
-  /// - HP Fisik (Wi-Fi): http://192.168.2.133:8000/apis
+  /// - HP Fisik (Wi-Fi): http://10.44.215.86:8000/api
   static String get defaultBaseUrl {
     if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return 'http://127.0.0.1:8000/api';
     }
-    // Ganti ke 'http://10.0.2.2:8000/api' jika menggunakan Android Emulator
-    return 'http://192.168.18.227:8000/api';
+    return 'http://192.168.1.28:8000/api';
   }
 
   ApiService({String? baseUrl}) {
     _dio = Dio(
       BaseOptions(
-        // baseUrl: 'http://10.0.2.2:8000/api', // emulator
-        baseUrl: 'http://192.168.18.26:8000/api', // real device
+        baseUrl: baseUrl ?? defaultBaseUrl,
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-
       ),
     );
 
@@ -49,7 +46,9 @@ class ApiService {
         },
         onError: (DioException e, handler) async {
           final statusCode = e.response?.statusCode;
-          if (statusCode == 401 || statusCode == 403) {
+          // Hanya 401 (Unauthenticated) yang menghapus token dan logout.
+          // 403 (Forbidden/Non-VIP) dibiarkan agar error message bisa tampil di layar UI.
+          if (statusCode == 401) {
             await _tokenService.deleteToken();
             final serverMsg = e.response?.data is Map
                 ? e.response?.data['message']?.toString()

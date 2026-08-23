@@ -83,12 +83,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   }
 
   void _addInitialGreeting() {
-    String greeting = 'Halo! Saya AI Asisten Pembelajaran RicoCapital. 👋\n\n'
-        'Ada materi atau rumus trading yang ingin Anda tanyakan seputar modul ini?';
-    if (widget.moduleTitle != null) {
-      greeting = 'Halo! Saya AI Asisten Pembelajaran untuk modul "${widget.moduleTitle}". 👋\n\n'
-          'Silakan ajukan pertanyaan seputar materi pada modul ini.';
-    }
+    String greeting = 'Halo! Ada yang bisa saya bantu. 👋\n\n';
 
     _messages.add(ChatMessageModel.bot(text: greeting));
   }
@@ -143,6 +138,96 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     super.dispose();
   }
 
+  void _showClearChatConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.cardBorder, width: 1),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.restart_alt_rounded, color: AppColors.webRed, size: 22),
+            SizedBox(width: 10),
+            Text(
+              'Reset Chatbot',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: AppFontSizes.md,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Hapus semua riwayat percakapan dan reset memori chatbot untuk memulai sesi baru?',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: AppFontSizes.sm,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: Colors.white60),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _clearChatMemory();
+            },
+            child: const Text(
+              'Hapus & Reset',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _clearChatMemory() async {
+    await _historyService.clearHistory();
+    if (mounted) {
+      setState(() {
+        _messages.clear();
+        _addInitialGreeting();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 18),
+              SizedBox(width: 8),
+              Text('Memori chat berhasil direset.'),
+            ],
+          ),
+          backgroundColor: AppColors.cardDark,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: AppColors.cardBorder, width: 0.5),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final content = Column(
@@ -165,44 +250,80 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
 
         // Header Bar
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 12,
+          ),
           decoration: const BoxDecoration(
             color: AppColors.cardDark,
-            border: Border(bottom: BorderSide(color: AppColors.cardBorder, width: 0.5)),
+            border: Border(
+              bottom: BorderSide(color: AppColors.cardBorder, width: 0.5),
+            ),
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Row(
             children: [
+              if (widget.isModal) ...[
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(width: 12),
+              ] else if (Navigator.canPop(context)) ...[
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white70),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(width: 12),
+              ],
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+                child: const Icon(
+                  Icons.smart_toy_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      'AI Asisten Pembelajaran',
-                      style: TextStyle(color: Colors.white, fontSize: AppFontSizes.md, fontWeight: FontWeight.bold),
+                      'Tanya AI',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppFontSizes.md,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Text(
-                      widget.moduleTitle ?? widget.courseTitle ?? 'RicoCapital Academy',
-                      style: const TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.xs),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (widget.courseTitle != null)
+                      Text(
+                        widget.courseTitle!,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: AppFontSizes.xs,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),
-              if (widget.isModal)
-                IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              IconButton(
+                icon: const Icon(Icons.restart_alt_rounded, color: Colors.white70),
+                tooltip: 'Reset Memori Chat',
+                onPressed: _showClearChatConfirmationDialog,
+              ),
             ],
           ),
         ),
@@ -223,11 +344,17 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
         // Loading Indicator
         if (_isLoading)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 8,
+            ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.cardDark,
                     borderRadius: BorderRadius.circular(16),
@@ -238,12 +365,18 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                       SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 2,
+                        ),
                       ),
                       SizedBox(width: 10),
                       Text(
-                        'AI sedang mencari materi...',
-                        style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.xs),
+                        'Sedang berpikir...',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: AppFontSizes.xs,
+                        ),
                       ),
                     ],
                   ),
@@ -261,11 +394,15 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               children: [
-                _buildQuickChip('Apa poin utama materi ini?'),
+                _buildQuickChip(
+                  'Apa kelas yang cocok untuk belajar dasar crypto?',
+                ),
                 const SizedBox(width: 8),
-                _buildQuickChip('Rangkumkan penjelasan modul ini'),
+                _buildQuickChip(
+                  'Apa itu wallet crypto dan bagaimana cara kerjanya?',
+                ),
                 const SizedBox(width: 8),
-                _buildQuickChip('Bagaimana strategi risk management?'),
+                _buildQuickChip('Bagaimana strategi trading?'),
               ],
             ),
           ),
@@ -280,20 +417,31 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           ),
           decoration: const BoxDecoration(
             color: AppColors.cardDark,
-            border: Border(top: BorderSide(color: AppColors.cardBorder, width: 0.5)),
+            border: Border(
+              top: BorderSide(color: AppColors.cardBorder, width: 0.5),
+            ),
           ),
           child: Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: _textController,
-                  style: const TextStyle(color: Colors.white, fontSize: AppFontSizes.sm),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: AppFontSizes.sm,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Tanyakan materi kelas...',
-                    hintStyle: const TextStyle(color: Colors.white38, fontSize: AppFontSizes.sm),
+                    hintStyle: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: AppFontSizes.sm,
+                    ),
                     filled: true,
                     fillColor: AppColors.background,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                       borderSide: BorderSide.none,
@@ -311,7 +459,11 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                  child: const Icon(
+                    Icons.send_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                 ),
               ),
             ],
@@ -338,7 +490,10 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
 
   Widget _buildQuickChip(String label) {
     return ActionChip(
-      label: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+      label: Text(
+        label,
+        style: const TextStyle(color: Colors.white70, fontSize: 11),
+      ),
       backgroundColor: AppColors.cardDark,
       side: const BorderSide(color: AppColors.cardBorder),
       onPressed: () => _sendMessage(label),
@@ -351,14 +506,23 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
             Container(
               padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-              child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 16),
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -381,7 +545,9 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   Text(
                     _cleanDisplayText(msg.text),
                     style: TextStyle(
-                      color: isUser ? Colors.white : (msg.isInScope ? Colors.white : Colors.white70),
+                      color: isUser
+                          ? Colors.white
+                          : (msg.isInScope ? Colors.white : Colors.white70),
                       fontSize: AppFontSizes.sm,
                       height: 1.45,
                     ),
@@ -391,14 +557,21 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                     const Divider(color: Colors.white24, height: 1),
                     const SizedBox(height: 6),
                     const Text(
-                      '📌 Sumber Referensi Modul:',
-                      style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold),
+                      'Sumber:',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     ...msg.sources.map(
                       (src) => Text(
                         '• ${src.moduleTitle}',
-                        style: const TextStyle(color: Colors.white70, fontSize: 10),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
                   ],
