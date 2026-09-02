@@ -67,9 +67,16 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+              const Icon(
+                Icons.check_circle_outline,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 8),
-              Text('Selamat datang, $userName!'),
+              Text(
+                'Selamat datang, $userName!',
+                style: const TextStyle(color: Colors.white),
+              ),
             ],
           ),
           backgroundColor: AppColors.primary,
@@ -141,7 +148,9 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text(
                 'Masukkan akun',
-                style: AppTextStyles.title.copyWith(fontSize: AppFontSizes.xxxl),
+                style: AppTextStyles.title.copyWith(
+                  fontSize: AppFontSizes.xxxl,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
@@ -246,7 +255,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Text(
                     'Belum Punya Akun? ',
-                    style: TextStyle(color: Colors.grey, fontSize: AppFontSizes.sm),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: AppFontSizes.sm,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {

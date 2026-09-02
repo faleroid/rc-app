@@ -65,27 +65,6 @@ class _EbooksScreenState extends State<EbooksScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.cardDark,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'E-Book',
-          style: TextStyle(
-            color: AppColors.textWhite,
-            fontWeight: FontWeight.bold,
-            fontSize: AppFontSizes.lg,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.textWhite,
-            size: 20,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
       body: RefreshIndicator(
         onRefresh: _loadEbooks,
         color: AppColors.webRed,
@@ -233,175 +212,79 @@ class _EbooksScreenState extends State<EbooksScreen> {
 
   Widget _buildEbookCard(EbookModel ebook) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.cardDark,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.cardBorder),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Ebook Thumbnail Icon Box
-                Container(
-                  width: 70,
-                  height: 95,
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppColors.webRed.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.menu_book_rounded,
-                        color: AppColors.webRed,
-                        size: 36,
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'PDF',
-                        style: TextStyle(
-                          color: AppColors.webRed,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+      child: InkWell(
+        onTap: () {
+          context.push('/ebooks/${ebook.slug}/read', extra: ebook);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              // Small PDF Icon Box
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.webRed.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.webRed.withValues(alpha: 0.3),
                   ),
                 ),
-                const SizedBox(width: 14),
-
-                // Info Section
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (ebook.category != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.purple.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            ebook.category!.name,
-                            style: const TextStyle(
-                              color: Colors.purpleAccent,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                      ],
-                      Text(
-                        ebook.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (ebook.author != null && ebook.author!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          'Oleh: ${ebook.author}',
-                          style: const TextStyle(
-                            color: AppColors.textWhite70,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          if (ebook.pageCount != null) ...[
-                            const Icon(
-                              Icons.description_outlined,
-                              color: AppColors.textWhite54,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${ebook.pageCount} Halaman',
-                              style: const TextStyle(
-                                color: AppColors.textWhite54,
-                                fontSize: 11,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (ebook.description != null && ebook.description!.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                ebook.description!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppColors.textWhite70,
-                  fontSize: 12,
-                  height: 1.4,
+                child: const Icon(
+                  Icons.picture_as_pdf_rounded,
+                  color: AppColors.webRed,
+                  size: 20,
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-          ],
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: const BoxDecoration(
-              color: Colors.black12,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.webRed,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              const SizedBox(width: 14),
+
+              // Title and Category
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      ebook.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.textWhite,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                  ),
-                  onPressed: () {
-                    context.push('/ebooks/${ebook.slug}/read', extra: ebook);
-                  },
-                  icon: const Icon(Icons.auto_stories, size: 16),
-                  label: const Text(
-                    'Baca E-Book',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
+                    if (ebook.category != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        ebook.category!.name,
+                        style: const TextStyle(
+                          color: AppColors.textWhite54,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textWhite54,
+                size: 20,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

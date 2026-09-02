@@ -194,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               'Keluar Akun',
                               style: TextStyle(
-                                fontSize: AppFontSizes.lg,
+                                fontSize: AppFontSizes.xs,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -207,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           Text(
-                            '@ Rico Capital App',
+                            'Ricocapital',
                             style: TextStyle(
                               color: Colors.white54,
                               fontSize: AppFontSizes.xs,
@@ -215,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Version : 1',
+                            'Version : 1.0.5',
                             style: TextStyle(
                               color: Colors.white54,
                               fontSize: AppFontSizes.xs,
@@ -508,14 +508,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           _buildDivider(),
           _buildListTile(
-            'E-Book',
-            leadingIcon: Icons.auto_stories_outlined,
-            onTap: () {
-              context.push('/ebooks');
-            },
-          ),
-          _buildDivider(),
-          _buildListTile(
             'Password',
             leadingIcon: Icons.lock_outline,
             onTap: () {
@@ -565,7 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: AppFontSizes.md,
+              fontSize: AppFontSizes.sm,
               fontWeight: FontWeight.w500,
             ),
           ),

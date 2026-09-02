@@ -10,6 +10,7 @@ import 'screens/academy_page.dart';
 import 'screens/about_page.dart';
 import 'screens/course_list_screen.dart';
 import 'screens/signals_screen.dart';
+import 'screens/ebooks_screen.dart';
 import 'screens/package.dart';
 import 'screens/chat_bot_screen.dart';
 import 'services/token_service.dart';
@@ -214,95 +215,103 @@ class _MainScreenState extends State<MainScreen>
     _tabController.animateTo(3);
   }
 
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      // Bottom Nav: Home
-      case 0:
-        return Column(
-          children: [
-            const SizedBox(height: 20),
+  /// Landing page (Beranda) — shown only to non-logged-in users
+  Widget _buildLandingPage() {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
 
-            // Tab Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                height: 42,
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: AppColors.cardDark,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.cardBorder, width: 1),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  dividerColor: Colors.transparent,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  labelColor: AppColors.textWhite,
-                  unselectedLabelColor: AppColors.textWhite54,
-                  labelStyle: const TextStyle(
-                    fontSize: AppFontSizes.xs,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontSize: AppFontSizes.xs,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  splashFactory: NoSplash.splashFactory,
-                  overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  tabs: const [
-                    Tab(text: "Home"),
-                    Tab(text: "Academy"),
-                    Tab(text: "About"),
-                    Tab(text: "Packages"),
-                  ],
-                ),
-              ),
+        // Tab Bar
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Container(
+            height: 42,
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: AppColors.cardDark,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.cardBorder, width: 1),
             ),
-
-            const SizedBox(height: 10),
-
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  // Tab 0: Home
-                  HomePage(onNavigateToPackage: _navigateToPackage),
-
-                  // Tab 1: Academy
-                  AcademyPage(onNavigateToPricing: _navigateToPackage),
-
-                  // Tab 2: About
-                  AboutPage(
-                    onNavigateToAcademy: _navigateToacademy,
-                    onNavigateToPackage: _navigateToPackage,
+            child: TabBar(
+              controller: _tabController,
+              dividerColor: Colors.transparent,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  // Tab 3: Packages
-                  const PackagePage(),
                 ],
               ),
+              labelColor: AppColors.textWhite,
+              unselectedLabelColor: AppColors.textWhite54,
+              labelStyle: const TextStyle(
+                fontSize: AppFontSizes.xs,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: AppFontSizes.xs,
+                fontWeight: FontWeight.w500,
+              ),
+              splashFactory: NoSplash.splashFactory,
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+              tabs: const [
+                Tab(text: "Home"),
+                Tab(text: "Academy"),
+                Tab(text: "About"),
+                Tab(text: "Packages"),
+              ],
             ),
-          ],
-        );
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Tab Content
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              // Tab 0: Home
+              HomePage(onNavigateToPackage: _navigateToPackage),
+
+              // Tab 1: Academy
+              AcademyPage(onNavigateToPricing: _navigateToPackage),
+
+              // Tab 2: About
+              AboutPage(
+                onNavigateToAcademy: _navigateToacademy,
+                onNavigateToPackage: _navigateToPackage,
+              ),
+              // Tab 3: Packages
+              const PackagePage(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    // User belum login → tampilkan landing page
+    if (!_isLoggedIn || !_isActive) {
+      return _buildLandingPage();
+    }
+
+    // User sudah login → bottom nav: 0=Berita, 1=Sinyal, 2=Modul, 3=E-Book
+    switch (_selectedIndex) {
+      case 0:
+        return const NewsScreen();
       case 1:
         return const SignalsScreen();
-
       case 2:
-        return const NewsScreen();
-
-      case 3:
         return const CourseListScreen();
+      case 3:
+        return const EbooksScreen();
       default:
         return const SizedBox.shrink();
     }
@@ -447,41 +456,24 @@ class _MainScreenState extends State<MainScreen>
       bottomNavigationBar: (_isLoggedIn && _isActive)
           ? Container(
               decoration: const BoxDecoration(
-                color: AppColors.background, // Dark background
+                color: AppColors.background,
                 border: Border(
                   top: BorderSide(
-                    color: AppColors.borderColor, // Top border
+                    color: AppColors.borderColor,
                     width: AppColors.borderWidth,
                   ),
                 ),
               ),
               child: BottomNavigationBar(
-                backgroundColor: Colors
-                    .transparent, // Transparent to use container background
-                elevation: 0, // Remove shadow
+                backgroundColor: Colors.transparent,
+                elevation: 0,
                 type: BottomNavigationBarType.fixed,
                 currentIndex: _selectedIndex,
                 selectedItemColor: AppColors.primary,
                 unselectedItemColor: Colors.white,
-                onTap: _onItemTapped, // Handle tap
-
+                onTap: _onItemTapped,
                 items: const [
-                  // Home
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home_outlined, color: AppColors.primary),
-                    label: 'Beranda',
-                  ),
-
-                  // Signal
-                  BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.show_chart_rounded,
-                      color: AppColors.primary,
-                    ),
-                    label: 'Sinyal',
-                  ),
-
-                  // News
+                  // Berita (default)
                   BottomNavigationBarItem(
                     icon: Icon(
                       Icons.article_outlined,
@@ -490,13 +482,31 @@ class _MainScreenState extends State<MainScreen>
                     label: 'Berita',
                   ),
 
-                  // Module
+                  // Sinyal
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.show_chart_rounded,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Sinyal',
+                  ),
+
+                  // Modul
                   BottomNavigationBarItem(
                     icon: Icon(
                       Icons.menu_book_outlined,
                       color: AppColors.primary,
                     ),
-                    label: 'Modul',
+                    label: 'Kursus',
+                  ),
+
+                  // E-Book
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.library_books_outlined,
+                      color: AppColors.primary,
+                    ),
+                    label: 'E-Book',
                   ),
                 ],
               ),

@@ -125,17 +125,13 @@ class _SignalsScreenState extends State<SignalsScreen> {
                 _buildStatItem(
                   'Sinyal Aktif',
                   active.toString(),
-                  AppColors.textWhite70,
+                  AppColors.textWhite,
                 ),
-                _buildStatItem(
-                  'Profit',
-                  hitTp.toString(),
-                  AppColors.textWhite70,
-                ),
+                _buildStatItem('Profit', hitTp.toString(), AppColors.textWhite),
                 _buildStatItem(
                   'Total Sinyal',
                   total.toString(),
-                  AppColors.textWhite70,
+                  AppColors.textWhite,
                 ),
               ],
             ),
