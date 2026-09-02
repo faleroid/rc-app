@@ -42,12 +42,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'RicoCapital App',
+          'Profile',
           style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
         ),
       ),
@@ -191,10 +192,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Icon(Icons.logout, size: 20),
                             SizedBox(width: 8),
                             Text(
-                              'Logout',
+                              'Keluar Akun',
                               style: TextStyle(
                                 fontSize: AppFontSizes.lg,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -251,8 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 user.name,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: AppFontSizes.display,
-                  fontWeight: FontWeight.bold,
+                  fontSize: AppFontSizes.xxxl,
+                  fontWeight: FontWeight.w600,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -339,10 +340,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildPremiumCard(UserModel user) {
-    String expiredText = 'Aktif hingga -';
+    String expiredText = 'Kamu belum berlangganan paket apapun.';
     if (user.membershipExpiresAt != null) {
       expiredText =
-          'Aktif hingga ${DateFormat('dd MMMM yyyy').format(user.membershipExpiresAt!)}';
+          'Paket berlangganan kamu aktif hingga ${DateFormat('dd MMMM yyyy').format(user.membershipExpiresAt!)}';
     }
 
     return Container(
@@ -364,7 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               color: Colors.white,
               fontSize: AppFontSizes.xxl,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
@@ -372,30 +373,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             expiredText,
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: AppFontSizes.sm,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 45,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {
-                context.go('/main', extra: {'isLoggedIn': true, 'tabIndex': 1});
-              },
-              child: const Text(
-                'Lihat semua paket',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              fontSize: AppFontSizes.xs,
             ),
           ),
         ],
@@ -518,14 +496,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             valueListenable: AnnouncementTrackerService().unreadCountNotifier,
             builder: (context, unreadCount, child) {
               return _buildListTile(
-                'Pengumuman VIP',
-                leadingIcon: Icons.campaign_outlined,
+                'Pengumuman',
+                leadingIcon: Icons.notifications_outlined,
                 badgeCount: unreadCount,
                 onTap: () async {
                   await context.push('/announcements');
                   AnnouncementTrackerService().checkUnreadAnnouncements();
                 },
               );
+            },
+          ),
+          _buildDivider(),
+          _buildListTile(
+            'E-Book',
+            leadingIcon: Icons.auto_stories_outlined,
+            onTap: () {
+              context.push('/ebooks');
             },
           ),
           _buildDivider(),
@@ -538,7 +524,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           _buildDivider(),
           _buildListTile(
-            'Help Center',
+            'Pusat Bantuan',
             leadingIcon: Icons.help_outline,
             onTap: () {
               context.push('/profile/help-center');
@@ -546,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           _buildDivider(),
           _buildListTile(
-            'Terms of Use',
+            'Syarat & Ketentuan',
             leadingIcon: Icons.description_outlined,
             onTap: () {
               context.push('/profile/terms-of-use');
@@ -554,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           _buildDivider(),
           _buildListTile(
-            'Privacy Policy',
+            'Kebijakan Privasi',
             leadingIcon: Icons.security_outlined,
             onTap: () {
               context.push('/profile/privacy-policy');

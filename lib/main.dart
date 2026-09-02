@@ -9,6 +9,7 @@ import 'screens/news_screen.dart';
 import 'screens/academy_page.dart';
 import 'screens/about_page.dart';
 import 'screens/course_list_screen.dart';
+import 'screens/signals_screen.dart';
 import 'screens/package.dart';
 import 'screens/chat_bot_screen.dart';
 import 'services/token_service.dart';
@@ -295,9 +296,12 @@ class _MainScreenState extends State<MainScreen>
           ],
         );
       case 1:
-        return const NewsScreen();
+        return const SignalsScreen();
 
       case 2:
+        return const NewsScreen();
+
+      case 3:
         return const CourseListScreen();
       default:
         return const SizedBox.shrink();
@@ -357,7 +361,7 @@ class _MainScreenState extends State<MainScreen>
                               ),
                               backgroundColor: AppColors.webRed,
                               child: const Icon(
-                                Icons.campaign_outlined,
+                                Icons.notifications_outlined,
                                 color: Colors.white,
                                 size: 24,
                               ),
@@ -430,19 +434,13 @@ class _MainScreenState extends State<MainScreen>
       body: _buildBody(),
 
       floatingActionButton: (_isLoggedIn && _isActive)
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: () {
                 ChatBotScreen.showModal(context);
               },
               backgroundColor: AppColors.primary,
-              icon: const Icon(Icons.smart_toy_rounded, color: Colors.white),
-              label: const Text(
-                'Tanya AI',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              tooltip: 'Tanya AI',
+              child: const Icon(Icons.chat_bubble_rounded, color: Colors.white),
             )
           : null,
 
@@ -458,8 +456,8 @@ class _MainScreenState extends State<MainScreen>
                 ),
               ),
               child: BottomNavigationBar(
-                backgroundColor:
-                    Colors.transparent, // Transparent to use container background
+                backgroundColor: Colors
+                    .transparent, // Transparent to use container background
                 elevation: 0, // Remove shadow
                 type: BottomNavigationBarType.fixed,
                 currentIndex: _selectedIndex,
@@ -474,15 +472,30 @@ class _MainScreenState extends State<MainScreen>
                     label: 'Beranda',
                   ),
 
+                  // Signal
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.show_chart_rounded,
+                      color: AppColors.primary,
+                    ),
+                    label: 'Sinyal',
+                  ),
+
                   // News
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.article_outlined, color: AppColors.primary),
+                    icon: Icon(
+                      Icons.article_outlined,
+                      color: AppColors.primary,
+                    ),
                     label: 'Berita',
                   ),
 
                   // Module
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.menu_book_outlined, color: AppColors.primary),
+                    icon: Icon(
+                      Icons.menu_book_outlined,
+                      color: AppColors.primary,
+                    ),
                     label: 'Modul',
                   ),
                 ],

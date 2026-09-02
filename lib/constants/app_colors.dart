@@ -5,7 +5,7 @@ class AppColors {
 
   // Colors
   static const Color primary = Color.fromARGB(255, 195, 52, 42);
-  static const Color background = Color(0xFF1A1A1A);
+  static const Color background = Color.fromARGB(255, 16, 16, 16);
   static const Color cardDark = Color.fromARGB(255, 30, 30, 30);
 
   // Text
@@ -69,7 +69,12 @@ class AppColors {
   static const Color textRed = Color(0xFFE53935);
 
   // Card / Surface Colors
-  static const Color cardBorder = Color(0xFF2C164D); // Thin card border
+  static const Color cardBorder = Color.fromARGB(
+    255,
+    43,
+    43,
+    43,
+  ); // Thin card border
   static const Color cardSignal = Color(0xFFB71C1C); // Red signal background
   static const Color cardModul = Color(0xFF1E1E1E); // Dark module card
 

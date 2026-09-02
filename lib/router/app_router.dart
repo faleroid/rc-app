@@ -16,7 +16,12 @@ import '../screens/privacy_policy_screen.dart';
 import '../screens/terms_of_use_screen.dart';
 import '../screens/help_center_screen.dart';
 import '../screens/announcements_screen.dart';
+import '../screens/signals_screen.dart';
+import '../screens/signal_performance_screen.dart';
+import '../screens/ebooks_screen.dart';
+import '../screens/ebook_reader_screen.dart';
 import '../models/payment_model.dart';
+import '../models/ebook_model.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -145,6 +150,26 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/announcements',
       builder: (context, state) => const AnnouncementsScreen(),
+    ),
+    GoRoute(
+      path: '/signals',
+      builder: (context, state) => const SignalsScreen(),
+    ),
+    GoRoute(
+      path: '/signals/performance',
+      builder: (context, state) => const SignalPerformanceScreen(),
+    ),
+    GoRoute(
+      path: '/ebooks',
+      builder: (context, state) => const EbooksScreen(),
+    ),
+    GoRoute(
+      path: '/ebooks/:slug/read',
+      builder: (context, state) {
+        final slug = state.pathParameters['slug']!;
+        final ebook = state.extra as EbookModel?;
+        return EbookReaderScreen(slug: slug, ebook: ebook);
+      },
     ),
     GoRoute(
       path: '/courses/:courseId/modules/:moduleId',

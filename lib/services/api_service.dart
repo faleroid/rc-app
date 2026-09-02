@@ -69,9 +69,13 @@ class ApiService {
                 : null;
 
             try {
-              final currentLocation =
-                  appRouter.routerDelegate.currentConfiguration.uri.toString();
-              final isPublicRoute = currentLocation.startsWith('/main') ||
+              final currentLocation = appRouter
+                  .routerDelegate
+                  .currentConfiguration
+                  .uri
+                  .toString();
+              final isPublicRoute =
+                  currentLocation.startsWith('/main') ||
                   currentLocation == '/' ||
                   currentLocation.startsWith('/splash') ||
                   currentLocation.startsWith('/login') ||

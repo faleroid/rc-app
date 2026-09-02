@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
@@ -126,25 +126,20 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
+        centerTitle: true,
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
-        title: const Row(
-          children: [
-            Icon(Icons.campaign_rounded, color: AppColors.primary, size: 24),
-            SizedBox(width: 10),
-            Text(
-              'Pengumuman VIP',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: AppFontSizes.lg,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        title: const Text(
+          'Pengumuman',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: AppFontSizes.lg,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       body: Column(
@@ -351,30 +346,24 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.cardDark,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.cardBorder),
-                ),
                 child: const Icon(
-                  Icons.campaign_outlined,
+                  Icons.notifications_none_rounded,
                   color: Colors.white38,
                   size: 48,
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Belum Ada Pengumuman',
+                'Ups, belum ada pengumuman nih',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: AppFontSizes.md,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 6),
               const Text(
-                'Pengumuman dan info update seputar kelas dan materi akan ditampilkan di sini.',
+                'Nantikan info selanjutnya yaaa, stay tune!',
                 style: TextStyle(
                   color: Colors.white54,
                   fontSize: AppFontSizes.xs,
@@ -429,10 +418,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             if (item.isPinned)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 0),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -440,28 +426,6 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                       const Color(0xFFCA8A04).withValues(alpha: 0.10),
                     ],
                   ),
-                  border: const Border(
-                    bottom: BorderSide(color: Color(0x33EAB308), width: 0.5),
-                  ),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.push_pin_rounded,
-                      color: Color(0xFFFACC15),
-                      size: 15,
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      'PENGUMUMAN UTAMA (PINNED)',
-                      style: TextStyle(
-                        color: Color(0xFFFDE047),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
                 ),
               ),
 
@@ -619,7 +583,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            item.author?.name ?? 'Admin RicoCapital',
+                            item.author?.name ?? 'RicoCapital',
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 11,
@@ -686,7 +650,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         border = const Color(0xFF7E22CE);
         text = const Color(0xFFD8B4FE);
         label = 'Umum';
-        icon = Icons.campaign_outlined;
+        icon = Icons.notifications_outlined;
         break;
     }
 

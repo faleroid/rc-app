@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart'; // Sesuaikan path jika perlu
-import 'home_screen.dart';               // Pastikan path ke home_page.dart benar
-import 'package.dart';            // Pastikan path ke package_page.dart benar
+import '../constants/app_colors.dart';
+import 'home_screen.dart';
+import 'signals_screen.dart';
+import 'package.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -11,46 +12,33 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  // 0 untuk Home, 1 untuk Package
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background, // Sesuaikan dengan warna background aplikasimu
-
-      // ─── INDEXED STACK ──────────────────────────────────────────
-      // Menjaga state setiap halaman agar tidak hancur saat pindah tab.
-      // Inilah kunci agar tombol onNavigateToPackage bisa ditekan berkali-kali.
+      backgroundColor: AppColors.background,
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          // Index 0: Home Page
           HomePage(
             onNavigateToPackage: () {
-              // Mengubah tab ke halaman Package (Index 1)
               setState(() {
-                _currentIndex = 1;
+                _currentIndex = 2;
               });
             },
           ),
-
-          // Index 1: Package Page
+          const SignalsScreen(),
           PackagePage(
-            onNavigateToPricing: () {
-              // Jika nanti kamu butuh navigasi khusus di dalam PackagePage
-              // bisa ditambahkan di sini.
-            },
+            onNavigateToPricing: () {},
           ),
         ],
       ),
-
-      // ─── BOTTOM NAVIGATION BAR ──────────────────────────────────
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             top: BorderSide(
-              color: AppColors.cardBorder, // Batas garis tipis di atas menu
+              color: AppColors.cardBorder,
               width: 1.0,
             ),
           ),
@@ -62,7 +50,6 @@ class _MainScreenState extends State<MainScreen> {
           currentIndex: _currentIndex,
           type: BottomNavigationBarType.fixed,
           onTap: (index) {
-            // Pindah tab saat icon menu di bawah ditekan
             setState(() {
               _currentIndex = index;
             });
@@ -71,6 +58,10 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),
               label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.show_chart_rounded),
+              label: 'Sinyal',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_balance_wallet),

@@ -81,7 +81,7 @@ class _NewsScreenState extends State<NewsScreen> {
           if (!snapshot.hasData || snapshot.data!.articles.isEmpty) {
             return const Center(
               child: Text(
-                'Tidak ada berita ditemukan.',
+                'Sabar ya, sedang mengupdate berita terbaru...',
                 style: TextStyle(color: Colors.white),
               ),
             );
