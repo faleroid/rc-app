@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../models/profile_model.dart';
 import '../services/api_service.dart';
+import '../services/cache_service.dart';
 
 class AppException implements Exception {
   final String message;
@@ -12,13 +13,23 @@ class AppException implements Exception {
 
 class ProfileRepository {
   final ApiService _apiService = ApiService();
+  final CacheService _cache = CacheService();
 
-  Future<ProfileResponse> getProfile() async {
+  Future<ProfileResponse> getProfile({bool forceRefresh = false}) async {
+    const cacheKey = 'profile';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<ProfileResponse>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final response = await _apiService.dio.get('/profile');
 
       if (response.statusCode == 200) {
-        return ProfileResponse.fromJson(response.data);
+        final result = ProfileResponse.fromJson(response.data);
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw AppException('Failed to load profile');
       }
@@ -35,6 +46,9 @@ class ProfileRepository {
         '/profile/username',
         data: {'name': newName},
       );
+      if (response.statusCode == 200) {
+        _cache.invalidate('profile'); // Invalidate profile cache after update
+      }
       return response.statusCode == 200;
     } on DioException catch (e) {
       throw AppException(e.response?.data['message'] ?? 'Gagal mengubah nama');

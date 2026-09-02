@@ -1,16 +1,26 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import '../models/announcement_model.dart';
 import '../services/api_service.dart';
+import '../services/cache_service.dart';
 
 class AnnouncementRepository {
   final ApiService _apiService = ApiService();
+  final CacheService _cache = CacheService();
 
   Future<AnnouncementListResponse> fetchAnnouncements({
     String? category,
     String? search,
     int page = 1,
     int perPage = 15,
+    bool forceRefresh = false,
   }) async {
+    final cacheKey = 'announcements_${category ?? 'all'}_${search ?? ''}_${page}_$perPage';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<AnnouncementListResponse>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final queryParams = <String, dynamic>{
         'page': page,
@@ -31,7 +41,9 @@ class AnnouncementRepository {
       );
 
       if (response.statusCode == 200) {
-        return AnnouncementListResponse.fromJson(response.data);
+        final result = AnnouncementListResponse.fromJson(response.data);
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw Exception('Gagal memuat pengumuman');
       }
@@ -49,6 +61,9 @@ class AnnouncementRepository {
       );
 
       if (response.statusCode == 200) {
+        // Invalidate announcement caches since like state changed
+        _cache.invalidateByPrefix('announcements_');
+
         final data = response.data['data'] as Map<String, dynamic>? ?? {};
         return {
           'is_liked': data['is_liked'] ?? false,

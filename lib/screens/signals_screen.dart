@@ -27,7 +27,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
     _loadSignals();
   }
 
-  Future<void> _loadSignals() async {
+  Future<void> _loadSignals({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -37,6 +37,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
       final res = await _repository.fetchSignals(
         status: _selectedStatus,
         type: _selectedType,
+        forceRefresh: forceRefresh,
       );
       if (mounted) {
         setState(() {
@@ -59,7 +60,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: RefreshIndicator(
-        onRefresh: _loadSignals,
+        onRefresh: () => _loadSignals(forceRefresh: true),
         color: AppColors.webRed,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

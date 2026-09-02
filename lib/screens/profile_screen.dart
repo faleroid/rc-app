@@ -30,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _refresh() async {
     setState(() {
-      _profileFuture = _repository.getProfile();
+      _profileFuture = _repository.getProfile(forceRefresh: true);
     });
     AnnouncementTrackerService().checkUnreadAnnouncements();
   }
@@ -49,7 +49,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         title: const Text(
           'Profile',
-          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: AppFontSizes.lg,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       body: RefreshIndicator(

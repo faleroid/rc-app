@@ -44,7 +44,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     super.dispose();
   }
 
-  Future<void> _fetchData() async {
+  Future<void> _fetchData({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -54,6 +54,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
       final response = await _repository.fetchAnnouncements(
         category: _selectedCategory,
         search: _searchQuery,
+        forceRefresh: forceRefresh,
       );
 
       if (mounted) {

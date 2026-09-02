@@ -17,12 +17,13 @@ class TermsOfUseScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
+        centerTitle: true,
         title: const Text(
-          'Terms of Use',
+          'Ketentuan Penggunaan',
           style: TextStyle(
             color: Colors.white,
             fontSize: AppFontSizes.lg,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

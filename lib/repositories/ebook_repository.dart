@@ -1,16 +1,26 @@
 import 'package:dio/dio.dart';
 import '../models/ebook_model.dart';
 import '../services/api_service.dart';
+import '../services/cache_service.dart';
 
 class EbookRepository {
   final ApiService _apiService = ApiService();
+  final CacheService _cache = CacheService();
 
   Future<EbookListResponse> fetchEbooks({
     String category = 'all',
     String? search,
     int page = 1,
     int perPage = 12,
+    bool forceRefresh = false,
   }) async {
+    final cacheKey = 'ebooks_${category}_${search ?? ''}_${page}_$perPage';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<EbookListResponse>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final queryParams = <String, dynamic>{
         'page': page,
@@ -31,7 +41,9 @@ class EbookRepository {
       );
 
       if (response.statusCode == 200) {
-        return EbookListResponse.fromJson(response.data);
+        final result = EbookListResponse.fromJson(response.data);
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw Exception('Gagal memuat e-book');
       }

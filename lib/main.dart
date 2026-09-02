@@ -14,6 +14,7 @@ import 'screens/ebooks_screen.dart';
 import 'screens/package.dart';
 import 'screens/chat_bot_screen.dart';
 import 'services/token_service.dart';
+import 'services/cache_service.dart';
 import 'services/announcement_tracker_service.dart';
 import 'repositories/profile_repository.dart';
 import 'router/app_router.dart';
@@ -168,12 +169,13 @@ class _MainScreenState extends State<MainScreen>
       AnnouncementTrackerService().checkUnreadAnnouncements();
     } else {
       if (!mounted) return;
+      CacheService().invalidateAll(); // Clear all cached data on logout
       setState(() {
         _isLoggedIn = false;
         _userName = 'Profile';
         _isActive = false;
         if (_selectedIndex > 0) {
-          _selectedIndex = 0; // Return to Beranda tab when logged out
+          _selectedIndex = 0;
         }
       });
     }
@@ -302,19 +304,16 @@ class _MainScreenState extends State<MainScreen>
       return _buildLandingPage();
     }
 
-    // User sudah login → bottom nav: 0=Berita, 1=Sinyal, 2=Modul, 3=E-Book
-    switch (_selectedIndex) {
-      case 0:
-        return const NewsScreen();
-      case 1:
-        return const SignalsScreen();
-      case 2:
-        return const CourseListScreen();
-      case 3:
-        return const EbooksScreen();
-      default:
-        return const SizedBox.shrink();
-    }
+    // User sudah login → IndexedStack preserves all tab states
+    return IndexedStack(
+      index: _selectedIndex,
+      children: const [
+        NewsScreen(),       // 0: Berita
+        SignalsScreen(),    // 1: Sinyal
+        CourseListScreen(), // 2: Kursus
+        EbooksScreen(),     // 3: E-Book
+      ],
+    );
   }
 
   @override

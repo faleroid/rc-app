@@ -34,7 +34,7 @@ class _EbooksScreenState extends State<EbooksScreen> {
     super.dispose();
   }
 
-  Future<void> _loadEbooks() async {
+  Future<void> _loadEbooks({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -44,6 +44,7 @@ class _EbooksScreenState extends State<EbooksScreen> {
       final res = await _repository.fetchEbooks(
         category: _selectedCategory,
         search: _searchController.text,
+        forceRefresh: forceRefresh,
       );
       if (mounted) {
         setState(() {
@@ -66,7 +67,7 @@ class _EbooksScreenState extends State<EbooksScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: RefreshIndicator(
-        onRefresh: _loadEbooks,
+        onRefresh: () => _loadEbooks(forceRefresh: true),
         color: AppColors.webRed,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

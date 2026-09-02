@@ -99,8 +99,8 @@ class _EbookReaderScreenState extends State<EbookReaderScreen> {
           title,
           style: const TextStyle(
             color: AppColors.textWhite,
-            fontWeight: FontWeight.bold,
-            fontSize: AppFontSizes.md,
+            fontWeight: FontWeight.w500,
+            fontSize: AppFontSizes.lg,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

@@ -2,16 +2,29 @@ import 'package:dio/dio.dart';
 import '../models/course_model.dart';
 import '../models/module_detail_model.dart';
 import '../services/api_service.dart';
+import '../services/cache_service.dart';
 
 class CourseRepository {
   final ApiService _apiService = ApiService();
+  final CacheService _cache = CacheService();
 
-  Future<CourseListResponse> fetchCourses() async {
+  Future<CourseListResponse> fetchCourses({
+    bool forceRefresh = false,
+  }) async {
+    const cacheKey = 'courses';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<CourseListResponse>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final response = await _apiService.dio.get('/courses');
 
       if (response.statusCode == 200) {
-        return CourseListResponse.fromJson(response.data);
+        final result = CourseListResponse.fromJson(response.data);
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw Exception('Gagal memuat daftar modul');
       }

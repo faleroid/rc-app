@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import '../models/signal_model.dart';
 import '../services/api_service.dart';
+import '../services/cache_service.dart';
 
 class SignalRepository {
   final ApiService _apiService = ApiService();
+  final CacheService _cache = CacheService();
 
   Future<SignalListResponse> fetchSignals({
     String status = 'active',
@@ -11,7 +13,15 @@ class SignalRepository {
     String? search,
     int page = 1,
     int perPage = 12,
+    bool forceRefresh = false,
   }) async {
+    final cacheKey = 'signals_${status}_${type}_${search ?? ''}_${page}_$perPage';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<SignalListResponse>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final queryParams = <String, dynamic>{
         'status': status,
@@ -33,7 +43,9 @@ class SignalRepository {
       );
 
       if (response.statusCode == 200) {
-        return SignalListResponse.fromJson(response.data);
+        final result = SignalListResponse.fromJson(response.data);
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw Exception('Gagal memuat sinyal trading');
       }
@@ -63,13 +75,25 @@ class SignalRepository {
     }
   }
 
-  Future<List<SignalMonthlyRecapModel>> fetchMonthlyRecap() async {
+  Future<List<SignalMonthlyRecapModel>> fetchMonthlyRecap({
+    bool forceRefresh = false,
+  }) async {
+    const cacheKey = 'signals_monthly_recap';
+
+    if (!forceRefresh) {
+      final cached = _cache.get<List<SignalMonthlyRecapModel>>(cacheKey);
+      if (cached != null) return cached;
+    }
+
     try {
       final response = await _apiService.dio.get('/signals/recap');
 
       if (response.statusCode == 200) {
         final data = response.data['data'] as List<dynamic>? ?? [];
-        return data.map((e) => SignalMonthlyRecapModel.fromJson(e)).toList();
+        final result =
+            data.map((e) => SignalMonthlyRecapModel.fromJson(e)).toList();
+        _cache.set(cacheKey, result);
+        return result;
       } else {
         throw Exception('Gagal memuat rekap bulanan sinyal');
       }

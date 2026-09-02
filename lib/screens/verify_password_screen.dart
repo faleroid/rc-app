@@ -63,9 +63,14 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
+        centerTitle: true,
         title: const Text(
-          'Verifikasi Keamanan',
-          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.lg),
+          'Password',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: AppFontSizes.lg,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       body: SafeArea(
@@ -77,7 +82,10 @@ class _VerifyPasswordScreenState extends State<VerifyPasswordScreen> {
             children: [
               const Text(
                 'Masukkan password saat ini untuk melanjutkan.',
-                style: TextStyle(color: Colors.white70, fontSize: AppFontSizes.md),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: AppFontSizes.md,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
