@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Text(
                 'Selamat Datang Kembali!',
                 style: AppTextStyles.title.copyWith(
-                  fontSize: AppFontSizes.xl,
+                  fontSize: AppFontSizes.xxl,
                   fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
