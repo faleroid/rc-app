@@ -137,6 +137,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,34 +168,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Logo & Header
-                const Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.currency_bitcoin, color: AppColors.webRed, size: 32),
-                      SizedBox(width: 8),
-                      Text('Ricocapital', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Join Ricocapital',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Start your crypto trading journey with us',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textWhite70, fontSize: 14),
+                  style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
                 ),
                 const SizedBox(height: 28),
 
                 // Package Selection (Radio Cards)
                 const Text(
                   'Pilih Paket Membership',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 12),
 
@@ -209,16 +201,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Form Fields
                 _buildTextField(
                   controller: _nameController,
-                  label: 'Full Name',
-                  hint: 'Enter your full name',
+                  label: 'Nama Lengkap',
+                  hint: 'Masukkan Nama Lengkapmu',
                   icon: Icons.person_outline,
                   validator: (v) => v!.trim().isEmpty ? 'Nama lengkap wajib diisi' : null,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
                   controller: _emailController,
-                  label: 'Email Address',
-                  hint: 'Enter your email',
+                  label: 'Alamat Email',
+                  hint: 'Masukkan Email',
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) => v!.trim().isEmpty || !v.contains('@') ? 'Email tidak valid' : null,
@@ -226,8 +218,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 _buildTextField(
                   controller: _phoneController,
-                  label: 'Phone Number',
-                  hint: 'Enter your phone number',
+                  label: 'Nomor Handphone',
+                  hint: 'Contoh: +62 812345678',
                   icon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
                   validator: (v) => v!.trim().isEmpty ? 'Nomor telepon wajib diisi' : null,
@@ -235,8 +227,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(height: 16),
                 _buildTextField(
                   controller: _domicileController,
-                  label: 'Domicile (City/Region)',
-                  hint: 'Enter your city or region',
+                  label: 'Domisili',
+                  hint: 'Masukkan Domisili',
                   icon: Icons.location_on_outlined,
                   validator: (v) => v!.trim().isEmpty ? 'Domisili wajib diisi' : null,
                 ),
@@ -244,18 +236,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _buildTextField(
                   controller: _passwordController,
                   label: 'Password',
-                  hint: 'Create a strong password',
+                  hint: 'Buat Paswword',
                   icon: Icons.lock_outline,
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
+                  suffixIcon: IconButton(
+                    tooltip: _isPasswordVisible ? 'Sembunyikan password' : 'Lihat password',
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
+                    ),
+                    onPressed: () => setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    }),
+                  ),
                   validator: (v) => v!.length < 8 ? 'Minimal 8 karakter' : null,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
                   controller: _confirmPasswordController,
-                  label: 'Confirm Password',
-                  hint: 'Confirm your password',
+                  label: 'Konfirmasi Password',
+                  hint: 'Masukkan Konfirmasi Password',
                   icon: Icons.lock_reset_outlined,
-                  obscureText: true,
+                  obscureText: !_isConfirmPasswordVisible,
+                  suffixIcon: IconButton(
+                    tooltip: _isConfirmPasswordVisible ? 'Sembunyikan password' : 'Lihat password',
+                    icon: Icon(
+                      _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
+                    ),
+                    onPressed: () => setState(() {
+                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                    }),
+                  ),
                   validator: (v) => v != _passwordController.text ? 'Password tidak cocok' : null,
                 ),
                 const SizedBox(height: 20),
@@ -313,8 +325,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: _isSubmitting
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            'Create Account',
-                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            'Buat Akun',
+                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
                           ),
                   ),
                 ),
@@ -324,12 +336,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? ', style: TextStyle(color: AppColors.textWhite70, fontSize: 14)),
+                    const Text('Sudah Punya Akun? ', style: TextStyle(color: AppColors.textWhite70, fontSize: 12)),
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: const Text(
-                        'Sign in',
-                        style: TextStyle(color: AppColors.webRed, fontWeight: FontWeight.bold, fontSize: 14),
+                        'Masuk',
+                        style: TextStyle(color: AppColors.webRed, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                     ),
                   ],
@@ -399,6 +411,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required IconData icon,
     bool obscureText = false,
     TextInputType? keyboardType,
+    Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -418,6 +431,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             prefixIcon: Icon(icon, color: AppColors.webRed, size: 20),
             filled: true,
             fillColor: AppColors.cardDark,
+            suffixIcon: suffixIcon,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(color: AppColors.cardBorder),

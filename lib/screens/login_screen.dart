@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _tokenService = TokenService();
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   void _handleLogin() async {
     final email = _emailController.text.trim();
@@ -147,9 +148,10 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Masukkan akun',
+                'Selamat Datang Kembali!',
                 style: AppTextStyles.title.copyWith(
-                  fontSize: AppFontSizes.xxxl,
+                  fontSize: AppFontSizes.xl,
+                  fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -161,7 +163,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Email',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: AppFontSizes.md,
+                    fontSize: AppFontSizes.sm,
+                    fontWeight: FontWeight.w500,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -186,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Password',
                   hintStyle: const TextStyle(
                     color: Colors.white70,
-                    fontSize: AppFontSizes.md,
+                    fontSize: AppFontSizes.sm,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -200,8 +203,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderSide: const BorderSide(color: Colors.white),
                     borderRadius: BorderRadius.circular(30),
                   ),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      tooltip: _isPasswordVisible ? 'Sembunyikan password' : 'Lihat password',
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.white70,
+                      ),
+                      onPressed: () => setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      }),
+                    ),
+                  ),
                 ),
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
               ),
               const SizedBox(height: 12),
               Align(
@@ -214,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.grey,
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.grey,
-                      fontSize: AppFontSizes.sm,
+                      fontSize: AppFontSizes.xs,
                     ),
                   ),
                 ),
@@ -244,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: AppFontSizes.lg,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                 ),
@@ -257,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Belum Punya Akun? ',
                     style: TextStyle(
                       color: Colors.grey,
-                      fontSize: AppFontSizes.sm,
+                      fontSize: AppFontSizes.xs,
                     ),
                   ),
                   GestureDetector(
@@ -268,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       'Daftar Disini',
                       style: TextStyle(
                         color: AppColors.primary,
-                        fontSize: AppFontSizes.sm,
+                        fontSize: AppFontSizes.xs,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

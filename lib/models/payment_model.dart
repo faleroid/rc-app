@@ -36,6 +36,18 @@ class MembershipPackageModel {
       parsedBenefits = List<String>.from(rawBenefits);
     }
 
+        final durationDays = (json['duration_days'] as num?)?.toInt() ?? 0;
+        final rawDuration = json['duration']?.toString().trim() ?? '';
+        final duration = rawDuration.isNotEmpty
+        ? rawDuration
+        : durationDays > 0
+        ? (durationDays >= 30
+          ? (durationDays == 30
+            ? '1 bulan'
+            : '${(durationDays / 30).round()} bulan')
+          : '$durationDays hari')
+        : 'selamanya';
+
     return MembershipPackageModel(
       id: json['id'],
       name: json['name'] ?? '',
@@ -44,8 +56,8 @@ class MembershipPackageModel {
       originalPrice: json['original_price'] != null ? (json['original_price'] as num).toDouble() : null,
       formattedPrice: json['formatted_price'] ?? '',
       formattedOriginalPrice: json['formatted_original_price'],
-      duration: json['duration'] ?? '',
-      durationDays: json['duration_days'] ?? 0,
+      duration: duration,
+      durationDays: durationDays,
       benefits: parsedBenefits,
       isFeatured: json['is_featured'] ?? false,
       isBestSeller: json['is_best_seller'] ?? false,

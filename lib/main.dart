@@ -23,8 +23,20 @@ import 'constants/assets.dart';
 import 'dart:ui'; // For PointerDeviceKind
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'services/push_notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await PushNotificationService.instance.initialize();
+  } catch (e) {
+    debugPrint('Firebase init error: $e');
+  }
   await initializeDateFormatting('id_ID', null);
   runApp(const MyApp());
 }
@@ -166,10 +178,14 @@ class _MainScreenState extends State<MainScreen>
       setState(() {
         _isLoggedIn = true;
       });
-      await _fetchProfile();
+      final isActive = await _fetchProfile();
       AnnouncementTrackerService().checkUnreadAnnouncements();
+      if (isActive) {
+        await PushNotificationService.instance.subscribeVipTopic();
+      }
     } else {
       if (!mounted) return;
+      PushNotificationService.instance.unsubscribeVipTopic();
       CacheService().invalidateAll(); // Clear all cached data on logout
       setState(() {
         _isLoggedIn = false;
@@ -190,7 +206,7 @@ class _MainScreenState extends State<MainScreen>
     super.dispose();
   }
 
-  Future<void> _fetchProfile() async {
+  Future<bool> _fetchProfile() async {
     try {
       final repo = ProfileRepository();
       final res = await repo.getProfile();
@@ -200,10 +216,12 @@ class _MainScreenState extends State<MainScreen>
           _role = res.data!.role.toLowerCase();
           _isActive = res.data!.isActive;
         });
+        return res.data!.isActive;
       }
     } catch (e) {
       // Pass
     }
+    return false;
   }
 
   void _onItemTapped(int index) {
@@ -424,7 +442,7 @@ class _MainScreenState extends State<MainScreen>
                 : TextButton(
                     style: TextButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textPrimary,
+                      foregroundColor: AppColors.textWhite,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -436,7 +454,7 @@ class _MainScreenState extends State<MainScreen>
                     onPressed: () {
                       context.push('/login');
                     },
-                    child: const Text('Login', style: AppTextStyles.buttonBold),
+                    child: const Text('Masuk', style: AppTextStyles.buttonBold),
                   ),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
 import '../models/signal_model.dart';
 import '../repositories/signal_repository.dart';
+import '../repositories/profile_repository.dart';
 
 class SignalsScreen extends StatefulWidget {
   const SignalsScreen({super.key});
@@ -13,8 +14,10 @@ class SignalsScreen extends StatefulWidget {
 
 class _SignalsScreenState extends State<SignalsScreen> {
   final SignalRepository _repository = SignalRepository();
+  final ProfileRepository _profileRepo = ProfileRepository();
 
   bool _isLoading = true;
+  bool _isAdmin = false;
   String? _errorMessage;
   SignalListResponse? _signalResponse;
 
@@ -24,7 +27,19 @@ class _SignalsScreenState extends State<SignalsScreen> {
   @override
   void initState() {
     super.initState();
+    _checkAdminRole();
     _loadSignals();
+  }
+
+  Future<void> _checkAdminRole() async {
+    try {
+      final res = await _profileRepo.getProfile();
+      if (res.data != null && mounted) {
+        setState(() {
+          _isAdmin = res.data!.role.toLowerCase() == 'admin';
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadSignals({bool forceRefresh = false}) async {
@@ -296,7 +311,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
       );
     }
 
-    return Container(
+    final cardContent = Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -491,6 +506,309 @@ class _SignalsScreenState extends State<SignalsScreen> {
         ],
       ),
     );
+
+    if (!_isAdmin) {
+      return cardContent;
+    }
+
+    // Dismissible for Admin role (Swipe Right: Edit Status, Swipe Left: Delete)
+    return Dismissible(
+      key: ValueKey('signal_${signal.id}'),
+      direction: DismissDirection.horizontal,
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          // Swipe Right -> Edit Status Modal
+          await _showEditStatusModal(signal);
+          return false; // Don't remove widget from list automatically
+        } else if (direction == DismissDirection.endToStart) {
+          // Swipe Left -> Confirm Delete
+          return await _confirmDeleteSignal(signal);
+        }
+        return false;
+      },
+      background: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF1D4ED8), // Deep vibrant blue
+              Color(0xFF3B82F6), // Bright modern blue
+              Color(0xFF60A5FA), // Light blue accent
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          children: [
+            Icon(Icons.edit_note_rounded, color: Colors.white, size: 28),
+            SizedBox(width: 8),
+            Text(
+              'Ubah Status',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFF87171), // Light red accent
+              Color(0xFFEF4444), // Vibrant red
+              Color(0xFFB91C1C), // Deep crimson red
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              'Hapus Sinyal',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.delete_forever_rounded, color: Colors.white, size: 28),
+          ],
+        ),
+      ),
+      child: cardContent,
+    );
+  }
+
+  Future<void> _showEditStatusModal(SignalModel signal) async {
+    final List<Map<String, dynamic>> statusOptions = [
+      {'value': 'active', 'label': 'AKTIF', 'color': Colors.blueAccent},
+    ];
+
+    // Generate Hit TP options dynamically based on the signal's TP targets
+    final tpCount = signal.tpTargets.length;
+    for (int i = 1; i <= tpCount; i++) {
+      statusOptions.add({
+        'value': 'hit_tp$i',
+        'label': 'HIT TP$i (${signal.tpTargets[i - 1]})',
+        'color': Colors.greenAccent,
+      });
+    }
+
+    // Stop Loss option
+    statusOptions.add({
+      'value': 'hit_sl',
+      'label': signal.stopLoss != null && signal.stopLoss!.isNotEmpty
+          ? 'HIT STOP LOSS (${signal.stopLoss})'
+          : 'HIT STOP LOSS (SL)',
+      'color': Colors.redAccent,
+    });
+
+    // Closed and Cancelled
+    statusOptions.add({
+      'value': 'closed',
+      'label': 'SELESAI (CLOSED)',
+      'color': Colors.grey,
+    });
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.cardDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Update Status: ${signal.pair}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white54,
+                        size: 20,
+                      ),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(color: AppColors.cardBorder),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: statusOptions.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 6),
+                    itemBuilder: (context, index) {
+                      final opt = statusOptions[index];
+                      final isCurrent =
+                          signal.status.toLowerCase() == opt['value'];
+                      final color = opt['color'] as Color;
+
+                      return ListTile(
+                        dense: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            color: isCurrent ? color : AppColors.cardBorder,
+                            width: isCurrent ? 1.5 : 1,
+                          ),
+                        ),
+                        tileColor: isCurrent
+                            ? color.withValues(alpha: 0.15)
+                            : AppColors.background,
+                        leading: Icon(
+                          isCurrent
+                              ? Icons.check_circle
+                              : Icons.radio_button_unchecked,
+                          color: isCurrent ? color : Colors.white54,
+                          size: 20,
+                        ),
+                        title: Text(
+                          opt['label'] as String,
+                          style: TextStyle(
+                            color: isCurrent ? Colors.white : Colors.white70,
+                            fontWeight: isCurrent
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            fontSize: 13,
+                          ),
+                        ),
+                        onTap: () async {
+                          Navigator.of(ctx).pop();
+                          if (!isCurrent) {
+                            await _updateStatus(
+                              signal.id,
+                              opt['value'] as String,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _updateStatus(int id, String newStatus) async {
+    try {
+      await _repository.updateSignalStatus(id, newStatus);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Status sinyal berhasil diperbarui!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      _loadSignals(forceRefresh: true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: AppColors.webRed,
+        ),
+      );
+    }
+  }
+
+  Future<bool> _confirmDeleteSignal(SignalModel signal) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Hapus Sinyal?',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus sinyal ${signal.pair} (${signal.type}) ini?',
+          style: const TextStyle(color: AppColors.textWhite70, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Batal', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.webRed,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              'Hapus',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _repository.deleteSignal(signal.id);
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sinyal ${signal.pair} berhasil dihapus!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _loadSignals(forceRefresh: true);
+        return true;
+      } catch (e) {
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: AppColors.webRed,
+          ),
+        );
+        return false;
+      }
+    }
+    return false;
   }
 
   Widget _buildStatusBadge(String status) {

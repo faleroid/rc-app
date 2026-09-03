@@ -155,4 +155,44 @@ class SignalRepository {
       );
     }
   }
+
+  Future<SignalModel> updateSignalStatus(int id, String newStatus) async {
+    try {
+      final response = await _apiService.dio.patch(
+        '/signals/$id/status',
+        data: {'status': newStatus},
+      );
+
+      if (response.statusCode == 200) {
+        _cache.invalidateByPrefix('signals_');
+        final data = response.data['data'] as Map<String, dynamic>;
+        return SignalModel.fromJson(data);
+      } else {
+        throw Exception(response.data['message'] ?? 'Gagal mengubah status sinyal');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ??
+            'Terjadi kesalahan jaringan saat mengubah status sinyal',
+      );
+    }
+  }
+
+  Future<bool> deleteSignal(int id) async {
+    try {
+      final response = await _apiService.dio.delete('/signals/$id');
+
+      if (response.statusCode == 200) {
+        _cache.invalidateByPrefix('signals_');
+        return true;
+      } else {
+        throw Exception(response.data['message'] ?? 'Gagal menghapus sinyal');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ??
+            'Terjadi kesalahan jaringan saat menghapus sinyal',
+      );
+    }
+  }
 }
