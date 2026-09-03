@@ -104,4 +104,55 @@ class SignalRepository {
       );
     }
   }
+
+  Future<SignalModel> createSignal({
+    required String pair,
+    required String type, // 'Futures' or 'Spot'
+    required String side, // 'LONG' or 'SHORT'
+    String? leverage,
+    required List<String> entryTargets,
+    required List<String> tpTargets,
+    String? stopLoss,
+    String? notes,
+  }) async {
+    try {
+      final payload = <String, dynamic>{
+        'pair': pair,
+        'type': type,
+        'side': side,
+        'entry_targets': entryTargets,
+        'tp_targets': tpTargets,
+      };
+
+      if (leverage != null && leverage.isNotEmpty) {
+        payload['leverage'] = leverage;
+      }
+      if (stopLoss != null && stopLoss.isNotEmpty) {
+        payload['stop_loss'] = stopLoss;
+      }
+      if (notes != null && notes.isNotEmpty) {
+        payload['notes'] = notes;
+      }
+
+      final response = await _apiService.dio.post(
+        '/signals',
+        data: payload,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Invalidate signal caches so newly added signal appears immediately
+        _cache.invalidateByPrefix('signals_');
+
+        final data = response.data['data'] as Map<String, dynamic>;
+        return SignalModel.fromJson(data);
+      } else {
+        throw Exception(response.data['message'] ?? 'Gagal membuat sinyal');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ??
+            'Terjadi kesalahan jaringan saat membuat sinyal',
+      );
+    }
+  }
 }

@@ -117,6 +117,7 @@ class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   String _userName = 'Profile';
+  String _role = 'user';
   bool _isActive = false;
   bool _isLoggedIn = false;
   late TabController _tabController;
@@ -173,6 +174,7 @@ class _MainScreenState extends State<MainScreen>
       setState(() {
         _isLoggedIn = false;
         _userName = 'Profile';
+        _role = 'user';
         _isActive = false;
         if (_selectedIndex > 0) {
           _selectedIndex = 0;
@@ -195,6 +197,7 @@ class _MainScreenState extends State<MainScreen>
       if (res.data != null && mounted) {
         setState(() {
           _userName = res.data!.name.split(' ').first;
+          _role = res.data!.role.toLowerCase();
           _isActive = res.data!.isActive;
         });
       }
@@ -308,10 +311,10 @@ class _MainScreenState extends State<MainScreen>
     return IndexedStack(
       index: _selectedIndex,
       children: const [
-        NewsScreen(),       // 0: Berita
-        SignalsScreen(),    // 1: Sinyal
+        NewsScreen(), // 0: Berita
+        SignalsScreen(), // 1: Sinyal
         CourseListScreen(), // 2: Kursus
-        EbooksScreen(),     // 3: E-Book
+        EbooksScreen(), // 3: E-Book
       ],
     );
   }
@@ -442,14 +445,39 @@ class _MainScreenState extends State<MainScreen>
       body: _buildBody(),
 
       floatingActionButton: (_isLoggedIn && _isActive)
-          ? FloatingActionButton(
-              onPressed: () {
-                ChatBotScreen.showModal(context);
-              },
-              backgroundColor: AppColors.primary,
-              tooltip: 'Tanya AI',
-              child: const Icon(Icons.chat_bubble_rounded, color: Colors.white),
-            )
+          ? (_role == 'admin'
+                ? FloatingActionButton.extended(
+                    onPressed: () async {
+                      final result = await context.push('/signals/add');
+                      if (result == true) {
+                        // Signal added, switch to signals tab if desired
+                        setState(() {
+                          _selectedIndex = 1;
+                        });
+                      }
+                    },
+                    backgroundColor: AppColors.primary,
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    label: const Text(
+                      'Sinyal',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                : FloatingActionButton(
+                    onPressed: () {
+                      ChatBotScreen.showModal(context);
+                    },
+                    backgroundColor: AppColors.primary,
+                    tooltip: 'Tanya AI',
+                    child: const Icon(
+                      Icons.chat_bubble_rounded,
+                      color: Colors.white,
+                    ),
+                  ))
           : null,
 
       bottomNavigationBar: (_isLoggedIn && _isActive)

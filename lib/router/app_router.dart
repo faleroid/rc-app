@@ -18,6 +18,7 @@ import '../screens/help_center_screen.dart';
 import '../screens/announcements_screen.dart';
 import '../screens/signals_screen.dart';
 import '../screens/signal_performance_screen.dart';
+import '../screens/add_signal_screen.dart';
 import '../screens/ebooks_screen.dart';
 import '../screens/ebook_reader_screen.dart';
 import '../models/payment_model.dart';
@@ -158,6 +159,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/signals/performance',
       builder: (context, state) => const SignalPerformanceScreen(),
+    ),
+    GoRoute(
+      path: '/signals/add',
+      builder: (context, state) => const AddSignalScreen(),
     ),
     GoRoute(
       path: '/ebooks',
