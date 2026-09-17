@@ -80,7 +80,7 @@ class AboutPage extends StatelessWidget {
     _TeamMember(
       name: 'Taufik Fajar Ikhsan',
       position: 'Chief Creative Officer',
-      imageUrl: 'assets/images/anggota/CCO_fajar.png',
+      imageUrl: 'assets/images/anggota/CCO_fajar.jpeg',
     ),
     _TeamMember(
       name: 'Nugrahhadi Al Khawarizmi',
