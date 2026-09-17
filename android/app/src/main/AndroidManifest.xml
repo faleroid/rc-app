@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="RicoCapital"
-        android:name="${applicationName}"
+        android:name="android.app.Application"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <activity
