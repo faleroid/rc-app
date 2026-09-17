@@ -561,9 +561,9 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header: Title, Timestamp, and Dropdown toggle button
-              InkWell(
+              GestureDetector(
                 onTap: _toggleExpand,
-                borderRadius: BorderRadius.circular(8),
+                behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   child: Row(
