@@ -533,6 +533,23 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
                         },
                       ),
                     ),
+                    if (item.isPinned)
+                      Positioned(
+                        left: 10,
+                        top: 10,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.push_pin_rounded,
+                            color: Color(0xFFEAB308),
+                            size: 16,
+                          ),
+                        ),
+                      ),
                     Positioned(
                       right: 10,
                       top: 10,
@@ -586,6 +603,16 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
                             const SizedBox(height: 6),
                             Row(
                               children: [
+                                if (item.isPinned &&
+                                    (item.imageUrl == null ||
+                                        item.imageUrl!.isEmpty)) ...[
+                                  const Icon(
+                                    Icons.push_pin_rounded,
+                                    color: Color(0xFFEAB308),
+                                    size: 12,
+                                  ),
+                                  const SizedBox(width: 4),
+                                ],
                                 Text(
                                   item.timeAgo ?? item.formattedDate ?? '',
                                   style: const TextStyle(
