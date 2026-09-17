@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../constants/margin.dart';
 import '../constants/font.dart';
@@ -199,17 +198,8 @@ class AcademyPage extends StatelessWidget {
   Widget _buildTimelineItem(AcademyModule module) {
     final bool isLocked = module.isLocked;
 
-    // Timeline line gradient / color
-    final lineGradient = isLocked
-        ? LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Colors.grey.withValues(alpha: 0.3),
-        Colors.grey.withValues(alpha: 0.3),
-      ],
-    )
-        : const LinearGradient(
+    // Timeline line keeps the active blue-purple progress styling.
+    final lineGradient = const LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
@@ -261,11 +251,7 @@ class AcademyPage extends StatelessWidget {
                         color: AppColors.textWhite,
                         width: 3.0,
                       ),
-                      gradient: isLocked
-                          ? const LinearGradient(
-                        colors: [Color(0xFF64748B), Color(0xFF475569)],
-                      )
-                          : const LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
                       ),
                       boxShadow: [
@@ -277,13 +263,7 @@ class AcademyPage extends StatelessWidget {
                       ],
                     ),
                     child: Center(
-                      child: isLocked
-                          ? const Icon(
-                        Icons.lock_outline,
-                        color: Colors.white,
-                        size: 16,
-                      )
-                          : Text(
+                      child: Text(
                         module.id.toString(),
                         style: const TextStyle(
                           color: Colors.white,
@@ -431,113 +411,6 @@ class AcademyPage extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  // Blur Overlay for Premium Modules
-                  if (isLocked)
-                    Positioned.fill(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        child: Stack(
-                          children: [
-                            // Blurry background filter
-                            Positioned.fill(
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 4.5, sigmaY: 4.5),
-                                child: Container(
-                                  color: Colors.black.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ),
-                            // Lock icon, title & action
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.lock,
-                                      color: Color(0xFFFACC15), // Yellow-400
-                                      size: 32,
-                                    ),
-                                    const SizedBox(height: AppSpacing.sm),
-                                    const Text(
-                                      "Premium Module",
-                                      style: TextStyle(
-                                        color: AppColors.textWhite,
-                                        fontSize: AppFontSizes.md + 1,
-                                        fontFamily: AppFonts.primary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.xs),
-                                    const Text(
-                                      "Join us to access this exclusive module",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: AppColors.textWhite70,
-                                        fontSize: AppFontSizes.xs + 1,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSpacing.md),
-                                    // Unlock Now Button
-                                    GestureDetector(
-                                      onTap: onNavigateToPricing,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: AppSpacing.base + 2,
-                                          vertical: AppSpacing.sm,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              Color(0xFFEF4444), // red-500
-                                              Color(0xFFB91C1C), // red-700
-                                            ],
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            AppRadius.pill,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.red.withValues(alpha: 0.3),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.lock_open,
-                                              color: Colors.white,
-                                              size: 14,
-                                            ),
-                                            SizedBox(width: AppSpacing.xs + 2),
-                                            Text(
-                                              "Unlock Now",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: AppFontSizes.xs + 1,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),

@@ -19,10 +19,12 @@ import '../screens/announcements_screen.dart';
 import '../screens/signals_screen.dart';
 import '../screens/signal_performance_screen.dart';
 import '../screens/add_signal_screen.dart';
+import '../screens/add_announcement_screen.dart';
 import '../screens/ebooks_screen.dart';
 import '../screens/ebook_reader_screen.dart';
 import '../models/payment_model.dart';
 import '../models/ebook_model.dart';
+import '../models/announcement_model.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -151,6 +153,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/announcements',
       builder: (context, state) => const AnnouncementsScreen(),
+    ),
+    GoRoute(
+      path: '/announcements/add',
+      builder: (context, state) {
+        final existing = state.extra as AnnouncementModel?;
+        return AddAnnouncementScreen(existingAnnouncement: existing);
+      },
     ),
     GoRoute(
       path: '/signals',

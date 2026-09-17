@@ -13,6 +13,7 @@ import 'screens/signals_screen.dart';
 import 'screens/ebooks_screen.dart';
 import 'screens/package.dart';
 import 'screens/chat_bot_screen.dart';
+import 'widgets/expandable_speed_dial_fab.dart';
 import 'services/token_service.dart';
 import 'services/cache_service.dart';
 import 'services/announcement_tracker_service.dart';
@@ -464,27 +465,7 @@ class _MainScreenState extends State<MainScreen>
 
       floatingActionButton: (_isLoggedIn && _isActive)
           ? (_role == 'admin'
-                ? FloatingActionButton.extended(
-                    onPressed: () async {
-                      final result = await context.push('/signals/add');
-                      if (result == true) {
-                        // Signal added, switch to signals tab if desired
-                        setState(() {
-                          _selectedIndex = 1;
-                        });
-                      }
-                    },
-                    backgroundColor: AppColors.primary,
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    label: const Text(
-                      'Sinyal',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
-                  )
+                ? _buildAdminSpeedDialFab()
                 : FloatingActionButton(
                     onPressed: () {
                       ChatBotScreen.showModal(context);
@@ -557,6 +538,36 @@ class _MainScreenState extends State<MainScreen>
               ),
             )
           : null,
+    );
+  }
+
+  Widget _buildAdminSpeedDialFab() {
+    return ExpandableSpeedDialFab(
+      heroTag: 'fab_admin_speed_dial',
+      items: [
+        SpeedDialItem(
+          label: 'Tambah Pengumuman',
+          icon: Icons.notification_add,
+          onTap: () async {
+            final result = await context.push('/announcements/add');
+            if (result == true) {
+              // Refresh or handle if needed
+            }
+          },
+        ),
+        SpeedDialItem(
+          label: 'Tambah Sinyal',
+          icon: Icons.show_chart_rounded,
+          onTap: () async {
+            final result = await context.push('/signals/add');
+            if (result == true) {
+              setState(() {
+                _selectedIndex = 1;
+              });
+            }
+          },
+        ),
+      ],
     );
   }
 }

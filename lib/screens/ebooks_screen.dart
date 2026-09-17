@@ -136,7 +136,7 @@ class _EbooksScreenState extends State<EbooksScreen> {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
-                        _buildCategoryChip('Semua', 'all'),
+                        _buildCategoryChip('SEMUA', 'all'),
                         ..._ebookResponse!.categories.map(
                           (cat) => _buildCategoryChip(cat.name, cat.slug),
                         ),
@@ -230,19 +230,17 @@ class _EbooksScreenState extends State<EbooksScreen> {
             children: [
               // Small PDF Icon Box
               Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.webRed.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.webRed.withValues(alpha: 0.3),
-                  ),
-                ),
+                // decoration: BoxDecoration(
+                //   color: AppColors.webRed.withValues(alpha: 0.12),
+                //   borderRadius: BorderRadius.circular(8),
+                //   border: Border.all(
+                //     color: AppColors.webRed.withValues(alpha: 0.3),
+                //   ),
+                // ),
                 child: const Icon(
-                  Icons.picture_as_pdf_rounded,
+                  Icons.book_outlined,
                   color: AppColors.webRed,
-                  size: 20,
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 14),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/constants/font.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
 import '../models/signal_model.dart';
@@ -184,7 +185,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
                         'Lihat Performa',
                         style: TextStyle(
                           color: Colors.white60,
-                          fontSize: 12,
+                          fontSize: AppFontSizes.xs,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -211,14 +212,14 @@ class _SignalsScreenState extends State<SignalsScreen> {
           value,
           style: TextStyle(
             color: color,
-            fontSize: 20,
+            fontSize: AppFontSizes.xl,
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textWhite70, fontSize: 12),
+          style: const TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.sm),
         ),
       ],
     );
