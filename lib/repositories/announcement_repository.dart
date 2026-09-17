@@ -78,4 +78,127 @@ class AnnouncementRepository {
       );
     }
   }
+
+  Future<AnnouncementModel> createAnnouncement({
+    required String title,
+    required String content,
+    required String category,
+    String? imagePath,
+    String? actionUrl,
+    String? actionLabel,
+    bool isPinned = false,
+    bool isActive = true,
+  }) async {
+    try {
+      final Map<String, dynamic> formMap = {
+        'title': title,
+        'content': content,
+        'category': category,
+        'is_pinned': isPinned ? 1 : 0,
+        'is_active': isActive ? 1 : 0,
+      };
+
+      if (actionUrl != null && actionUrl.trim().isNotEmpty) {
+        formMap['action_url'] = actionUrl.trim();
+      }
+      if (actionLabel != null && actionLabel.trim().isNotEmpty) {
+        formMap['action_label'] = actionLabel.trim();
+      }
+      if (imagePath != null && imagePath.isNotEmpty) {
+        formMap['image'] = await MultipartFile.fromFile(
+          imagePath,
+          filename: imagePath.split(RegExp(r'[/\\]')).last,
+        );
+      }
+
+      final formData = FormData.fromMap(formMap);
+      final response = await _apiService.dio.post(
+        '/announcements',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        _cache.invalidateByPrefix('announcements_');
+        return AnnouncementModel.fromJson(response.data['data']);
+      } else {
+        throw Exception('Gagal membuat pengumuman');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Terjadi kesalahan saat membuat pengumuman',
+      );
+    }
+  }
+
+  Future<AnnouncementModel> updateAnnouncement({
+    required int id,
+    required String title,
+    required String content,
+    required String category,
+    String? imagePath,
+    bool removeImage = false,
+    String? actionUrl,
+    String? actionLabel,
+    bool isPinned = false,
+    bool isActive = true,
+  }) async {
+    try {
+      final Map<String, dynamic> formMap = {
+        'title': title,
+        'content': content,
+        'category': category,
+        'is_pinned': isPinned ? 1 : 0,
+        'is_active': isActive ? 1 : 0,
+      };
+
+      if (removeImage) {
+        formMap['remove_image'] = 1;
+      }
+
+      if (actionUrl != null && actionUrl.trim().isNotEmpty) {
+        formMap['action_url'] = actionUrl.trim();
+      }
+      if (actionLabel != null && actionLabel.trim().isNotEmpty) {
+        formMap['action_label'] = actionLabel.trim();
+      }
+      if (imagePath != null && imagePath.isNotEmpty) {
+        formMap['image'] = await MultipartFile.fromFile(
+          imagePath,
+          filename: imagePath.split(RegExp(r'[/\\]')).last,
+        );
+      }
+
+      final formData = FormData.fromMap(formMap);
+      final response = await _apiService.dio.post(
+        '/announcements/$id',
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        _cache.invalidateByPrefix('announcements_');
+        return AnnouncementModel.fromJson(response.data['data']);
+      } else {
+        throw Exception('Gagal memperbarui pengumuman');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Terjadi kesalahan saat memperbarui pengumuman',
+      );
+    }
+  }
+
+  Future<void> deleteAnnouncement(int id) async {
+    try {
+      final response = await _apiService.dio.delete('/announcements/$id');
+      if (response.statusCode == 200) {
+        _cache.invalidateByPrefix('announcements_');
+      } else {
+        throw Exception('Gagal menghapus pengumuman');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data['message'] ?? 'Terjadi kesalahan saat menghapus pengumuman',
+      );
+    }
+  }
 }

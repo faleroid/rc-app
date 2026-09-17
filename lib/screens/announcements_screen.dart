@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_font_sizes.dart';
 import '../models/announcement_model.dart';
 import '../repositories/announcement_repository.dart';
+import '../repositories/profile_repository.dart';
 import '../services/announcement_tracker_service.dart';
 
 class AnnouncementsScreen extends StatefulWidget {
@@ -16,10 +18,12 @@ class AnnouncementsScreen extends StatefulWidget {
 
 class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   final AnnouncementRepository _repository = AnnouncementRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
   final TextEditingController _searchController = TextEditingController();
 
   List<AnnouncementModel> _announcements = [];
   bool _isLoading = true;
+  bool _isAdmin = false;
   String? _errorMessage;
   String _selectedCategory = 'all';
   String _searchQuery = '';
@@ -35,7 +39,21 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   @override
   void initState() {
     super.initState();
+    _checkRole();
     _fetchData();
+  }
+
+  Future<void> _checkRole() async {
+    try {
+      final profile = await _profileRepository.getProfile();
+      if (mounted) {
+        setState(() {
+          _isAdmin = profile.data?.role == 'admin';
+        });
+      }
+    } catch (_) {
+      // Ignore if failed or not logged in
+    }
   }
 
   @override
@@ -118,6 +136,85 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _editAnnouncement(AnnouncementModel item) async {
+    final result = await context.push('/announcements/add', extra: item);
+    if (result == true) {
+      _fetchData(forceRefresh: true);
+    }
+  }
+
+  Future<void> _deleteAnnouncement(AnnouncementModel item) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.cardBorder, width: 0.5),
+        ),
+        title: const Text(
+          'Hapus Pengumuman?',
+          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.md, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus pengumuman "${item.title}"? Tindakan ini tidak dapat dibatalkan.',
+          style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal', style: TextStyle(color: Colors.white60)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _repository.deleteAnnouncement(item.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
+                  Text('Pengumuman berhasil dihapus.'),
+                ],
+              ),
+              backgroundColor: AppColors.cardDark,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: const BorderSide(color: AppColors.cardBorder, width: 0.5),
+              ),
+            ),
+          );
+        }
+        _fetchData(forceRefresh: true);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString().replaceAll('Exception: ', '')),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -387,9 +484,12 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         final item = _announcements[index];
         return _AnnouncementCardItem(
           item: item,
+          isAdmin: _isAdmin,
           onOpenActionUrl: _openActionUrl,
           onShowImage: _showImageDialog,
           onCopy: _copyAnnouncement,
+          onEdit: _editAnnouncement,
+          onDelete: _deleteAnnouncement,
         );
       },
     );
@@ -430,15 +530,21 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
 
 class _AnnouncementCardItem extends StatefulWidget {
   final AnnouncementModel item;
+  final bool isAdmin;
   final Function(String?) onOpenActionUrl;
   final Function(String) onShowImage;
   final Function(AnnouncementModel) onCopy;
+  final Function(AnnouncementModel) onEdit;
+  final Function(AnnouncementModel) onDelete;
 
   const _AnnouncementCardItem({
     required this.item,
+    required this.isAdmin,
     required this.onOpenActionUrl,
     required this.onShowImage,
     required this.onCopy,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
@@ -625,7 +731,52 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      // Tombol Admin Menu (Edit & Hapus)
+                      if (widget.isAdmin)
+                        PopupMenuButton<String>(
+                          icon: const Icon(
+                            Icons.more_vert_rounded,
+                            color: Colors.white70,
+                            size: 18,
+                          ),
+                          color: AppColors.cardDark,
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: const BorderSide(color: AppColors.cardBorder, width: 0.5),
+                          ),
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              widget.onEdit(item);
+                            } else if (value == 'delete') {
+                              widget.onDelete(item);
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              height: 36,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_outlined, size: 16, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text('Edit', style: TextStyle(color: Colors.white, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              height: 36,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_outline_rounded, size: 16, color: Colors.redAccent),
+                                  SizedBox(width: 8),
+                                  Text('Hapus', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
 
                       // Tombol Dropdown
                       AnimatedRotation(
