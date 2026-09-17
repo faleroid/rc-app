@@ -12,19 +12,19 @@ class ApiService {
   /// Mode konfigurasi environment API:
   /// - set `true` untuk menggunakan server hosting produksi
   /// - set `false` untuk beralih kembali ke local development
-  static const bool isProduction = true;
+  static const bool isProduction = false;
   static const String productionBaseUrl = 'https://ricocapital.id/api';
 
   /// Deterministic Base URL depending on environment & platform
   static String get defaultBaseUrl {
-    if (isProduction) {
-      return productionBaseUrl;
-    }
+    // if (isProduction) {
+    //   return productionBaseUrl;
+    // }
 
     if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return 'http://127.0.0.1:8000/api';
     }
-    return 'http://192.168.1.28:8000/api';
+    return 'http://192.168.18.36:8000/api';
   }
 
   ApiService({String? baseUrl}) {

@@ -346,12 +346,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                child: const Icon(
-                  Icons.notifications_none_rounded,
-                  color: Colors.white38,
-                  size: 48,
-                ),
+              const Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white38,
+                size: 48,
               ),
               const SizedBox(height: 16),
               const Text(
@@ -381,59 +379,138 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: _announcements.length,
-      separatorBuilder: (context, i) => const SizedBox(height: 16),
+      separatorBuilder: (context, i) => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 18),
+        child: Divider(color: AppColors.cardBorder, height: 1, thickness: 0.5),
+      ),
       itemBuilder: (context, index) {
         final item = _announcements[index];
-        return _buildAnnouncementCard(item);
+        return _AnnouncementCardItem(
+          item: item,
+          onOpenActionUrl: _openActionUrl,
+          onShowImage: _showImageDialog,
+          onCopy: _copyAnnouncement,
+        );
       },
     );
   }
 
-  Widget _buildAnnouncementCard(AnnouncementModel item) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: item.isPinned
-              ? const Color(0xFFEAB308).withValues(alpha: 0.6)
-              : AppColors.cardBorder,
-          width: item.isPinned ? 1.5 : 1.0,
-        ),
-        boxShadow: item.isPinned
-            ? [
-                BoxShadow(
-                  color: const Color(0xFFEAB308).withValues(alpha: 0.12),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  void _showImageDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(12),
+        child: Stack(
+          alignment: Alignment.topRight,
           children: [
-            // Pinned Banner Bar
-            if (item.isPinned)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFEAB308).withValues(alpha: 0.25),
-                      const Color(0xFFCA8A04).withValues(alpha: 0.10),
-                    ],
-                  ),
+            InteractiveViewer(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(imageUrl, fit: BoxFit.contain),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: CircleAvatar(
+                backgroundColor: Colors.black54,
+                child: IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  onPressed: () => Navigator.pop(ctx),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            // Image Thumbnail (if available)
-            if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
-              GestureDetector(
-                onTap: () => _showImageDialog(item.imageUrl!),
+class _AnnouncementCardItem extends StatefulWidget {
+  final AnnouncementModel item;
+  final Function(String?) onOpenActionUrl;
+  final Function(String) onShowImage;
+  final Function(AnnouncementModel) onCopy;
+
+  const _AnnouncementCardItem({
+    required this.item,
+    required this.onOpenActionUrl,
+    required this.onShowImage,
+    required this.onCopy,
+  });
+
+  @override
+  State<_AnnouncementCardItem> createState() => _AnnouncementCardItemState();
+}
+
+class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+  late AnimationController _controller;
+  late Animation<double> _expandAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpand() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Pinned Banner Bar
+          if (item.isPinned)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFEAB308).withValues(alpha: 0.25),
+                    const Color(0xFFCA8A04).withValues(alpha: 0.10),
+                  ],
+                ),
+              ),
+            ),
+
+          // Image Thumbnail (if available) - Always visible by default
+          if (item.imageUrl != null && item.imageUrl!.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: GestureDetector(
+                onTap: () => widget.onShowImage(item.imageUrl!),
                 child: Stack(
                   children: [
                     Container(
@@ -475,239 +552,129 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                   ],
                 ),
               ),
+            ),
 
-            // Card Content Area
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Category Badge & Date Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 12),
+
+          // Card Content Area
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: Title, Timestamp, and Dropdown toggle button
+              InkWell(
+                onTap: _toggleExpand,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildCategoryBadge(item.category),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time_rounded,
-                            color: Colors.white38,
-                            size: 13,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            item.timeAgo ?? item.formattedDate ?? '',
-                            style: const TextStyle(
-                              color: Colors.white38,
-                              fontSize: 11,
+                      // Title & Timestamp
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: AppFontSizes.lg,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Title
-                  Text(
-                    item.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: AppFontSizes.lg,
-                      fontWeight: FontWeight.bold,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Content Body
-                  Text(
-                    item.content,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: AppFontSizes.sm,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Action Button (if URL provided)
-                  if (item.actionUrl != null && item.actionUrl!.isNotEmpty) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 16,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () => _openActionUrl(item.actionUrl),
-                        icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                        label: Text(
-                          item.actionLabel?.isNotEmpty == true
-                              ? item.actionLabel!
-                              : 'Buka Tautan / Detail',
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.sm,
-                            fontWeight: FontWeight.bold,
-                          ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Text(
+                                  item.timeAgo ?? item.formattedDate ?? '',
+                                  style: const TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
+                      const SizedBox(width: 10),
 
-                  const Divider(color: Colors.white12, height: 1),
-                  const SizedBox(height: 10),
-
-                  // Footer: Author & Share
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Author
-                      Row(
-                        children: [
-                          const CircleAvatar(
-                            radius: 11,
-                            backgroundColor: AppColors.primary,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 14,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            item.author?.name ?? 'RicoCapital',
-                            style: const TextStyle(
-                              color: Colors.white54,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Share / Copy Button
-                      IconButton(
-                        icon: const Icon(
-                          Icons.share_outlined,
-                          color: Colors.white70,
+                      // Tombol Dropdown
+                      AnimatedRotation(
+                        turns: _isExpanded ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: _isExpanded
+                              ? AppColors.primaryLight
+                              : Colors.white70,
                           size: 18,
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        tooltip: 'Salin Pengumuman',
-                        onPressed: () => _copyAnnouncement(item),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryBadge(String category) {
-    Color bg;
-    Color border;
-    Color text;
-    String label;
-    IconData icon;
-
-    switch (category.toLowerCase()) {
-      case 'event':
-        bg = const Color(0xFF451A03);
-        border = const Color(0xFFB45309);
-        text = const Color(0xFFFCD34D);
-        label = 'Event';
-        icon = Icons.calendar_today_rounded;
-        break;
-      case 'urgent':
-        bg = const Color(0xFF4C0519);
-        border = const Color(0xFFBE123C);
-        text = const Color(0xFFFDA4AF);
-        label = 'Penting';
-        icon = Icons.warning_amber_rounded;
-        break;
-      case 'info':
-        bg = const Color(0xFF083344);
-        border = const Color(0xFF0E7490);
-        text = const Color(0xFF67E8F9);
-        label = 'Info';
-        icon = Icons.info_outline_rounded;
-        break;
-      case 'general':
-      default:
-        bg = const Color(0xFF3B0764);
-        border = const Color(0xFF7E22CE);
-        text = const Color(0xFFD8B4FE);
-        label = 'Umum';
-        icon = Icons.notifications_outlined;
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: border, width: 0.8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: text, size: 11),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: text,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showImageDialog(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(12),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            InteractiveViewer(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(imageUrl, fit: BoxFit.contain),
-              ),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: CircleAvatar(
-                backgroundColor: Colors.black54,
-                child: IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white),
-                  onPressed: () => Navigator.pop(ctx),
                 ),
               ),
-            ),
-          ],
-        ),
+
+              // Expandable Content (Muncul dari atas ke bawah)
+              SizeTransition(
+                sizeFactor: _expandAnimation,
+                axisAlignment: -1.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+
+                    // Content Body
+                    Text(
+                      item.content,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: AppFontSizes.sm,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    // Action Button (if URL provided)
+                    if (item.actionUrl != null &&
+                        item.actionUrl!.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () =>
+                              widget.onOpenActionUrl(item.actionUrl),
+                          icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                          label: Text(
+                            item.actionLabel?.isNotEmpty == true
+                                ? item.actionLabel!
+                                : 'Buka Tautan / Detail',
+                            style: const TextStyle(
+                              fontSize: AppFontSizes.sm,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

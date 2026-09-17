@@ -198,8 +198,8 @@ class _PackagePageState extends State<PackagePage> {
 
   Future<void> _handlePayment(MembershipPackageModel package) async {
     if (!_isLoggedIn) {
-      // Direct guest users to Login Screen
-      context.push('/login');
+      // Guest users select the same package through the registration screen.
+      context.push('/register', extra: package.id);
     } else {
       // Member logged in: check active package
       if (_currentMembership?.package['id'] == package.id) {
@@ -332,7 +332,7 @@ class _PackagePageState extends State<PackagePage> {
         child: Column(
           children: [
             const Text(
-              "Pilih Paket Yang Tepat Untuk Anda",
+              "Pilih Paket Yang Tepat Untuk Kamu",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.textWhite,
@@ -410,90 +410,8 @@ class _PackagePageState extends State<PackagePage> {
                   ),
                 );
               }),
-
-            if (!_isLoggedIn) ...[
-              const SizedBox(height: AppSpacing.xl2),
-              const Divider(color: AppColors.divider),
-              const SizedBox(height: AppSpacing.xl2),
-              _buildRegistrationForm(),
-            ],
-            
-            const SizedBox(height: AppSpacing.xl3),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildRegistrationForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            "Belum Punya Akun? Daftar Sekarang",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: AppFontSizes.xl,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          const Text(
-            "Lengkapi data diri Anda untuk membuat akun dan melanjutkan pembayaran.",
-            style: TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.sm),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.xl2),
-          
-          _buildTextField(
-            controller: _nameController,
-            label: "Full Name",
-            icon: Icons.person_outline,
-            validator: (v) => v!.isEmpty ? "Nama lengkap wajib diisi" : null,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildTextField(
-            controller: _emailController,
-            label: "Email Address",
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            validator: (v) => v!.isEmpty || !v.contains('@') ? "Email tidak valid" : null,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildTextField(
-            controller: _phoneController,
-            label: "Phone Number",
-            icon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-            validator: (v) => v!.isEmpty ? "Nomor telepon wajib diisi" : null,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildTextField(
-            controller: _domicileController,
-            label: "Domicile (City/Region)",
-            icon: Icons.location_on_outlined,
-            validator: (v) => v!.isEmpty ? "Domisili wajib diisi" : null,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildTextField(
-            controller: _passwordController,
-            label: "Password",
-            icon: Icons.lock_outline,
-            obscureText: true,
-            validator: (v) => v!.length < 8 ? "Minimal 8 karakter" : null,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildTextField(
-            controller: _confirmPasswordController,
-            label: "Confirm Password",
-            icon: Icons.lock_reset_outlined,
-            obscureText: true,
-            validator: (v) => v != _passwordController.text ? "Password tidak cocok" : null,
-          ),
-        ],
       ),
     );
   }

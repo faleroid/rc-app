@@ -114,7 +114,7 @@ class _NewsScreenState extends State<NewsScreen> {
                   child: Row(
                     children: [
                       Text(
-                        'Trending Hari ini',
+                        'Paling Update',
                         style: TextStyle(
                           fontSize: AppFontSizes.xl,
                           fontWeight: FontWeight.w600,
@@ -148,7 +148,7 @@ class _NewsScreenState extends State<NewsScreen> {
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
                   child: Text(
-                    'Berita Terkini',
+                    'Berita Lainnya',
                     style: TextStyle(
                       fontSize: AppFontSizes.xl,
                       fontWeight: FontWeight.w600,
@@ -199,10 +199,10 @@ class _NewsScreenState extends State<NewsScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(5),
           onTap: () => _openArticleLink(item.link),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -215,10 +215,10 @@ class _NewsScreenState extends State<NewsScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: const Text(
-                    'BREAKING NEWS',
+                    'Terbaru',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -231,8 +231,8 @@ class _NewsScreenState extends State<NewsScreen> {
                 Text(
                   item.title,
                   style: const TextStyle(
-                    fontSize: AppFontSizes.lg,
-                    fontWeight: FontWeight.bold,
+                    fontSize: AppFontSizes.md,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                     height: 1.3,
                   ),
@@ -244,7 +244,7 @@ class _NewsScreenState extends State<NewsScreen> {
                   item.description,
                   style: const TextStyle(
                     color: Colors.white70,
-                    fontSize: AppFontSizes.xs,
+                    fontSize: AppFontSizes.sm,
                     height: 1.4,
                   ),
                   maxLines: 2,
