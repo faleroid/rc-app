@@ -411,7 +411,6 @@ class AcademyPage extends StatelessWidget {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),

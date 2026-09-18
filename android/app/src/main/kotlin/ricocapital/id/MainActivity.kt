@@ -1,4 +1,4 @@
-package com.ricocapital.dev
+package ricocapital.id
 
 import io.flutter.embedding.android.FlutterActivity
 
