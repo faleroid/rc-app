@@ -193,8 +193,8 @@ class _AddSignalScreenState extends State<AddSignalScreen> {
                 controller: _pairController,
                 style: const TextStyle(
                   color: Colors.white,
+                  fontSize: AppFontSizes.sm,
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
                 ),
                 textCapitalization: TextCapitalization.characters,
                 decoration: _inputDecoration(
@@ -509,8 +509,8 @@ class _AddSignalScreenState extends State<AddSignalScreen> {
       child: Text(
         text,
         style: const TextStyle(
-          color: AppColors.textWhite70,
-          fontSize: 13,
+          color: Colors.white,
+          fontSize: AppFontSizes.sm,
           fontWeight: FontWeight.w500,
         ),
       ),

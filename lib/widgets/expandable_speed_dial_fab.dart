@@ -96,7 +96,7 @@ class _ExpandableSpeedDialFabState extends State<ExpandableSpeedDialFab>
     final mainBgColor = widget.backgroundColor ?? AppColors.primary;
     final mainFgColor = widget.foregroundColor ?? Colors.white;
     final defaultSubBgColor =
-        widget.subItemBackgroundColor ?? const Color.fromARGB(255, 133, 25, 25);
+        widget.subItemBackgroundColor ?? const Color.fromARGB(255, 154, 31, 31);
     final defaultSubFgColor = widget.subItemForegroundColor ?? Colors.white;
 
     return Column(

@@ -79,8 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   try {
                     context.go(
                       '/unauthenticated',
-                      extra:
-                          'Sesi profil Anda telah berakhir. Silakan login kembali.',
+                      extra: 'Sesi kamu telah berakhir. Silakan login kembali.',
                     );
                   } catch (_) {}
                 });
@@ -198,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Text(
                               'Keluar Akun',
                               style: TextStyle(
-                                fontSize: AppFontSizes.xs,
+                                fontSize: AppFontSizes.sm,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -345,7 +344,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildPremiumCard(UserModel user) {
     String expiredText = 'Kamu belum berlangganan paket apapun.';
+    String title = 'Non-Member';
     if (user.membershipExpiresAt != null) {
+      title = 'Member VIP';
       expiredText =
           'Paket berlangganan kamu aktif hingga ${DateFormat('dd MMMM yyyy').format(user.membershipExpiresAt!)}';
     }
@@ -364,8 +365,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Member VIP',
+          Text(
+            title,
             style: TextStyle(
               color: Colors.white,
               fontSize: AppFontSizes.xxl,

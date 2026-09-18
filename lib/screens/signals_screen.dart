@@ -105,11 +105,20 @@ class _SignalsScreenState extends State<SignalsScreen> {
                   horizontal: 16,
                   vertical: 12,
                 ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
+                sliver: SliverList.separated(
+                  itemCount: _signalResponse!.signals.length,
+                  itemBuilder: (context, index) {
                     final signal = _signalResponse!.signals[index];
                     return _buildSignalCard(signal);
-                  }, childCount: _signalResponse!.signals.length),
+                  },
+                  separatorBuilder: (context, index) => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(
+                      color: AppColors.divider,
+                      height: 1,
+                      thickness: 0.5,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -219,7 +228,10 @@ class _SignalsScreenState extends State<SignalsScreen> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textWhite70, fontSize: AppFontSizes.sm),
+          style: const TextStyle(
+            color: AppColors.textWhite70,
+            fontSize: AppFontSizes.sm,
+          ),
         ),
       ],
     );
@@ -313,14 +325,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
     }
 
     final cardContent = Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardDark,
-        gradient: cardGradient,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -334,8 +338,8 @@ class _SignalsScreenState extends State<SignalsScreen> {
                     signal.pair,
                     style: const TextStyle(
                       color: AppColors.textWhite,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -388,8 +392,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(color: AppColors.cardBorder, height: 1),
-          const SizedBox(height: 12),
 
           // Targets Section
           Row(
@@ -404,7 +406,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
                       'Target Entry',
                       style: TextStyle(
                         color: AppColors.textWhite70,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -431,7 +433,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
                       'Stop Loss',
                       style: TextStyle(
                         color: AppColors.textWhite70,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -453,35 +455,42 @@ class _SignalsScreenState extends State<SignalsScreen> {
           // Take Profit Targets
           const Text(
             'Take Profit',
-            style: TextStyle(color: AppColors.textWhite70, fontSize: 12),
+            style: TextStyle(color: AppColors.textWhite70, fontSize: 11),
           ),
           const SizedBox(height: 6),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: signal.tpTargets.asMap().entries.map((entry) {
-              final idx = entry.key + 1;
-              final val = entry.value;
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: Colors.green.withValues(alpha: 0.3),
+          if (signal.tpTargets.isEmpty)
+            const Text(
+              '-',
+              style: TextStyle(
+                color: Colors.greenAccent,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          else
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                for (int i = 0; i < signal.tpTargets.length; i++) ...[
+                  Text(
+                    signal.tpTargets[i],
+                    style: const TextStyle(
+                      color: Colors.greenAccent,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                child: Text(
-                  'TP$idx: $val',
-                  style: const TextStyle(
-                    color: Colors.greenAccent,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+                  if (i < signal.tpTargets.length - 1)
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textWhite54,
+                      size: 16,
+                    ),
+                ],
+              ],
+            ),
 
           const SizedBox(height: 10),
           Row(
@@ -528,7 +537,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
         return false;
       },
       background: Container(
-        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
@@ -559,7 +567,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
         ),
       ),
       secondaryBackground: Container(
-        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [

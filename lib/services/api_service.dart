@@ -21,10 +21,10 @@ class ApiService {
     //   return productionBaseUrl;
     // }
 
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-      return 'http://127.0.0.1:8000/api';
-    }
-    return 'http://192.168.18.36:8000/api';
+    // if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    //   return 'http://127.0.0.1:8000/api';
+    // }
+    return 'http://192.168.100.118:8000/api';
   }
 
   ApiService({String? baseUrl}) {
