@@ -145,7 +145,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     }
   }
 
-  Future<void> _deleteAnnouncement(AnnouncementModel item) async {
+  Future<bool> _deleteAnnouncement(AnnouncementModel item) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -156,11 +156,18 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
         ),
         title: const Text(
           'Hapus Pengumuman?',
-          style: TextStyle(color: Colors.white, fontSize: AppFontSizes.md, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: AppFontSizes.lg,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
-          'Apakah Anda yakin ingin menghapus pengumuman "${item.title}"? Tindakan ini tidak dapat dibatalkan.',
-          style: const TextStyle(color: Colors.white70, fontSize: AppFontSizes.sm),
+          'Apakah Anda yakin ingin menghapus pengumuman ini? Tindakan ini tidak dapat dibatalkan.',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: AppFontSizes.md,
+          ),
         ),
         actions: [
           TextButton(
@@ -171,10 +178,16 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Hapus'),
+            child: const Text('Hapus',
+            style: TextStyle(
+              fontSize: AppFontSizes.md,
+              fontWeight: FontWeight.bold,
+            )),
           ),
         ],
       ),
@@ -188,7 +201,11 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             SnackBar(
               content: const Row(
                 children: [
-                  Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
                   SizedBox(width: 8),
                   Text('Pengumuman berhasil dihapus.'),
                 ],
@@ -203,6 +220,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
           );
         }
         _fetchData(forceRefresh: true);
+        return true;
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -213,8 +231,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
             ),
           );
         }
+        return false;
       }
     }
+    return false;
   }
 
   @override
@@ -535,7 +555,7 @@ class _AnnouncementCardItem extends StatefulWidget {
   final Function(String) onShowImage;
   final Function(AnnouncementModel) onCopy;
   final Function(AnnouncementModel) onEdit;
-  final Function(AnnouncementModel) onDelete;
+  final Future<bool> Function(AnnouncementModel) onDelete;
 
   const _AnnouncementCardItem({
     required this.item,
@@ -587,11 +607,12 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
-
-    return ClipRRect(
+    final cardContent = ClipRRect(
       borderRadius: BorderRadius.circular(3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -731,52 +752,6 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
                           ],
                         ),
                       ),
-                      // Tombol Admin Menu (Edit & Hapus)
-                      if (widget.isAdmin)
-                        PopupMenuButton<String>(
-                          icon: const Icon(
-                            Icons.more_vert_rounded,
-                            color: Colors.white70,
-                            size: 18,
-                          ),
-                          color: AppColors.cardDark,
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: AppColors.cardBorder, width: 0.5),
-                          ),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              widget.onEdit(item);
-                            } else if (value == 'delete') {
-                              widget.onDelete(item);
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              height: 36,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit_outlined, size: 16, color: Colors.white),
-                                  SizedBox(width: 8),
-                                  Text('Edit', style: TextStyle(color: Colors.white, fontSize: 13)),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              height: 36,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete_outline_rounded, size: 16, color: Colors.redAccent),
-                                  SizedBox(width: 8),
-                                  Text('Hapus', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
 
                       // Tombol Dropdown
                       AnimatedRotation(
@@ -854,6 +829,89 @@ class _AnnouncementCardItemState extends State<_AnnouncementCardItem>
           ),
         ],
       ),
+    );
+
+    if (!widget.isAdmin) {
+      return cardContent;
+    }
+
+    // Dismissible for Admin role (Swipe Right: Edit Announcement, Swipe Left: Delete)
+    return Dismissible(
+      key: ValueKey('announcement_${widget.item.id}'),
+      direction: DismissDirection.horizontal,
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          // Swipe Right -> Edit Announcement
+          widget.onEdit(widget.item);
+          return false;
+        } else if (direction == DismissDirection.endToStart) {
+          // Swipe Left -> Confirm Delete
+          return await widget.onDelete(widget.item);
+        }
+        return false;
+      },
+      background: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF1D4ED8),
+              Color(0xFF3B82F6),
+              Color(0xFF60A5FA),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          children: [
+            Icon(Icons.edit_note_rounded, color: Colors.white, size: 28),
+            SizedBox(width: 8),
+            Text(
+              'Edit Pengumuman',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFF87171),
+              Color(0xFFEF4444),
+              Color(0xFFB91C1C),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              'Hapus Pengumuman',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(Icons.delete_forever_rounded, color: Colors.white, size: 28),
+          ],
+        ),
+      ),
+      child: cardContent,
     );
   }
 }

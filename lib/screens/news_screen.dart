@@ -131,7 +131,7 @@ class _NewsScreenState extends State<NewsScreen> {
               // 2. PageView Banner Utama (Breaking News Carousel)
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 175,
+                  height: 135,
                   child: PageView.builder(
                     controller: _pageController,
                     itemCount: breakingNewsList.length,
@@ -207,27 +207,6 @@ class _NewsScreenState extends State<NewsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Badge Breaking News
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Text(
-                    'Terbaru',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Text(
                   item.title,
                   style: const TextStyle(

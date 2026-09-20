@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:dio/dio.dart';
 import 'token_service.dart';
@@ -9,13 +7,9 @@ class ApiService {
   final TokenService _tokenService = TokenService();
   late final Dio _dio;
 
-  /// Mode konfigurasi environment API:
-  /// - set `true` untuk menggunakan server hosting produksi
-  /// - set `false` untuk beralih kembali ke local development
   static const bool isProduction = false;
   static const String productionBaseUrl = 'https://ricocapital.id/api';
 
-  /// Deterministic Base URL depending on environment & platform
   static String get defaultBaseUrl {
     // if (isProduction) {
     //   return productionBaseUrl;
@@ -24,7 +18,7 @@ class ApiService {
     // if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     //   return 'http://127.0.0.1:8000/api';
     // }
-    return 'http://192.168.100.118:8000/api';
+    return 'http://192.168.1.18:8000/api';
   }
 
   ApiService({String? baseUrl}) {

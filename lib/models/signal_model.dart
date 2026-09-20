@@ -36,11 +36,13 @@ class SignalModel {
       type: json['type'] ?? 'Spot',
       side: json['side'] ?? 'LONG',
       leverage: json['leverage']?.toString(),
-      entryTargets: (json['entry_targets'] as List<dynamic>?)
+      entryTargets:
+          (json['entry_targets'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      tpTargets: (json['tp_targets'] as List<dynamic>?)
+      tpTargets:
+          (json['tp_targets'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -59,11 +61,7 @@ class SignalStats {
   final int total;
   final int hitTp;
 
-  SignalStats({
-    required this.active,
-    required this.total,
-    required this.hitTp,
-  });
+  SignalStats({required this.active, required this.total, required this.hitTp});
 
   factory SignalStats.fromJson(Map<String, dynamic> json) {
     return SignalStats(

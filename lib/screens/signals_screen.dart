@@ -194,7 +194,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
                         'Lihat Performa',
                         style: TextStyle(
                           color: Colors.white60,
-                          fontSize: AppFontSizes.xs,
+                          fontSize: AppFontSizes.sm,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -296,7 +296,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
     if (statusLower.startsWith('hit_tp')) {
       cardGradient = RadialGradient(
         center: Alignment.topRight,
-        radius: 1.2,
+        radius: 0.8,
         colors: [
           Colors.greenAccent.withValues(alpha: 0.16),
           Colors.greenAccent.withValues(alpha: 0.04),
@@ -307,7 +307,7 @@ class _SignalsScreenState extends State<SignalsScreen> {
     } else if (statusLower == 'hit_sl') {
       cardGradient = RadialGradient(
         center: Alignment.topRight,
-        radius: 1.2,
+        radius: 0.8,
         colors: [
           Colors.redAccent.withValues(alpha: 0.16),
           Colors.redAccent.withValues(alpha: 0.04),
@@ -316,15 +316,17 @@ class _SignalsScreenState extends State<SignalsScreen> {
         stops: const [0.0, 0.5, 1.0],
       );
     } else {
-      cardGradient = RadialGradient(
-        center: Alignment.topRight,
-        radius: 1.2,
-        colors: [Colors.transparent, Colors.transparent, Colors.transparent],
-        stops: const [0.0, 0.5, 1.0],
-      );
+      cardGradient = null;
     }
 
     final cardContent = Container(
+      decoration: cardGradient != null
+          ? BoxDecoration(
+              gradient: cardGradient,
+              borderRadius: BorderRadius.circular(12),
+            )
+          : null,
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -388,7 +390,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
                   ],
                 ],
               ),
-              _buildStatusBadge(signal.status),
             ],
           ),
           const SizedBox(height: 12),
@@ -437,14 +438,53 @@ class _SignalsScreenState extends State<SignalsScreen> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      signal.stopLoss ?? '-',
-                      style: const TextStyle(
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                    if (statusLower == 'hit_sl')
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 2.5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFFEF4444,
+                          ).withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFEF4444,
+                            ).withValues(alpha: 0.5),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.cancel_rounded,
+                              color: Color(0xFFF87171),
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              signal.stopLoss ?? '-',
+                              style: const TextStyle(
+                                color: Color(0xFFF87171),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Text(
+                        signal.stopLoss ?? '-',
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -474,13 +514,65 @@ class _SignalsScreenState extends State<SignalsScreen> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 for (int i = 0; i < signal.tpTargets.length; i++) ...[
-                  Text(
-                    signal.tpTargets[i],
-                    style: const TextStyle(
-                      color: Colors.greenAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final tpNumber = i + 1;
+                      final isHit = _isTargetHit(
+                        statusLower,
+                        tpNumber,
+                        signal.tpTargets.length,
+                      );
+
+                      return Container(
+                        padding: isHit
+                            ? const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2.5,
+                              )
+                            : EdgeInsets.zero,
+                        decoration: isHit
+                            ? BoxDecoration(
+                                color: const Color(
+                                  0xFF10B981,
+                                ).withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFF10B981,
+                                  ).withValues(alpha: 0.5),
+                                  width: 0.8,
+                                ),
+                              )
+                            : null,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isHit) ...[
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                color: Color(0xFF34D399),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                            Text(
+                              signal.tpTargets[i],
+                              style: TextStyle(
+                                color: isHit
+                                    ? const Color(0xFF34D399)
+                                    : (statusLower == 'hit_sl'
+                                          ? Colors.white38
+                                          : Colors.greenAccent),
+                                fontSize: 13.5,
+                                fontWeight: isHit
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   if (i < signal.tpTargets.length - 1)
                     const Icon(
@@ -504,11 +596,14 @@ class _SignalsScreenState extends State<SignalsScreen> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              Text(
-                signal.timeAgo ?? signal.formattedDate ?? '',
-                style: const TextStyle(
-                  color: AppColors.textWhite54,
-                  fontSize: 10,
+              Padding(
+                padding: const EdgeInsets.only(right: 4.0),
+                child: Text(
+                  signal.timeAgo ?? signal.formattedDate ?? '',
+                  style: const TextStyle(
+                    color: AppColors.textWhite54,
+                    fontSize: 10,
+                  ),
                 ),
               ),
             ],
@@ -819,59 +914,6 @@ class _SignalsScreenState extends State<SignalsScreen> {
     return false;
   }
 
-  Widget _buildStatusBadge(String status) {
-    Color color;
-    String label;
-
-    switch (status.toLowerCase()) {
-      case 'active':
-        color = Colors.blueAccent;
-        label = 'AKTIF';
-        break;
-      case 'hit_tp1':
-      case 'hit_tp2':
-      case 'hit_tp3':
-      case 'hit_tp4':
-      case 'hit_tp5':
-      case 'hit_tp_swing':
-        color = Colors.greenAccent;
-        label = status.toUpperCase().replaceAll('_', ' ');
-        break;
-      case 'hit_sl':
-        color = Colors.redAccent;
-        label = 'HIT SL';
-        break;
-      case 'closed':
-        color = Colors.grey;
-        label = 'SELESAI';
-        break;
-      case 'cancelled':
-        color = Colors.orangeAccent;
-        label = 'BATAL';
-        break;
-      default:
-        color = Colors.grey;
-        label = status.toUpperCase();
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 8,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
   Widget _buildErrorWidget() {
     return Center(
       child: Padding(
@@ -918,5 +960,21 @@ class _SignalsScreenState extends State<SignalsScreen> {
         ),
       ),
     );
+  }
+
+  bool _isTargetHit(String status, int targetNumber, int totalTargets) {
+    if (!status.startsWith('hit_tp')) return false;
+
+    if (status == 'hit_tp_swing') {
+      return targetNumber == totalTargets;
+    }
+
+    final match = RegExp(r'hit_tp(\d+)').firstMatch(status);
+    if (match != null) {
+      final hitNumber = int.tryParse(match.group(1)!) ?? 0;
+      return targetNumber <= hitNumber;
+    }
+
+    return false;
   }
 }

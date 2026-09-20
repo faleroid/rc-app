@@ -16,8 +16,8 @@ class ChatRepository {
         '/chat',
         data: {
           'question': question,
-          if (courseId != null) 'course_id': courseId,
-          if (moduleId != null) 'module_id': moduleId,
+          'course_id': ?courseId,
+          'module_id': ?moduleId,
         },
       );
 
